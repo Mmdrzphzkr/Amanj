@@ -1,0 +1,89 @@
+# ================================================================= #
+# General & OS Files
+# ================================================================= #
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Linux
+*~
+
+# ================================================================= #
+# IDE & Editor Directories
+# ================================================================= #
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+
+# ================================================================= #
+# Node.js Dependencies & Logs
+# ================================================================= #
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Other
+.npm
+package-lock.json
+yarn.lock
+# (Note: Many teams commit lock files, but you can ignore if you prefer)
+
+# ================================================================= #
+# Strapi Specific
+# ================================================================= #
+# Build folder
+build/
+
+# Environment variables - DO NOT COMMIT SECRET KEYS!
+.env
+.env.development
+.env.production
+
+# Temporary files & local database (if using SQLite)
+.tmp/
+data.db
+data.db-journal
+
+# User-uploaded content. For production, use a provider like S3 or Cloudinary.
+# It's not recommended to commit user uploads to your git repository.
+public/uploads/
+
+# ================================================================= #
+# Next.js Specific
+# ================================================================= #
+# Build folder
+.next/
+out/
+
+# Environment variables - DO NOT COMMIT SECRET KEYS!
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Vercel deployment folder
+.vercel/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Coverage reports
+coverage/
