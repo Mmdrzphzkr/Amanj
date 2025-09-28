@@ -14,16 +14,18 @@ import {
   MenuItem,
 } from "@mui/material";
 
-const slugify = (text) =>
-  text
+// 1. REMOVED the 'slugify' library import
+// 2. ADDED our new custom function for Farsi slugs
+const persianSlugify = (text) => {
+  if (!text) return "";
+  return text
     .toString()
-    .toLowerCase()
     .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-");
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\u0600-\u06FF0-9-]/g, "") // Remove all non-Farsi, non-numeric, non-dash characters
+    .replace(/--+/g, "-"); // Replace multiple - with single -
+};
 
-// The component now accepts initialData
 export default function CategoryForm({ allCategories, initialData }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -33,14 +35,12 @@ export default function CategoryForm({ allCategories, initialData }) {
   const router = useRouter();
   const isEditMode = Boolean(initialData);
 
-  // Use useEffect to pre-fill the form when in edit mode
   useEffect(() => {
     if (isEditMode) {
       setFormData({
-        name: initialData.attributes.name || "",
-        slug: initialData.attributes.slug || "",
-        // The parent is a relation, so its ID is nested in the data object
-        parent: initialData.attributes.parent?.data?.id || "",
+        name: initialData.name || "",
+        slug: initialData.slug || "",
+        parent: initialData.parent?.data?.id || "",
       });
     }
   }, [initialData, isEditMode]);
@@ -50,33 +50,31 @@ export default function CategoryForm({ allCategories, initialData }) {
     setFormData((prev) => {
       const newState = { ...prev, [name]: value };
       if (name === "name") {
-        newState.slug = slugify(value);
+        // 3. USE our new custom function
+        newState.slug = persianSlugify(value);
       }
       return newState;
     });
   };
 
+  // ... the rest of your component (handleSubmit, JSX) remains exactly the same ...
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const payload = {
       name: formData.name,
       slug: formData.slug,
       parent: formData.parent || null,
     };
-
-    // Switch URL and Method based on edit mode
     const url = isEditMode
       ? `/api/product-categories/${initialData.id}`
       : "/api/product-categories";
     const method = isEditMode ? "PUT" : "POST";
-
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
+    console.log("Response:", res);
     if (res.ok) {
       alert(`دسته بندی با موفقیت ${isEditMode ? "به‌روزرسانی" : "ایجاد"} شد`);
       router.refresh();
@@ -105,7 +103,7 @@ export default function CategoryForm({ allCategories, initialData }) {
           name="slug"
           label="اسلاگ (آدرس)"
           value={formData.slug}
-          InputProps={{ readOnly: true }}
+          InputProps={{ readOnly: true, style: { direction: "rtl" } }} // Ensure slug is LTR
           helperText="این فیلد به صورت خودکار ساخته می‌شود."
         />
         <FormControl fullWidth margin="normal">
@@ -124,7 +122,6 @@ export default function CategoryForm({ allCategories, initialData }) {
             </MenuItem>
             {allCategories?.map(
               (cat) =>
-                // Prevent a category from being its own parent
                 initialData?.id !== cat.id && (
                   <MenuItem key={cat.id} value={cat.id}>
                     {cat.name}

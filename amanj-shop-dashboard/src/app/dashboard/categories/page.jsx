@@ -46,12 +46,12 @@ export default async function CategoriesPage() {
           </TableHead>
           <TableBody>
             {categories?.map((category) => (
-              <TableRow key={category.id}>
+              <TableRow key={category.documentId}>
                 <TableCell>{category.name}</TableCell>
                 <TableCell align="right">
                   <Button
                     component={Link}
-                    href={`/dashboard/categories/${category.id}`}
+                    href={`/dashboard/categories/${category.documentId}`}
                   >
                     ویرایش
                   </Button>

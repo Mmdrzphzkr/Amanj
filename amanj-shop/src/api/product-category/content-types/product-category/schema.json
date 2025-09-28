@@ -7,18 +7,20 @@
     "displayName": "ProductCategory"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
     "name": {
       "type": "string",
-      "required": true
+      "required": true,
+      "unique": true
     },
     "slug": {
       "type": "uid",
       "targetField": "name",
-      "required": true
+      "required": true,
+      "regex": "^[a-zA-Z0-9-_.~\\u0600-\\u06FF]*$"
     },
     "parent": {
       "type": "relation",

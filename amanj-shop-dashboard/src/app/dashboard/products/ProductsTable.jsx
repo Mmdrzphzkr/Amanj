@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 
 export default function ProductsTable({ products }) {
-  console.log("ProductsTable products:", products );
+  console.log("ProductsTable products:", products);
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }}>
@@ -28,27 +28,30 @@ export default function ProductsTable({ products }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell component="th" scope="row">
-                {product.name}
-              </TableCell>
-              <TableCell align="right">${product.price}</TableCell>
-              <TableCell align="right">{product.stock}</TableCell>
-              <TableCell align="right">
-                {product.category?.data?.attributes?.name || "N/A"}
-              </TableCell>
-              <TableCell align="right">
-                <Button
-                  component={Link}
-                  href={`/dashboard/products/${product.id}`}
-                >
-                  ویرایش
-                </Button>
-                {/* Delete functionality will require another API call */}
-              </TableCell>
-            </TableRow>
-          ))}
+          {products.map((product) => {
+            console.log("Product documentId:", product.documentId);
+            return (
+              <TableRow key={product.documentId}>
+                <TableCell component="th" scope="row">
+                  {product.name}
+                </TableCell>
+                <TableCell align="right">${product.price}</TableCell>
+                <TableCell align="right">{product.stock}</TableCell>
+                <TableCell align="right">
+                  {product.category?.data?.name || "N/A"}
+                </TableCell>
+                <TableCell align="right">
+                  <Button
+                    component={Link}
+                    href={`/dashboard/products/${product.documentId}`}
+                  >
+                    ویرایش
+                  </Button>
+                  {/* Delete functionality will require another API call */}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>

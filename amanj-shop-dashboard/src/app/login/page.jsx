@@ -32,10 +32,8 @@ export default function LoginPage() {
       );
 
       const strapiData = await strapiRes.json();
-      console.log("Strapi Response:", strapiData);
 
       if (strapiData.jwt) {
-        console.log("JWT received from Strapi. Attempting to set cookie...");
         await auth.login(strapiData.jwt, strapiData.user);
       } else {
         alert(`Error: ${strapiData.error.message}`);

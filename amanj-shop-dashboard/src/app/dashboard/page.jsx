@@ -6,7 +6,6 @@ import { Button, Typography, Container, CircularProgress } from "@mui/material";
 
 export default function DashboardPage() {
   const { user, logout, loading } = useAuth();
-  console.log("DashboardPage user:", user);
   if (loading) {
     return (
       <Container sx={{ display: "flex", justifyContent: "center", mt: 8 }}>

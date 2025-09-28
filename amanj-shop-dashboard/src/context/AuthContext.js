@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkUser = async () => {
       const res = await fetch("/api/me");
-      console.log("Check user response:", res);
       if (res.ok) {
         const { user } = await res.json();
         if (user) {
@@ -34,7 +33,6 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (res.ok) {
-      console.log("strapi user: ", strapiUser);
       setUser(strapiUser);
       // Use a hard reload to prevent race conditions
       window.location.href = "/dashboard";

@@ -1,13 +1,41 @@
 // src/app/dashboard/products/[id]/page.jsx
 import { getStrapiData } from "@/lib/strapi";
-import { Typography, Box, ProductForm } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import ProductForm from "../ProductForm";
-export default async function EditProductPage() {
-  const { id } = params;
-  const { data: product } = await getStrapiData(`/api/products/${id}`);
+export default async function EditProductPage(params) {
+  const { id } = params.params;
+
+  console.log("params:", id);
+
+  const { data: product } = await getStrapiData(`/api/products/${id}?populate=*`);
 
   if (!product) {
     return <Typography> محصول مورد نظر یافت نشد !! </Typography>;
+  }
+
+  // 1. Fetch categories on the server before rendering
+  const { data: categories } = await getStrapiData("/api/product-categories");
+
+  // 2. Enforce the business rule: A product cannot be created without a category
+  if (!categories || categories.length === 0) {
+    return (
+      <Box>
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          خطا: دسته‌بندی وجود ندارد
+        </Typography>
+        <Typography sx={{ mb: 4 }}>
+          شما نمی‌توانید محصولی را بدون اختصاص دادن به یک دسته‌بندی ایجاد کنید.
+          لطفاً ابتدا یک دسته‌بندی بسازید.
+        </Typography>
+        <Button
+          variant="contained"
+          component={Link}
+          href="/dashboard/categories/new"
+        >
+          ایجاد دسته‌بندی جدید
+        </Button>
+      </Box>
+    );
   }
 
   return (
@@ -15,7 +43,7 @@ export default async function EditProductPage() {
       <Typography variant="h4" sx={{ mb: 4 }}>
         ویرایش محصول
       </Typography>
-      <ProductForm initialData={product} />
+      <ProductForm initialData={product} categories={categories} />
     </Box>
   );
 }

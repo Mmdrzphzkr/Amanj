@@ -7,7 +7,7 @@
     "displayName": "Product"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -18,7 +18,8 @@
     "slug": {
       "type": "uid",
       "targetField": "name",
-      "required": true
+      "required": true,
+      "regex": "^[a-zA-Z0-9-_.~\\u0600-\\u06FF]*$"
     },
     "description": {
       "type": "blocks"

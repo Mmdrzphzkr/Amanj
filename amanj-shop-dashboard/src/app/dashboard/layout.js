@@ -27,7 +27,6 @@ const navItems = [
 export default async function DashboardLayout({ children }) {
   const cookieStore = cookies(); 
   const token = await cookieStore.get("strapi_jwt")?.value;
-  console.log("DashboardLayout token:", token);
 
   if (!token) {
     redirect("/login");

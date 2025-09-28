@@ -5,17 +5,17 @@ import { getStrapiData } from "@/lib/strapi";
 
 export default async function EditCategoryPage({ params }) {
   const { id } = params;
-
+  console.log("params:",id );
   // 1. Fetch the specific category we want to edit
   const { data: categoryToEdit } = await getStrapiData(
     `/api/product-categories/${id}`
   );
-
+  console.log("categoryToEdit:", categoryToEdit);
   // 2. Fetch all categories to populate the 'parent' dropdown
   const { data: allCategories } = await getStrapiData(
     "/api/product-categories"
   );
-
+  console.log("allCategories:", allCategories);
   if (!categoryToEdit) {
     return <Typography>Category not found.</Typography>;
   }

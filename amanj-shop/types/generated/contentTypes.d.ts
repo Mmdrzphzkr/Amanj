@@ -411,7 +411,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     singularName: 'article';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
@@ -483,7 +483,7 @@ export interface ApiBrandBrand extends Struct.CollectionTypeSchema {
     singularName: 'brand';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -542,7 +542,7 @@ export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
     singularName: 'faq';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     answer: Schema.Attribute.Text & Schema.Attribute.Required;
@@ -601,7 +601,7 @@ export interface ApiProductCategoryProductCategory
     singularName: 'product-category';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -613,7 +613,9 @@ export interface ApiProductCategoryProductCategory
       'api::product-category.product-category'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     parent: Schema.Attribute.Relation<
       'oneToOne',
       'api::product-category.product-category'
@@ -634,7 +636,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     singularName: 'product';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     brand: Schema.Attribute.Relation<'oneToOne', 'api::brand.brand'>;
@@ -681,7 +683,7 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
     singularName: 'review';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     author: Schema.Attribute.Relation<
