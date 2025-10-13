@@ -18,10 +18,11 @@ const DRAWER_WIDTH = 240;
 const APP_BAR_Z_INDEX = 1300; // Define a static zIndex value
 
 const navItems = [
-  { text: "داشبورد", href: "/dashboard" },
-  { text: "محصولات", href: "/dashboard/products" },
-  { text: "سفارشات", href: "/dashboard/orders" },
-  { text: "دسته بندی ها", href: "/dashboard/categories" },
+  { text: "داشبورد", href: "/dashboard" },
+  { text: "محصولات", href: "/dashboard/products" },
+  { text: "دسته بندی ها", href: "/dashboard/categories" },
+  { text: "برندها", href: "/dashboard/brands" },
+  { text: "سفارشات", href: "/dashboard/orders" },
 ];
 
 export default async function DashboardLayout({ children }) {

@@ -14,11 +14,13 @@
     "@mui/material": "^7.3.2",
     "@mui/material-nextjs": "^7.3.2",
     "@mui/stylis-plugin-rtl": "^7.3.2",
+    "@reduxjs/toolkit": "^2.9.0",
     "cookie": "^1.0.2",
     "js-cookie": "^3.0.5",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-redux": "^9.2.0",
     "slugify": "^1.6.6",
     "stylis": "^4.3.6",
     "stylis-plugin-rtl": "^2.1.1"

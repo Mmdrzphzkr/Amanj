@@ -592,6 +592,107 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiHeaderHeader extends Struct.CollectionTypeSchema {
+  collectionName: 'headers';
+  info: {
+    displayName: 'Header';
+    pluralName: 'headers';
+    singularName: 'header';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::header.header'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface ApiMainSliderMainSlider extends Struct.CollectionTypeSchema {
+  collectionName: 'main_sliders';
+  info: {
+    displayName: 'MainSlider';
+    pluralName: 'main-sliders';
+    singularName: 'main-slider';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    body: Schema.Attribute.Blocks;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images' | 'videos'> &
+      Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::main-slider.main-slider'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
+  collectionName: 'orders';
+  info: {
+    displayName: 'Order';
+    pluralName: 'orders';
+    singularName: 'order';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customerName: Schema.Attribute.String & Schema.Attribute.Required;
+    customerPhone: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'customerPhone'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'> &
+      Schema.Attribute.Private;
+    orderStatus: Schema.Attribute.Enumeration<
+      ['new', 'processing', 'completed', 'canceled']
+    >;
+    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
+    publishedAt: Schema.Attribute.DateTime;
+    totalPrice: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiProductCategoryProductCategory
   extends Struct.CollectionTypeSchema {
   collectionName: 'product_categories';
@@ -656,6 +757,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
     price: Schema.Attribute.Decimal & Schema.Attribute.Required;
     products: Schema.Attribute.Relation<'manyToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
@@ -1225,6 +1327,9 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::faq.faq': ApiFaqFaq;
       'api::global.global': ApiGlobalGlobal;
+      'api::header.header': ApiHeaderHeader;
+      'api::main-slider.main-slider': ApiMainSliderMainSlider;
+      'api::order.order': ApiOrderOrder;
       'api::product-category.product-category': ApiProductCategoryProductCategory;
       'api::product.product': ApiProductProduct;
       'api::review.review': ApiReviewReview;

@@ -1,8 +1,7 @@
 // src/app/layout.js
 import { Vazirmatn } from "next/font/google";
 import "./globals.css";
-import ThemeRegistry from "@/components/Theme/ThemeRegistry";
-import { AuthProvider } from "@/context/AuthContext";
+import ClientProviders from "@/components/ClientProviders/clientProviders";
 
 const vazirmatn = Vazirmatn({ subsets: ["arabic"], display: "swap" });
 
@@ -15,9 +14,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fa" dir="rtl">
       <body className={vazirmatn.className}>
-        <AuthProvider>
-          <ThemeRegistry>{children}</ThemeRegistry>
-        </AuthProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

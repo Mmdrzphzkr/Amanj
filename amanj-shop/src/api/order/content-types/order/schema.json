@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "customerName": {
+      "type": "string",
+      "required": true
+    },
+    "customerPhone": {
+      "type": "string",
+      "default": "customerPhone",
+      "required": true,
+      "regex": "^09[0-9]{9}$"
+    },
+    "orderStatus": {
+      "type": "enumeration",
+      "required": false,
+      "enum": [
+        "new",
+        "processing",
+        "completed",
+        "canceled"
+      ]
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "order"
+    },
+    "totalPrice": {
+      "type": "decimal",
+      "required": false
+    }
+  }
+}
