@@ -2,9 +2,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { fetchProducts } from "../../../redux/slices/productslice";
+import { fetchProducts } from "../../../redux/slices/productSlice";
 import Header from "../header/header";
 import MainSlider from "../../modules/main-slider/main-slider";
+import BrandSlider from "../../modules/brand-slider/brand-slider";
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const HomePage = () => {
     <main className="container">
       <Header />
       <MainSlider />
+      <BrandSlider />
       <section className="flex gap-8 flex-wrap justify-center">
         <div className="flex-1 min-w-[300px] bg-[#f9f9f9] p-6 rounded-lg">
           <h2 className="text-xl font-semibold">Featured Products</h2>

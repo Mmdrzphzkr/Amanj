@@ -1,5 +1,5 @@
 "use client";
-import { fetchHeaders } from "../../../redux/slices/headerslice";
+import { fetchHeaders } from "../../../redux/slices/headerSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -8,7 +8,6 @@ const Header = () => {
   const dispatch = useDispatch();
   const headers = useSelector((state) => state.headers.items);
 
-  console.log(headers);
   useEffect(() => {
     dispatch(fetchHeaders());
   }, [dispatch]);

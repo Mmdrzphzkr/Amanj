@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "brand_sliders",
+  "info": {
+    "singularName": "brand-slider",
+    "pluralName": "brand-sliders",
+    "displayName": "BrandSlider"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "order": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    }
+  }
+}
