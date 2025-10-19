@@ -3,6 +3,8 @@ import productsReducer from "./slices/productSlice";
 import headersReducer from "./slices/headerSlice";
 import mainSliderReducer from "./slices/mainSliderSlice";
 import brandSliderReducer from "./slices/brandSliderSlice";
+import publicGalleryReducer from "./slices/publicGallerySlice";
+import BottomSliderReducer from "./slices/bottomSliderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +12,7 @@ export const store = configureStore({
     headers: headersReducer,
     mainSlider: mainSliderReducer,
     brandSlider: brandSliderReducer,
+    publicGallery: publicGalleryReducer,
+    bottomSlider: BottomSliderReducer,
   },
 });

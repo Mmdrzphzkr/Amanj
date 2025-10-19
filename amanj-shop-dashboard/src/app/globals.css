@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+body main .section__one {
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #f9f8f5 100%,
+    #f9f8f5 100%
+  );
+}
+
+body main .section__two {
+  background: #f9f8f5;
+}
+
+body main .section__three {
+  background: #f9f8f5;
+}
+
+body main .section__four {
+  background: #f9f8f5;
+}
+
+.garantee-box {
+  box-shadow: 0 0 4px #0000000d;
+}

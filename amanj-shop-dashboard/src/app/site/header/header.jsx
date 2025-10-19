@@ -2,18 +2,36 @@
 import { fetchHeaders } from "../../../redux/slices/headerSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Header = () => {
   const dispatch = useDispatch();
   const headers = useSelector((state) => state.headers.items);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     dispatch(fetchHeaders());
   }, [dispatch]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20); // adjust threshold as you like
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
-      <header className="flex justify-between items-center py-[16px] px-[58px] bg-[#F9F8F5]">
+      <header
+        className={`flex justify-between items-center py-[16px] px-[58px] fixed top-0 left-0 right-0 z-50 transition-all duration-500 
+        ${
+          isScrolled
+            ? "backdrop-blur-md bg-[#F9F8F580] shadow-sm"
+            : "bg-transparent"
+        }`}
+      >
         <div className="flex justify-start items-center gap-8">
           <div className="text-3xl font-bold logo__container">
             <svg

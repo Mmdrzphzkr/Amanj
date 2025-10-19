@@ -475,6 +475,45 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiBottomSliderBottomSlider
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'bottom_sliders';
+  info: {
+    displayName: 'BottomSlider';
+    pluralName: 'bottom-sliders';
+    singularName: 'bottom-slider';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    body: Schema.Attribute.Blocks;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::bottom-slider.bottom-slider'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiBrandSliderBrandSlider extends Struct.CollectionTypeSchema {
   collectionName: 'brand_sliders';
   info: {
@@ -809,6 +848,37 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     specifications: Schema.Attribute.Component<'shared.specification', true>;
     stock: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     thumbnail: Schema.Attribute.Media<'images'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPublicGalleryPublicGallery
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'public_galleries';
+  info: {
+    displayName: 'PublicGallery';
+    pluralName: 'public-galleries';
+    singularName: 'public-gallery';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    image: Schema.Attribute.Media<'images' | 'videos' | 'audios' | 'files'> &
+      Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::public-gallery.public-gallery'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1361,6 +1431,7 @@ declare module '@strapi/strapi' {
       'api::about.about': ApiAboutAbout;
       'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
+      'api::bottom-slider.bottom-slider': ApiBottomSliderBottomSlider;
       'api::brand-slider.brand-slider': ApiBrandSliderBrandSlider;
       'api::brand.brand': ApiBrandBrand;
       'api::category.category': ApiCategoryCategory;
@@ -1371,6 +1442,7 @@ declare module '@strapi/strapi' {
       'api::order.order': ApiOrderOrder;
       'api::product-category.product-category': ApiProductCategoryProductCategory;
       'api::product.product': ApiProductProduct;
+      'api::public-gallery.public-gallery': ApiPublicGalleryPublicGallery;
       'api::review.review': ApiReviewReview;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

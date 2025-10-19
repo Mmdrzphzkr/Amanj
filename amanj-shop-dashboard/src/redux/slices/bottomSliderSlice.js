@@ -1,28 +1,28 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchStrapiData } from "@/lib/strapi-frontend";
 
-export const fetchBrandSlider = createAsyncThunk(
-  "brandSlider/fetchBrandSlider",
-  async () => await fetchStrapiData("/api/brand-sliders?populate=*")
+export const fetchBottomSlider = createAsyncThunk(
+  "bottomSlider/fetchBottomSlider",
+  async () => await fetchStrapiData("/api/bottom-sliders?populate=*")
 );
 
-const brandSliderSlice = createSlice({
-  name: "brandSlider",
+const bottomSliderSlice = createSlice({
+  name: "bottomSlider",
   initialState: { items: [], status: "idle", error: null },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchBrandSlider.pending, (state) => {
+      .addCase(fetchBottomSlider.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchBrandSlider.fulfilled, (state, action) => {
+      .addCase(fetchBottomSlider.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.items = action.payload;
       })
-      .addCase(fetchBrandSlider.rejected, (state, action) => {
+      .addCase(fetchBottomSlider.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });
   },
 });
 
-export default brandSliderSlice.reducer;
+export default bottomSliderSlice.reducer;

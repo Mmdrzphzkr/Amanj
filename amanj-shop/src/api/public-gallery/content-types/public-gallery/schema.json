@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "public_galleries",
+  "info": {
+    "singularName": "public-gallery",
+    "pluralName": "public-galleries",
+    "displayName": "PublicGallery"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "videos",
+        "audios",
+        "files"
+      ]
+    }
+  }
+}

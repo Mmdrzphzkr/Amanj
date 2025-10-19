@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bottom_sliders",
+  "info": {
+    "singularName": "bottom-slider",
+    "pluralName": "bottom-sliders",
+    "displayName": "BottomSlider"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "body": {
+      "type": "blocks",
+      "required": false
+    },
+    "order": {
+      "type": "integer",
+      "required": true,
+      "unique": false,
+      "min": 0
+    }
+  }
+}

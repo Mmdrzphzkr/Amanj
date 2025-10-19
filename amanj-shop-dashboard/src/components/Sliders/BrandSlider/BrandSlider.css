@@ -1,0 +1,30 @@
+.brand-slider-container{
+    position: relative;
+}
+.brand-slider-container img{
+  width: 190px;
+  height: 60px;
+}
+.brand-slider-container:before{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 12%;
+    z-index: 10;
+    opacity: 0.8;
+    background: linear-gradient(to left, #EDE9DE 0, #EDE9DE 80%, #EDE9DE00 100%);
+}
+
+.brand-slider-container:after{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 15%;
+    z-index: 10;
+    opacity: 0.8;
+    background: linear-gradient(to right, #EDE9DE 0, #EDE9DE 80%, #EDE9DE00 100%);
+}
