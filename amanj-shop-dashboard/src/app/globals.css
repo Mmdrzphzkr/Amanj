@@ -49,3 +49,14 @@ body main .section__four {
 .garantee-box {
   box-shadow: 0 0 4px #0000000d;
 }
+
+.swiper-button-prev, .swiper-button-next {
+  color: #696969 !important;
+  background: #fff !important;
+  border: 2px solid #ede9de !important;
+  border-radius: 50% !important;
+  svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}

@@ -7,14 +7,15 @@ const STRAPI_URL =
 
 export default function ProductCard({ product }) {
   // Assuming you have these attributes from Strapi
-  const { name, price, slug, thumbnail } = product;
-
+  const thumbnail = product.thumbnail.url;
+  const name = product.name;
+  const price = product.price;
   // Check if thumbnail data is available
-  if (!thumbnail?.data?.attributes?.url) {
+  if (!thumbnail) {
     return <div>Image not available</div>; // Or a placeholder
   }
 
-  const imageUrl = STRAPI_URL + thumbnail.data.attributes.url;
+  const imageUrl = STRAPI_URL + thumbnail;
 
   return (
     <Link

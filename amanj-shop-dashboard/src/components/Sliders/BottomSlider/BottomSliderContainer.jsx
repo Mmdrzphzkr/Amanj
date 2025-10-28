@@ -9,7 +9,7 @@ import { Navigation, Pagination } from "swiper/modules";
 const BottomSliderContainer = () => {
   const dispatch = useDispatch();
   const items = useSelector((s) => s.bottomSlider.items);
-  console.log(items, "bottom slider items");
+  
   useEffect(() => {
     dispatch(fetchBottomSlider());
   }, [dispatch]);
@@ -21,8 +21,6 @@ const BottomSliderContainer = () => {
   const options = {
     slidesPerView: 1,
     loop: true,
-    navigation: true,
-    pagination: { clickable: true },
     autoplay: true,
     speed: 600,
   };
