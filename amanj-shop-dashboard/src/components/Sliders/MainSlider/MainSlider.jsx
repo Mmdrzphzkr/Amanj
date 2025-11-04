@@ -20,7 +20,7 @@ const MainSlide = ({ item, strapiUrl }) => {
 
       {/* در صورت نیاز overlay محتوا */}
       {item?.body && (
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none top-[30%] px-[58px] w-[30%]">
           <div className="slider-content-overlay pointer-events-auto">
             <div
               dangerouslySetInnerHTML={{

@@ -6,6 +6,7 @@ import brandSliderReducer from "./slices/brandSliderSlice";
 import publicGalleryReducer from "./slices/publicGallerySlice";
 import BottomSliderReducer from "./slices/bottomSliderSlice";
 import FaqAccordionReducer from "./slices/faqAccordionSlice";
+import CategoryReducer from "./slices/categorySlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
     publicGallery: publicGalleryReducer,
     bottomSlider: BottomSliderReducer,
     faqAccordion: FaqAccordionReducer,
+    categories: CategoryReducer,
   },
 });
