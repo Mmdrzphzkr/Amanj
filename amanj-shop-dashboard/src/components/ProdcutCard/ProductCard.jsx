@@ -12,6 +12,13 @@ const ProductCard = ({ product, strapiUrl }) => {
         justifyContent: "space-between",
         borderRadius: "24px",
         padding: "10px",
+        transition: "all 0.3s ease-in-out",
+        "&:hover": {
+          transform: "scale(1.03)",
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1) !important",
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          transition: "all 0.3s ease-in-out",
+        },
       }}
       style={{ boxShadow: "0 0px 4px rgba(0, 0, 0, 0.05)" }}
     >

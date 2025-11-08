@@ -23,6 +23,17 @@
   }
 }
 
+/* ❌ این خطوط در صورت استفاده در اسلایدر برندها باید با دقت استفاده شوند */
+.brand-slider-container img {
+  width: 190px; /* ❌ این را حذف کنید یا به یک مقدار responsive تغییر دهید */
+  height: 60px; /* ✅ این خوب است اگر max-height باشد */
+}
+
+/* 💡 پیشنهاد: عرض را حذف کنید و اجازه دهید flex/grid/swiper آن را کنترل کند */
+.brand-slider-container img {
+  height: 60px; /* یا max-height: 60px; */
+  width: auto; /* یا max-width: 100%; */
+}
 .product-thumbs-slider .swiper-slide {
   opacity: 0.6;
   transition: opacity 0.3s ease;

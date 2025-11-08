@@ -18,6 +18,18 @@
     "url": {
       "type": "string",
       "required": true
+    },
+    "header": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::header.header",
+      "inversedBy": "parent"
+    },
+    "parent": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::header.header",
+      "mappedBy": "header"
     }
   }
 }

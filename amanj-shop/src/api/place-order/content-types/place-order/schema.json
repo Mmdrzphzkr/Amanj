@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "place_orders",
+  "info": {
+    "singularName": "place-order",
+    "pluralName": "place-orders",
+    "displayName": "PlaceOrder"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "family": {
+      "type": "string",
+      "required": true
+    },
+    "mobile": {
+      "type": "string",
+      "required": true,
+      "regex": "^09\\d{9}$"
+    },
+    "description": {
+      "type": "text"
+    },
+    "productId": {
+      "type": "integer",
+      "required": true
+    },
+    "quantity": {
+      "type": "integer",
+      "required": true,
+      "default": 1
+    }
+  }
+}

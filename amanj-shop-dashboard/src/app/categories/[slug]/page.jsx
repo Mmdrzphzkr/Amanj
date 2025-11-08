@@ -9,6 +9,8 @@ import Footer from "@/components/Footer/Footer";
 import Breadcrumb from "@/components/Breadcrumb/Breadcrumb";
 import ProductCard from "@/components/ProdcutCard/ProductCard";
 import Link from "next/link";
+import { Suspense } from "react";
+import Loading from "@/components/Loading/Loading";
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -53,7 +55,7 @@ export default function CategoryPage() {
   }, [decodedSlug, dispatch, categoryStatus]);
 
   if (loading || categoryStatus === "loading") {
-    return <div>در حال بارگذاری...</div>;
+    return <Loading />;
   }
 
   if (!currentCategory) {
@@ -61,15 +63,15 @@ export default function CategoryPage() {
   }
 
   return (
-    <>
+    <Suspense fallback={<Loading />}>
       <Header />
-      <div class="bread-crumb__container pt-20">
+      <div class="bread-crumb__container pt-20 bg-[#F9F8F5]">
         <Breadcrumb
           category={currentCategory}
           currentTitle={currentCategory.name}
         />
       </div>
-      <main className="container mx-auto">
+      <main className="container mx-auto bg-[#F9F8F5]">
         <div className="px-[58px] py-8">
           <h1 className="text-3xl font-bold mb-8">{currentCategory.name}</h1>
 
@@ -90,6 +92,6 @@ export default function CategoryPage() {
         </div>
       </main>
       <Footer />
-    </>
+    </Suspense>
   );
 }

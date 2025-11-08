@@ -5,15 +5,19 @@ import { ChevronLeft } from "@mui/icons-material";
 
 const Breadcrumb = ({ category, currentTitle }) => {
   const pathname = usePathname();
+  
+  // اگر در صفحه دسته بندی هستیم، از currentTitle استفاده نکنیم
+  const isInCategoryPage = pathname.startsWith('/categories/');
 
   const breadcrumbItems = [
     { title: "خانه", path: "/" },
     category && {
       title: category.name,
-      path: `/categories/${category.slug}` // حذف site از مسیر
+      path: `/categories/${category.slug}`
     },
-    { title: currentTitle, path: pathname },
-  ].filter(Boolean);
+    // فقط در صورتی که در صفحه دسته بندی نیستیم، آیتم سوم را نمایش دهیم
+    !isInCategoryPage && { title: currentTitle, path: pathname },
+  ].filter(Boolean); // حذف موارد null و undefined
 
   return (
     <nav className="flex px-[58px] py-4 text-sm">

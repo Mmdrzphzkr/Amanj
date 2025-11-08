@@ -56,7 +56,7 @@ const ProductSliderContainer = () => {
         )}
         swiperOptions={options}
         modules={[Autoplay, Navigation]}
-        className="product-swiper w-full"
+        className="product-swiper w-full py-5"
       />
     </div>
   );

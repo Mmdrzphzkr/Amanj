@@ -605,7 +605,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="flex gap-8 flex-wrap justify-center flex-col section__two px-[58px]">
+      <section className="flex gap-8 flex-wrap justify-center flex-col section__two px-[58px] container">
         <div className="section__header flex flex-col items-center justify-center mt-[103px]">
           <div className="container__svg">
             <svg
