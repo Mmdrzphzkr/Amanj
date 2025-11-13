@@ -1,3 +1,4 @@
+// ProductCard.jsx
 import { Card, CardMedia, CardContent, Typography } from "@mui/material";
 const ProductCard = ({ product, strapiUrl }) => {
   const src = `${strapiUrl}${
@@ -7,6 +8,7 @@ const ProductCard = ({ product, strapiUrl }) => {
   return (
     <Card
       sx={{
+        // ✅ FIX: افزودن صریح عرض 100% برای اطمینان از انعطاف‌پذیری در داخل SwiperSlide
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -60,6 +62,7 @@ const ProductCard = ({ product, strapiUrl }) => {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
+            {/* ... (SVG paths) ... */}
             <path
               d="M3.2 9.12C2.752 9.12 2.33067 9.03467 1.936 8.864C1.552 8.704 1.216 8.48 0.928 8.192C0.64 7.904 0.410667 7.56267 0.24 7.168C0.08 6.784 0 6.368 0 5.92V1.648H1.104V5.744C1.104 6.032 1.15733 6.29867 1.264 6.544C1.37067 6.8 1.51467 7.01867 1.696 7.2C1.888 7.392 2.112 7.54133 2.368 7.648C2.624 7.75467 2.896 7.808 3.184 7.808H5.952C6.19733 7.808 6.42667 7.76 6.64 7.664C6.85333 7.57867 7.04 7.456 7.2 7.296C7.36 7.14667 7.48267 6.96533 7.568 6.752C7.664 6.54933 7.712 6.32533 7.712 6.08V1.376H8.816V6.272C8.816 6.66667 8.74133 7.03467 8.592 7.376C8.44267 7.728 8.23467 8.032 7.968 8.288C7.712 8.544 7.408 8.74667 7.056 8.896C6.71467 9.04533 6.34667 9.12 5.952 9.12H3.2ZM3.728 0H5.088V1.36H3.728V0Z"
               fill="#B4B4B4"

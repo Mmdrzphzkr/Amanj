@@ -27,36 +27,35 @@ const ProductSliderContainer = () => {
     slidesPerView: 1,
     spaceBetween: 24,
     loop: products.length > 4,
-    autoplay:
-      products.length > 1
-        ? { delay: 2500, disableOnInteraction: false }
-        : false,
+    // autoplay:
+    //   products.length > 1
+    //     ? { delay: 2500, disableOnInteraction: false }
+    //     : false,
     navigation: true,
     speed: 600,
     breakpoints: {
-      480: { slidesPerView: 2 },
       768: { slidesPerView: 3 },
       1024: { slidesPerView: 4 }, // ✅ نمایش ۴ محصول در دسکتاپ
     },
   };
 
   return (
-    <div className="product-slider-container w-full max-w-[1400px] mx-auto px-4">
+    // ❌ اصلاح: حذف px-4 از کانتینر بیرونی برای جلوگیری از تداخل با سوایپر
+    <div className="product-slider-container w-full h-full">
       <SwiperWrapper
         items={products}
         renderItem={(product) => (
-          <div className="w-full h-full flex items-center justify-center">
-            <Link
-              href={`/products/${product.slug}`}
-              className="block w-full h-full p-1"
-            >
-              <ProductCard product={product} strapiUrl={STRAPI_URL} />
-            </Link>
-          </div>
+          // ✅ اصلاح: حذف div والد اضافی و اضافه کردن w-full برای اطمینان از انعطاف Link
+          <Link
+            href={`/products/${product.slug}`}
+            className="inline-block" // w-full برای اطمینان از پر کردن SwiperSlide
+          >
+            <ProductCard product={product} strapiUrl={STRAPI_URL} />
+          </Link>
         )}
         swiperOptions={options}
         modules={[Autoplay, Navigation]}
-        className="product-swiper w-full py-5"
+        className="product-swiper !p-5"
       />
     </div>
   );

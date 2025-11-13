@@ -29,7 +29,7 @@ const HomePage = () => {
       <div className="bg-[#EDE9DE] h-[115px]">
         <BrandSliderContainer />
       </div>
-      <section className="flex gap-8 flex-wrap justify-center flex-col section__one px-[58px]">
+      <section className="flex gap-8 flex-wrap justify-center flex-col section__one px-[15px] md:px-[58px]">
         <div className="section__header flex flex-col items-center justify-center mt-[132px]">
           <div className="container__svg">
             <svg
@@ -605,7 +605,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="flex gap-8 flex-wrap justify-center flex-col section__two px-[58px] container">
+      <section className="flex gap-8 flex-wrap justify-center flex-col section__two px-[15px] md:px-[58px] container">
         <div className="section__header flex flex-col items-center justify-center mt-[103px]">
           <div className="container__svg">
             <svg
@@ -1037,12 +1037,10 @@ const HomePage = () => {
           </div>
           <p className="text-3xl font-bold mt-3">محصولات پر فروش</p>
         </div>
-        <div className="text-lg font-bold text-black text-center">
-          <ProductSliderContainer />
-        </div>
+        <ProductSliderContainer />
       </section>
 
-      <section className="flex gap-8 flex-wrap justify-center flex-col section__three px-[58px]">
+      <section className="flex gap-8 flex-wrap justify-center flex-col section__three px-[15px] md:px-[58px]">
         <div className="section__header flex flex-col items-center justify-center mt-[103px] mb-">
           <div className="container__svg">
             <svg
@@ -1479,11 +1477,11 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="section__four px-[58px] pt-[154px]">
+      <section className="section__four px-[15px] md:px-[58px] pt-[154px]">
         <BottomSliderContainer />
       </section>
 
-      <section className="section__five px-[58px]">
+      <section className="section__five px-[15px] md:px-[58px]">
         <div className="section__header flex flex-col items-center justify-center mt-[103px] mb-">
           <div className="container__svg">
             <svg

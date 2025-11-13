@@ -763,6 +763,7 @@ export interface ApiMainSliderMainSlider extends Struct.CollectionTypeSchema {
       'api::main-slider.main-slider'
     > &
       Schema.Attribute.Private;
+    mobileImage: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     order: Schema.Attribute.Integer &
       Schema.Attribute.SetMinMax<

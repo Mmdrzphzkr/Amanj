@@ -2,7 +2,13 @@
 import React from "react";
 
 const MainSlide = ({ item, strapiUrl }) => {
-  const img = item?.image ?? {};
+  let img;
+
+  if (window.innerWidth < 768) {
+    img = item?.mobileImage ?? {};
+  } else {
+    img = item?.image ?? {};
+  }
   const src = `${strapiUrl}${img.url?.startsWith("/") ? "" : "/"}${
     img.url || ""
   }`;
@@ -20,7 +26,7 @@ const MainSlide = ({ item, strapiUrl }) => {
 
       {/* در صورت نیاز overlay محتوا */}
       {item?.body && (
-        <div className="absolute inset-0 pointer-events-none top-[30%] px-[58px] w-[30%]">
+        <div className="md:absolute inset-0 pointer-events-none md:top-[30%] px-[15px] py-[15px] md:py-0 md:px-[58px] md:w-[30%] hidden md:block">
           <div className="slider-content-overlay pointer-events-auto">
             <div
               dangerouslySetInnerHTML={{

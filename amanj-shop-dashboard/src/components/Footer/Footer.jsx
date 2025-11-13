@@ -66,14 +66,14 @@ const Footer = () => {
               </p>
             </div>
           </div>
-          <div className="footer-content__part-two flex items-start justify-center flex-col h-full mt-4 md:mt-0">
+          <div className="footer-content__part-two flex items-center md:items-start justify-center flex-col h-full mt-4 md:mt-0 w-full md:w-max">
             <p className="text-white font-bold text-lg mb-4">لینک ها</p>
-            <ul className="flex items-start justify-start flex-col">
+            <ul className="flex items-center justify-start md:items-start md:justify-start flex-col w-full">
               <li>
                 <a
                   href="#"
                   rel="nofollow"
-                  className="text-[#868686] text-[16px] font-medium"
+                  className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                 >
                   مقالات
                 </a>
@@ -82,7 +82,7 @@ const Footer = () => {
                 <a
                   href="#"
                   rel="nofollow"
-                  className="text-[#868686] text-[16px] font-medium"
+                  className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                 >
                   پشتیبانی
                 </a>
@@ -91,7 +91,7 @@ const Footer = () => {
                 <a
                   href="#"
                   rel="nofollow"
-                  className="text-[#868686] text-[16px] font-medium"
+                  className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                 >
                   دسته بندی ها
                 </a>
@@ -100,7 +100,7 @@ const Footer = () => {
                 <a
                   href="#"
                   rel="nofollow"
-                  className="text-[#868686] text-[16px] font-medium"
+                  className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                 >
                   آموزش ها
                 </a>
@@ -109,21 +109,21 @@ const Footer = () => {
                 <a
                   href="#"
                   rel="nofollow"
-                  className="text-[#868686] text-[16px] font-medium"
+                  className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                 >
                   درباره ما
                 </a>
               </li>
             </ul>
           </div>
-          <div className="footer-content__part-three flex items-start justify-center flex-col h-full mt-4 md:mt-0">
+          <div className="footer-content__part-three flex items-center md:items-start justify-center flex-col h-full mt-4 md:mt-0 w-full md:w-max">
             <p className="text-white font-bold text-lg mb-4">ارتباط با ما</p>
-            <ul>
+            <ul className="flex items-center justify-start md:items-start md:justify-start flex-col w-full">
               <li>
                 <a
                   href="#"
                   rel="nofollow"
-                  className="text-[#868686] text-[16px] font-medium"
+                  className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                 >
                   تلفن: ۰۹۰۰۱۶۹۶۹۹۹
                 </a>
@@ -132,7 +132,7 @@ const Footer = () => {
                 <a
                   href="#"
                   rel="nofollow"
-                  className="text-[#868686] text-[16px] font-medium"
+                  className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                 >
                   آدرس: مشهد خیابان سیدی
                 </a>

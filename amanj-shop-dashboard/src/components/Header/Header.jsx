@@ -1,13 +1,17 @@
 "use client";
 import { fetchHeaders } from "@/redux/slices/headerSlice";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 
 const Header = () => {
   const dispatch = useDispatch();
   const headers = useSelector((state) => state.headers.items);
+
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchHeaders());
@@ -15,24 +19,144 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20); // adjust threshold as you like
+      setIsScrolled(window.scrollY > 20);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleSearch = async () => {
+    if (!query) return;
+    const res = await fetch(`/api/search?query=${query}`);
+    const data = await res.json();
+    setResults(data);
+  };
+
+  const isMobile =
+    typeof window !== "undefined" ? window.innerWidth < 768 : false;
+
   return (
     <>
+      {/* --- سایدبار موبایل --- */}
+      <div
+        dir="rtl"
+        className={`fixed inset-0 z-50 transition-all duration-500 ${
+          isMobileMenuOpen
+            ? "bg-black/50 visible opacity-100"
+            : "opacity-0 invisible"
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <div
+          dir="rtl"
+          className={`rtl bg-white w-3/4 h-full p-5 overflow-y-auto transform transition-transform duration-500 ${
+            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">منو</h2>
+            <button onClick={() => setIsMobileMenuOpen(false)}>✕</button>
+          </div>
+
+          {/* جستجو همیشه باز در بالای منو */}
+          <div className="mt-6">
+            <div className="flex items-center border rounded-full overflow-hidden bg-[#EDE9DE]">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                placeholder="جستجو..."
+                className="flex-1 px-4 py-2 outline-none bg-transparent"
+              />
+              <button
+                onClick={handleSearch}
+                className="px-3 text-gray-600 hover:text-black"
+              >
+                <svg
+                  width="48"
+                  height="49"
+                  viewBox="0 0 48 49"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    y="0.817968"
+                    width="48"
+                    height="48"
+                    rx="24"
+                    fill="#EDE9DE"
+                  />
+                  <path
+                    d="M33 33.818L27.6039 28.4219M27.6039 28.4219C28.9395 27.0858 29.7655 25.2402 29.7655 23.2016C29.7655 21.9963 29.4767 20.8584 28.9646 19.8534M27.6039 28.4219C26.2679 29.7585 24.4218 30.5853 22.3828 30.5853C18.3054 30.5853 15 27.2795 15 23.2016C15 19.1238 18.3054 15.818 22.3828 15.818C23.8008 15.818 25.1255 16.2178 26.2502 16.9109"
+                    stroke="#3F3F3F"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mt-2 max-h-60 overflow-y-auto">
+              {results.map((r) => (
+                <div key={r.id} className="p-2 border-b text-sm">
+                  {r.title}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* آیتم‌های منو */}
+          <nav className="mt-8 flex flex-col gap-4">
+            {headers?.map((h) => (
+              <a
+                key={h.id}
+                href={h.url}
+                className="text-lg font-medium text-gray-700 hover:text-black"
+              >
+                {h.name}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* --- هدر دسکتاپ و موبایل --- */}
       <header
-        className={`flex justify-between items-center py-[16px] px-[58px] fixed top-0 left-0 right-0 z-50 transition-all duration-500 
+        className={`flex justify-between items-center px-[15px] py-[10px] md:py-[16px] md:px-[58px] fixed top-0 left-0 right-0 z-40 transition-all duration-500 
         ${
           isScrolled
             ? "backdrop-blur-md bg-[#F9F8F580] shadow-sm"
             : "bg-transparent"
         }`}
       >
-        <div className="flex justify-start items-center gap-8">
+        <div className="flex justify-between md:justify-start items-center gap-6 w-full">
+          {/* دکمه منوی موبایل */}
+          {isMobile && (
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden bg-[#EDE9DE] rounded-full p-2 flex items-center justify-center border border-gray-700"
+            >
+              <svg
+                width="24px"
+                height="24px"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+              >
+                <path
+                  stroke="#000000"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6H20M4 12H20M4 18H20"
+                />
+              </svg>
+            </button>
+          )}
+
+          {/* لوگو */}
           <div className="text-3xl font-bold logo__container">
             <svg
               width="102"
@@ -65,7 +189,9 @@ const Header = () => {
               />
             </svg>
           </div>
-          <nav className="flex justify-start items-center gap-6">
+
+          {/* منوی دسکتاپ */}
+          <nav className="hidden md:flex justify-start items-center gap-6">
             {headers?.map((header) => (
               <div key={header.id}>
                 <a
@@ -78,48 +204,66 @@ const Header = () => {
             ))}
           </nav>
         </div>
-        <div className="flex justify-end items-center gap-4">
-          <button>
-            <svg
-              width="48"
-              height="49"
-              viewBox="0 0 48 49"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                y="0.817968"
-                width="48"
-                height="48"
-                rx="24"
-                fill="#EDE9DE"
-              />
-              <path
-                d="M33 33.818L27.6039 28.4219M27.6039 28.4219C28.9395 27.0858 29.7655 25.2402 29.7655 23.2016C29.7655 21.9963 29.4767 20.8584 28.9646 19.8534M27.6039 28.4219C26.2679 29.7585 24.4218 30.5853 22.3828 30.5853C18.3054 30.5853 15 27.2795 15 23.2016C15 19.1238 18.3054 15.818 22.3828 15.818C23.8008 15.818 25.1255 16.2178 26.2502 16.9109"
-                stroke="#3F3F3F"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-            </svg>
-          </button>
-          <button className="">
-            <svg
-              width="48"
-              height="49"
-              viewBox="0 0 48 49"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect y="0.13591" width="48" height="48" rx="24" fill="#EDE9DE" />
-              <path
-                d="M29 20.1359C29 17.3745 26.7614 15.1359 24 15.1359C21.2386 15.1359 19 17.3745 19 20.1359M32.2692 29.1359C32.2056 29.4666 32.1738 29.632 32.1361 29.776C31.6456 31.6489 30.0122 32.9981 28.0805 33.1261C27.9319 33.1359 27.7635 33.1359 27.4267 33.1359H21.8691C20.3038 33.1359 19.5212 33.1359 18.8578 32.9257C17.7473 32.5738 16.8164 31.805 16.2611 30.7808C15.9295 30.1691 15.7817 29.4005 15.4861 27.8634C15.069 25.6945 14.8604 24.61 15.0387 23.7362C15.3381 22.2691 16.3475 21.0471 17.7316 20.476C18.556 20.1359 19.6604 20.1359 21.8691 20.1359H28.9084C31.5497 20.1359 33.5373 22.5421 33.0385 25.1359"
-                stroke="#3F3F3F"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </button>
+
+        {/* سمت راست هدر (دسکتاپ) */}
+        <div className="hidden md:flex justify-end items-center gap-4 relative">
+          {/* جستجو با افکت باز شدن نرم */}
+          <div
+            className={`flex items-center border border-gray-300 rounded-full overflow-hidden transition-all duration-500 bg-[#EDE9DE] ${
+              isSearchOpen ? "w-64 px-2" : "w-12 justify-center"
+            }`}
+          >
+            {isSearchOpen ? (
+              <>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  placeholder="جستجو..."
+                  className="flex-1 bg-transparent px-2 py-1 outline-none text-sm"
+                  autoFocus
+                />
+                <button
+                  onClick={() => {
+                    setQuery("");
+                    setIsSearchOpen(false);
+                  }}
+                  className="text-gray-600 hover:text-black ml-1"
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="flex items-center justify-center"
+              >
+                <svg
+                  width="48"
+                  height="49"
+                  viewBox="0 0 48 49"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    y="0.817968"
+                    width="48"
+                    height="48"
+                    rx="24"
+                    fill="#EDE9DE"
+                  />
+                  <path
+                    d="M33 33.818L27.6039 28.4219M27.6039 28.4219C28.9395 27.0858 29.7655 25.2402 29.7655 23.2016C29.7655 21.9963 29.4767 20.8584 28.9646 19.8534M27.6039 28.4219C26.2679 29.7585 24.4218 30.5853 22.3828 30.5853C18.3054 30.5853 15 27.2795 15 23.2016C15 19.1238 18.3054 15.818 22.3828 15.818C23.8008 15.818 25.1255 16.2178 26.2502 16.9109"
+                    stroke="#3F3F3F"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+
           <a href="/login" rel="nofollow" className="">
             <svg
               width="48"

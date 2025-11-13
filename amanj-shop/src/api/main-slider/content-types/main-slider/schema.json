@@ -31,6 +31,14 @@
       "type": "integer",
       "default": 0,
       "min": 0
+    },
+    "mobileImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
     }
   }
 }

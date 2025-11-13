@@ -11,24 +11,25 @@ const AccordionItem = ({ faq, isOpen, onToggle }) => {
         aria-expanded={isOpen}
       >
         <span className="text-lg leading-10">{faq.question}</span>
-
-        <svg
-          className={`w-[44px] h-[44px] text-[#3F3F3F] transition-transform duration-300 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-          viewBox="0 0 44 44"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect width="44" height="44" rx="22" fill="#F7F7F7" />
-          <path
-            d="M17 19.5L22 24.5L27 19.5"
-            stroke="#3F3F3F"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        <span className="w-[44px] h-[44px] flex-1">
+          <svg
+            className={`text-[#3F3F3F] transition-transform duration-300 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+            viewBox="0 0 44 44"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="44" height="44" rx="22" fill="#F7F7F7" />
+            <path
+              d="M17 19.5L22 24.5L27 19.5"
+              stroke="#3F3F3F"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
       </button>
 
       {/* محتوای پاسخ (آکاردئون باز) */}
