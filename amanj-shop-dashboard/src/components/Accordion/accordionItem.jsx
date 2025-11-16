@@ -11,9 +11,9 @@ const AccordionItem = ({ faq, isOpen, onToggle }) => {
         aria-expanded={isOpen}
       >
         <span className="text-lg leading-10">{faq.question}</span>
-        <span className="w-[44px] h-[44px] flex-1">
+        <span className="">
           <svg
-            className={`text-[#3F3F3F] transition-transform duration-300 ${
+            className={`w-[44px] h-[44px] text-[#3F3F3F] transition-transform duration-300 ${
               isOpen ? "rotate-180" : ""
             }`}
             viewBox="0 0 44 44"

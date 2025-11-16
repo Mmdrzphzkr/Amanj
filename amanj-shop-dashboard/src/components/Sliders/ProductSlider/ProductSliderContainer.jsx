@@ -27,10 +27,10 @@ const ProductSliderContainer = () => {
     slidesPerView: 1,
     spaceBetween: 24,
     loop: products.length > 4,
-    // autoplay:
-    //   products.length > 1
-    //     ? { delay: 2500, disableOnInteraction: false }
-    //     : false,
+    autoplay:
+      products.length > 1
+        ? { delay: 2500, disableOnInteraction: false }
+        : false,
     navigation: true,
     speed: 600,
     breakpoints: {
