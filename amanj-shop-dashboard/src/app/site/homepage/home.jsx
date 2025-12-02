@@ -23,7 +23,7 @@ const HomePage = () => {
   }, [dispatch]);
 
   return (
-    <main className="container">
+    <main className="">
       <Header />
       <MainSliderContainer />
       <div className="bg-[#EDE9DE] h-[115px]">
@@ -502,9 +502,12 @@ const HomePage = () => {
           </p>
         </div>
         <div className="flex flex-col justify-center items-center garatee-box__container">
-          <div className="flex flex-col md:flex-row justify-between gap-5 items-center w-full mb-6">
-            <div className="garantee-box garantee-box flex flex-col md:flex justify-between items-center p-4 bg-white rounded-[40px] flex-5/12 h-[361px]">
-              <div className="grantee-box-image w-full h-[253px]">
+    <div className="grid grid-cols-1 gap-5 items-center w-full mb-6 
+                    md:grid-cols-12 md:gap-5">
+        
+        <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-5">
+            <div className="grantee-box-image w-full h-[253px]">
                 <img
                   src={`${STRAPI_URL}${publicGallery[1]?.image?.url}`}
                   alt={`${
@@ -515,16 +518,18 @@ const HomePage = () => {
                   loading="lazy"
                   className="w-full h-full"
                 />
-              </div>
-              <p className="grantee-box-title text-2xl font-bold">
-                پشتیبانی ۲۴ ساعته
-              </p>
-              <p className="grantee-box-description text-[#696969] text-lg">
-                همیشه آماده پاسخگویی به سوالات و نیازهای شما
-              </p>
             </div>
-            <div className="garantee-box flex flex-col md:flex justify-between items-center p-4 bg-white rounded-[40px] flex-7/12 h-[361px]">
-              <div className="grantee-box-image w-full h-[253px]">
+            <p className="grantee-box-title text-2xl font-bold">
+                پشتیبانی ۲۴ ساعته
+            </p>
+            <p className="grantee-box-description text-[#696969] text-lg">
+                همیشه آماده پاسخگویی به سوالات و نیازهای شما
+            </p>
+        </div>
+        
+        <div className="garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-7">
+            <div className="grantee-box-image w-full h-[253px]">
                 <img
                   src={`${STRAPI_URL}${publicGallery[0]?.image?.url}`}
                   alt={`${
@@ -535,18 +540,22 @@ const HomePage = () => {
                   loading="lazy"
                   className="w-full h-full"
                 />
-              </div>
-              <p className="grantee-box-title text-2xl font-bold">
-                تعمیر تخصصی با قطعات اورجینال
-              </p>
-              <p className="grantee-box-description text-[#696969] text-lg">
-                تعمیر توسط تکنسین‌های حرفه‌ای با قطعات اصلی
-              </p>
             </div>
-          </div>
-          <div className="flex flex-col md:flex-row justify-between gap-6 items-center w-full">
-            <div className="garantee-box garantee-box flex flex-col md:flex justify-between items-center p-4 bg-white rounded-[40px] flex-5/12 h-[361px]">
-              <div className="grantee-box-image w-full h-[253px]">
+            <p className="grantee-box-title text-2xl font-bold">
+                تعمیر تخصصی با قطعات اورجینال
+            </p>
+            <p className="grantee-box-description text-[#696969] text-lg">
+                تعمیر توسط تکنسین‌های حرفه‌ای با قطعات اصلی
+            </p>
+        </div>
+    </div>
+    
+    <div className="grid grid-cols-1 gap-6 items-center w-full
+                    md:grid-cols-12 md:gap-6">
+        
+        <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-4">
+            <div className="grantee-box-image w-full h-[253px]">
                 <img
                   src={`${STRAPI_URL}${publicGallery[3]?.image?.url}`}
                   alt={`${
@@ -557,14 +566,16 @@ const HomePage = () => {
                   loading="lazy"
                   className="w-full h-full"
                 />
-              </div>
-              <p className="grantee-box-title text-2xl font-bold">اصالت کالا</p>
-              <p className="grantee-box-description text-[#696969] text-lg">
-                تمام محصولات با تضمین اورجینال بودن
-              </p>
             </div>
-            <div className="garantee-box garantee-box flex flex-col md:flex justify-between items-center p-4 bg-white rounded-[40px] flex-5/12 h-[361px]">
-              <div className="grantee-box-image w-full h-[253px]">
+            <p className="garantee-box-title text-2xl font-bold">اصالت کالا</p>
+            <p className="garantee-box-description text-[#696969] text-lg">
+                تمام محصولات با تضمین اورجینال بودن
+            </p>
+        </div>
+        
+        <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-4">
+            <div className="grantee-box-image w-full h-[253px]">
                 <img
                   src={`${STRAPI_URL}${publicGallery[2]?.image?.url}`}
                   alt={`${
@@ -575,16 +586,18 @@ const HomePage = () => {
                   loading="lazy"
                   className="w-full h-full"
                 />
-              </div>
-              <p className="grantee-box-title text-2xl font-bold">
-                ضمانت قیمت و کیفیت
-              </p>
-              <p className="grantee-box-description text-[#696969] text-lg">
-                بهترین کیفیت با منصفانه‌ترین قیمت بازار
-              </p>
             </div>
-            <div className="garantee-box garantee-box flex flex-col md:flex justify-between items-center p-4 bg-white rounded-[40px] flex-5/12 h-[361px]">
-              <div className="grantee-box-image w-full h-[253px]">
+            <p className="garantee-box-title text-2xl font-bold">
+                ضمانت قیمت و کیفیت
+            </p>
+            <p className="garantee-box-description text-[#696969] text-lg">
+                بهترین کیفیت با منصفانه‌ترین قیمت بازار
+            </p>
+        </div>
+        
+        <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-4">
+            <div className="grantee-box-image w-full h-[253px]">
                 <img
                   src={`${STRAPI_URL}${publicGallery[4]?.image?.url}`}
                   alt={`${
@@ -595,17 +608,17 @@ const HomePage = () => {
                   loading="lazy"
                   className="w-full h-full"
                 />
-              </div>
-              <p className="grantee-box-title text-2xl font-bold">گارانتی</p>
-              <p className="grantee-box-description text-[#696969] text-lg">
-                اطمینان خاطر از خرید با ضمانت معتبر
-              </p>
             </div>
-          </div>
+            <p className="garantee-box-title text-2xl font-bold">گارانتی</p>
+            <p className="garantee-box-description text-[#696969] text-lg">
+                اطمینان خاطر از خرید با ضمانت معتبر
+            </p>
         </div>
+    </div>
+</div>
       </section>
 
-      <section className="flex gap-8 flex-wrap justify-center flex-col section__two px-[15px] md:px-[58px] container">
+      <section className="flex gap-8 flex-wrap justify-center flex-col section__two px-[15px] md:px-[58px]">
         <div className="section__header flex flex-col items-center justify-center mt-[103px]">
           <div className="container__svg">
             <svg
