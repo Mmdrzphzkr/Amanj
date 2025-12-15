@@ -7,6 +7,8 @@ import publicGalleryReducer from "./slices/publicGallerySlice";
 import BottomSliderReducer from "./slices/bottomSliderSlice";
 import FaqAccordionReducer from "./slices/faqAccordionSlice";
 import CategoryReducer from "./slices/categorySlice";
+import CartReducer from "./slices/cartSlice";
+import { cartMiddleware } from "./middleware/cartMiddleware";
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +20,8 @@ export const store = configureStore({
     bottomSlider: BottomSliderReducer,
     faqAccordion: FaqAccordionReducer,
     categories: CategoryReducer,
+    cart: CartReducer
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(cartMiddleware),
 });
