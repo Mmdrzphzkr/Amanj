@@ -26,7 +26,7 @@ const Footer = () => {
           style={{ zIndex: "-1" }}
           className="w-full h-[600px] absolute bottom-0 left-0 right-0"
         />
-        <div className="container">
+        <div className="container mx-auto p-4 md:p-8">
           <div className="footer-content__container flex justify-between items-start flex-col md:flex-row">
             <div className="footer-content__part-one basis-[100%] md:basis-[30%]">
               <div className="amanj-logo pb-6 flex items-center justify-center pt-4 md:pt-0  md:justify-start md:items-center">

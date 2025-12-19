@@ -32,7 +32,7 @@ const HomePage = () => {
         <BrandSliderContainer />
       </div>
       <section className="flex gap-8 flex-wrap justify-center flex-col section__one">
-        <div className="container mx-auto">
+        <div className="container mx-auto p-4">
           <div className="section__header flex flex-col items-center justify-center mb-[30px] mt-[50px] md:mt-[132px]">
             <div className="container__svg">
               <svg
@@ -618,7 +618,7 @@ const HomePage = () => {
       </section>
 
       <section className="flex gap-8 flex-wrap justify-center flex-col section__two">
-        <div className="container mx-auto">
+        <div className="container mx-auto p-4">
           <div className="section__header flex flex-col items-center justify-center mb-[30px] mt-[50px] md:mt-[103px]">
             <div className="container__svg">
               <svg
@@ -1055,7 +1055,7 @@ const HomePage = () => {
       </section>
 
       <section className="flex gap-8 flex-wrap justify-center flex-col section__three">
-        <div className="container mx-auto">
+        <div className="container mx-auto p-4">
           <div className="section__header flex flex-col items-center justify-center mb-[30px] mt-[50px] md:mt-[103px]">
             <div className="container__svg">
               <svg
@@ -1494,13 +1494,13 @@ const HomePage = () => {
       </section>
 
       <section className="section__four pt-[154px]">
-        <div className="container mx-auto">
+        <div className="container mx-auto p-4">
           <BottomSliderContainer />
         </div>
       </section>
 
       <section className="section__five">
-        <div className="container mx-auto">
+        <div className="container mx-auto p-4">
           <div className="section__header flex flex-col items-center justify-center mb-[30px] mt-[50px] md:mt-[103px]">
             <div className="container__svg">
               <svg

@@ -12,8 +12,8 @@ import StoreProvider from "../redux/StoreProvider";
 const vazirmatn = Vazirmatn({ subsets: ["arabic"], display: "swap" });
 
 export const metadata = {
-  title: "داشبورد فروشگاه",
-  description: "مدیریت فروشگاه شما",
+  title: "Amanj coffee",
+  description: "Amanj coffee shop",
 };
 
 export default function RootLayout({ children }) {
