@@ -1,275 +1,487 @@
-// src/app/checkout/page.jsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { clearCart } from "@/redux/slices/cartSlice"; // برای خالی کردن سبد بعد از خرید
+import { clearCart } from "@/redux/slices/cartSlice";
+import { toast } from "react-hot-toast";
+import Header from "@/components/Header/Header";
+import Loading from "@/components/Loading/Loading";
+import {
+  Grid,
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Paper,
+  CircularProgress,
+  Divider,
+  Container,
+} from "@mui/material";
+import {
+  LocalShippingOutlined,
+  AddLocationAltOutlined,
+} from "@mui/icons-material";
 
 export default function CheckoutPage() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
   const router = useRouter();
   const dispatch = useDispatch();
-  
-  // اطلاعات سبد خرید از Redux
+
   const cartItems = useSelector((state) => state.cart.items);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
-  
-  // وضعیت‌های لوکال برای Checkout
+
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [shippingMethod, setShippingMethod] = useState("پست پیشتاز");
-  const [paymentMethod, setPaymentMethod] = useState("card_to_card");
+  const [shippingMethod] = useState("پست پیشتاز");
+  const [paymentMethod] = useState("card_to_card");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  
-  const SHIPPING_COST = 30000; // هزینه ارسال ثابت (به ریال/تومان)
+  const [showAddressForm, setShowAddressForm] = useState(false);
 
-  // 1. بررسی لاگین و سبد خرید (Auth Guard & Cart Guard)
+  // استیت مطابق با تصویر دیتابیس استرپی
+  const [newAddress, setNewAddress] = useState({
+    title: "",
+    province: "",
+    city: "",
+    postal_code: "",
+    full_address: "",
+    phone: "",
+  });
+  const [isSubmittingAddress, setIsSubmittingAddress] = useState(false);
+
+  const SHIPPING_COST = 30000;
+
+  // ۱. بررسی وضعیت سبد خرید
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      // اگر لاگین نیست، به صفحه لاگین ریدایرکت شود (آدرس فعلی برای بازگشت ذخیره می‌شود)
-      router.push(`/login?callbackUrl=/checkout`);
+    if (!authLoading && cartItems.length === 0) {
+      router.push("/cart");
     }
+  }, [authLoading, cartItems.length, router]);
 
-    if (!authLoading && isAuthenticated && cartItems.length === 0) {
-        // اگر سبد خرید خالی است
-        router.push('/cart');
-    }
-  }, [isAuthenticated, authLoading, router, cartItems.length]);
-
-  // 2. فچ کردن آدرس‌های کاربر
+  // ۲. دریافت آدرس‌های کاربر از API
   useEffect(() => {
     if (isAuthenticated) {
-      const fetchAddresses = async () => {
-        try {
-          // استفاده از API Route محلی که توکن را از کوکی می‌خواند
-          const res = await fetch("/api/user/addresses"); 
-          if (res.ok) {
-            const data = await res.json();
-            setAddresses(data);
-            // انتخاب آدرس پیش‌فرض (مثلا اولین آدرس)
-            if (data.length > 0) {
-              setSelectedAddress(data[0]);
-            }
-          }
-        } catch (error) {
-          console.error("خطا در فچ کردن آدرس‌ها:", error);
-        }
-      };
       fetchAddresses();
     }
   }, [isAuthenticated]);
-  
-  // اگر در حال لودینگ احراز هویت هستیم، چیزی نشان نمی‌دهیم
-  if (authLoading || !isAuthenticated || cartItems.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        در حال هدایت به صفحه لاگین/سبد خرید...
-      </div>
-    );
-  }
 
-  // 3. تابع نهایی ثبت سفارش
-  const handlePlaceOrder = async () => {
-    if (!selectedAddress) {
-      alert("لطفاً یک آدرس برای ارسال انتخاب کنید.");
-      return;
-    }
-    
-    if (isPlacingOrder) return;
-    setIsPlacingOrder(true);
-    
-    // تهیه اسنپ‌شات از محصولات سبد خرید برای ذخیره در سفارش
-    const itemsSnapshot = cartItems.map(item => ({
-        product_id: item.id,
-        quantity: item.quantity,
-        price_at_time_of_order: item.price,
-        title: item.title
-    }));
+  // داخل src/app/checkout/page.jsx
 
-    const finalOrderData = {
-      // داده‌های مورد نیاز مدل Order در Strapi
-      data: {
-        totalAmount: totalAmount + SHIPPING_COST,
-        status: "pending_payment", // وضعیت اولیه
-        paymentMethod: paymentMethod,
-        shippingMethod: shippingMethod,
-        shippingCost: SHIPPING_COST,
-        // رابطه کاربری (userId): چون کاربر لاگین است، Strapi خودش می‌تواند کاربر را ست کند. 
-        // اگر لازم است، می‌توانید user.id را هم بفرستید.
-        user: user.id, 
-        
-        // اسنپ‌شات‌ها (مهم برای عدم تغییر آدرس و قیمت)
-        AddressSnapshot: JSON.stringify(selectedAddress.attributes), 
-        OrderItems: JSON.stringify(itemsSnapshot), 
-      }
-    };
-
+  const fetchAddresses = async () => {
     try {
-        // این درخواست باید به Strapi ارسال شود.
-        const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/orders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // باید توکن JWT کاربر را برای ثبت سفارش ارسال کنیم
-                'Authorization': `Bearer ${user.jwt}` // از user.jwt موجود در AuthContext استفاده می‌کنیم
-            },
-            body: JSON.stringify(finalOrderData),
-        });
+      const res = await fetch("/api/user/addresses");
+      const data = await res.json(); // حتما await res.json را بنویسید
 
-        if (res.ok) {
-            const order = await res.json();
-            alert("سفارش شما با موفقیت ثبت شد.");
-            dispatch(clearCart()); // خالی کردن سبد خرید
-            router.push(`/profile/orders/${order.data.id}`); // هدایت به صفحه جزییات سفارش
+      console.log("Addresses received:", data); // اینجا باید لیست آدرس‌ها (آرایه) را ببینید
+
+      if (res.ok && Array.isArray(data)) {
+        setAddresses(data);
+        console.log(data[0]);
+        if (data.length > 0) {
+          setSelectedAddress(data[0]);
+          setShowAddressForm(false);
         } else {
-            alert("خطا در ثبت سفارش. لطفاً دوباره تلاش کنید.");
+          setShowAddressForm(true);
         }
-
+      } else {
+        setAddresses([]);
+        setShowAddressForm(true);
+      }
     } catch (error) {
-        console.error("Checkout submission error:", error);
-        alert("خطای سیستمی در ثبت سفارش.");
-    } finally {
-        setIsPlacingOrder(false);
+      console.error("Error:", error);
+      setAddresses([]);
     }
   };
 
+  // ۳. ثبت آدرس جدید
+  const handleAddNewAddress = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+
+    if (
+      !newAddress.title ||
+      !newAddress.full_address ||
+      !newAddress.phone ||
+      !newAddress.province ||
+      !newAddress.city
+    ) {
+      toast.error("لطفاً تمام فیلدهای اجباری را پر کنید");
+      return;
+    }
+
+    setIsSubmittingAddress(true);
+    try {
+      const res = await fetch("/api/user/addresses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: newAddress }),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        setAddresses((prev) =>
+          Array.isArray(prev) ? [...prev, result] : [result]
+        );
+        setSelectedAddress(result);
+        setShowAddressForm(false);
+        setNewAddress({
+          title: "",
+          province: "",
+          city: "",
+          postal_code: "",
+          full_address: "",
+          phone: "",
+        });
+        toast.success("آدرس با موفقیت ثبت شد");
+      } else {
+        toast.error(result.error || "خطا در ثبت آدرس");
+      }
+    } catch (error) {
+      toast.error("ارتباط با سرور برقرار نشد");
+    } finally {
+      setIsSubmittingAddress(false);
+    }
+  };
+
+  // ۴. ثبت نهایی سفارش
+  const handlePlaceOrder = async () => {
+    if (!selectedAddress) {
+      toast.error("لطفاً یک آدرس انتخاب کنید");
+      return;
+    }
+
+    setIsPlacingOrder(true);
+
+    // ۱. آماده‌سازی آیتم‌ها مطابق فیلد items در دیتابیس (JSON)
+    const itemsArray = cartItems.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+      price: item.price,
+      title: item.title,
+    }));
+
+    const finalOrderData = {
+      data: {
+        // مقدار فیلد order_id اگر در استرپی Auto-generate نیست باید اینجا تولید شود
+        order_id: `ORD-${Date.now()}`,
+
+        // مطابق نام فیلد در عکس (statuses)
+        statuses: "pending",
+
+        // مطابق نام فیلد در عکس (items) - ارسال به صورت آرایه/آبجکت برای فیلد JSON
+        items: itemsArray,
+
+        // ایجاد رابطه با آدرس انتخاب شده (ارسال فقط ID)
+        order_address: selectedAddress.id,
+
+      },
+    };
+
+    try {
+      const res = await fetch("/api/user/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalOrderData),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        toast.error(result?.message || "خطا در ثبت سفارش");
+        return;
+      }
+
+      toast.success("سفارش شما با موفقیت ثبت شد ✅");
+      dispatch(clearCart());
+      // در استرپی معمولاً آیدی در result.data.id است
+      router.push(`/profile/orders/${result.id || result.data?.id}`);
+    } catch (error) {
+      toast.error("خطای سیستمی در ثبت سفارش");
+    } finally {
+      setIsPlacingOrder(false);
+    }
+  };
+
+  if (authLoading) return <Loading />;
+
+  if (!isAuthenticated) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 10 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 5,
+            textAlign: "center",
+            borderRadius: "32px",
+            border: "1px solid #DED9CC",
+            bgcolor: "#EDE9DE",
+          }}
+        >
+          <Typography variant="h5" fontWeight="bold" mb={2}>
+            نیاز به ورود به حساب
+          </Typography>
+          <Box
+            sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 3 }}
+          >
+            <Button
+              variant="contained"
+              onClick={() => router.push("/login?callbackUrl=/checkout")}
+              sx={{ bgcolor: "#3F3F3F" }}
+            >
+              ورود
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => router.push("/register?callbackUrl=/checkout")}
+              sx={{ color: "#3F3F3F", borderColor: "#3F3F3F" }}
+            >
+              ثبت نام
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-4 flex flex-col lg:flex-row gap-8">
-      
-      {/* ستون راست: اطلاعات سفارش و پرداخت */}
-      <div className="lg:w-1/3 order-1 lg:order-2">
-        <div className="sticky top-4 p-6 bg-gray-50 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold mb-4 border-b pb-2">خلاصه سفارش</h2>
-          
-          <div className="space-y-2 text-gray-700">
-            <div className="flex justify-between">
-              <span>جمع اقلام ({cartItems.length} کالا):</span>
-              <span className="font-semibold">{totalAmount.toLocaleString()} تومان</span>
-            </div>
-            <div className="flex justify-between">
-              <span>هزینه ارسال:</span>
-              <span className="font-semibold">{SHIPPING_COST.toLocaleString()} تومان</span>
-            </div>
-          </div>
-          
-          <div className="flex justify-between text-lg font-bold mt-4 pt-4 border-t border-dashed">
-            <span>مبلغ قابل پرداخت:</span>
-            <span className="text-green-600">{(totalAmount + SHIPPING_COST).toLocaleString()} تومان</span>
-          </div>
-
-          <button
-            onClick={handlePlaceOrder}
-            disabled={isPlacingOrder || !selectedAddress}
-            className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg text-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
-          >
-            {isPlacingOrder ? "در حال ثبت سفارش..." : "تأیید و ثبت نهایی سفارش"}
-          </button>
-
-          {paymentMethod === 'card_to_card' && (
-            <div className="mt-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-sm text-yellow-800">
-                <p className="font-bold">روش پرداخت: کارت به کارت</p>
-                <p>پس از ثبت سفارش، لطفاً مبلغ را به شماره کارت زیر واریز نمایید:</p>
-                <p className="ltr text-center font-mono mt-1 select-all">**6037-99XX-XXXX-XXXX**</p>
-                <p className="text-xs mt-1">پس از واریز، وضعیت سفارش شما توسط ادمین تایید خواهد شد.</p>
-            </div>
-          )}
-          {paymentMethod === 'online' && (
-            <div className="mt-4 p-3 bg-red-100 border border-red-400 rounded text-sm text-red-800">
-                <p className="font-bold">روش پرداخت: درگاه اینترنتی (غیرفعال)</p>
-                <p>درگاه پرداخت فعال نیست. لطفاً از روش کارت به کارت استفاده کنید.</p>
-            </div>
-          )}
-
-        </div>
-      </div>
-
-      {/* ستون چپ: آدرس و روش‌های ارسال */}
-      <div className="lg:w-2/3 order-2 lg:order-1 space-y-8">
-        
-        {/* بخش ۱: انتخاب آدرس */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 border-b pb-2">۱. آدرس‌های ثبت‌شده</h2>
-          {addresses.length === 0 ? (
-            <div className="p-4 bg-yellow-50 rounded">
-                شما هنوز آدرسی ثبت نکرده‌اید. لطفاً آدرس جدیدی اضافه کنید.
-            </div>
-            // اینجا باید یک Modal یا فرم برای افزودن آدرس جدید اضافه کنید
-          ) : (
-            <div className="grid gap-4">
-              {addresses.map((addr) => (
-                <div 
-                  key={addr.id}
-                  onClick={() => setSelectedAddress(addr)}
-                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                    selectedAddress?.id === addr.id ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-500' : 'hover:border-gray-400 bg-white'
-                  }`}
+    <>
+      <Header />
+      <Container maxWidth="lg" sx={{ py: 6, paddingTop: "90px" }}>
+        <Grid container spacing={4}>
+          {/* ستون راست: آدرس */}
+          <Grid item xs={12} md={8}>
+            <Paper
+              elevation={0}
+              sx={{ p: 4, borderRadius: "24px", border: "1px solid #eee" }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 4,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
                 >
-                  <div className="font-bold">{addr.attributes.Title}</div>
-                  <div className="text-sm text-gray-600">گیرنده: {addr.attributes.RecipientName} ({addr.attributes.RecipientPhone})</div>
-                  <div className="text-sm mt-1">{addr.attributes.FullAddress}، {addr.attributes.City}</div>
-                </div>
-              ))}
-              <button className="text-blue-500 hover:text-blue-600 text-sm mt-2">
-                + افزودن آدرس جدید
-              </button>
-            </div>
-          )}
-        </div>
+                  <LocalShippingOutlined /> ۱. اطلاعات ارسال
+                </Typography>
+                {!showAddressForm && (
+                  <Button
+                    startIcon={<AddLocationAltOutlined />}
+                    onClick={() => setShowAddressForm(true)}
+                    sx={{ color: "#C5A35C" }}
+                  >
+                    افزودن آدرس جدید
+                  </Button>
+                )}
+              </Box>
 
-        {/* بخش ۲: روش ارسال */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 border-b pb-2">۲. روش ارسال</h2>
-          {/* اینجا می‌توانید Radio Button برای روش‌های ارسال بگذارید */}
-          <div className="p-4 border rounded-lg bg-white">
-            <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
-              <input
-                type="radio"
-                name="shipping"
-                value="پست پیشتاز"
-                checked={shippingMethod === "پست پیشتاز"}
-                onChange={(e) => setShippingMethod(e.target.value)}
-                className="form-radio h-4 w-4 text-blue-600"
-              />
-              <span className="font-semibold">پست پیشتاز (۳ تا ۵ روز کاری) - {SHIPPING_COST.toLocaleString()} تومان</span>
-            </label>
-          </div>
-        </div>
+              {!showAddressForm ? (
+                <Grid container spacing={2}>
+                  {addresses?.map((addr) => (
+                    <Grid item xs={12} key={addr.id}>
+                      <Paper
+                        onClick={() => setSelectedAddress(addr)}
+                        sx={{
+                          p: 3,
+                          cursor: "pointer",
+                          borderRadius: "16px",
+                          border:
+                            selectedAddress?.id === addr.id
+                              ? "2px solid #C5A35C"
+                              : "1px solid #eee",
+                          bgcolor:
+                            selectedAddress?.id === addr.id
+                              ? "#FFFAEE"
+                              : "white",
+                        }}
+                      >
+                        <Typography fontWeight="bold">{addr.title}</Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          {addr.province}، {addr.city}، {addr.full_address}
+                        </Typography>
+                        <Typography variant="caption">
+                          تلفن: {addr.phone}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <Box component="form">
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="عنوان آدرس"
+                        value={newAddress.title}
+                        onChange={(e) =>
+                          setNewAddress({
+                            ...newAddress,
+                            title: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="استان"
+                        value={newAddress.province}
+                        onChange={(e) =>
+                          setNewAddress({
+                            ...newAddress,
+                            province: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="شهر"
+                        value={newAddress.city}
+                        onChange={(e) =>
+                          setNewAddress({ ...newAddress, city: e.target.value })
+                        }
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="کد پستی"
+                        value={newAddress.postal_code}
+                        onChange={(e) =>
+                          setNewAddress({
+                            ...newAddress,
+                            postal_code: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="شماره تماس"
+                        value={newAddress.phone}
+                        onChange={(e) =>
+                          setNewAddress({
+                            ...newAddress,
+                            phone: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label="آدرس دقیق"
+                        value={newAddress.full_address}
+                        onChange={(e) =>
+                          setNewAddress({
+                            ...newAddress,
+                            full_address: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: "flex", gap: 2, mt: 2 }}>
+                      <Button
+                        variant="contained"
+                        onClick={handleAddNewAddress}
+                        disabled={isSubmittingAddress}
+                        sx={{ bgcolor: "#3F3F3F" }}
+                      >
+                        {isSubmittingAddress
+                          ? "در حال ثبت..."
+                          : "ذخیره و انتخاب آدرس"}
+                      </Button>
+                      {addresses?.length > 0 && (
+                        <Button onClick={() => setShowAddressForm(false)}>
+                          انصراف
+                        </Button>
+                      )}
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+            </Paper>
+          </Grid>
 
-        {/* بخش ۳: روش پرداخت */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 border-b pb-2">۳. روش پرداخت</h2>
-          <div className="space-y-3">
-            <label className={`block p-4 border rounded-lg cursor-pointer ${paymentMethod === 'card_to_card' ? 'border-green-500 bg-green-50' : 'bg-white'}`}>
-              <input
-                type="radio"
-                name="payment"
-                value="card_to_card"
-                checked={paymentMethod === "card_to_card"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="form-radio h-4 w-4 text-green-600"
-              />
-              <span className="mr-3 font-semibold">کارت به کارت (پرداخت در خارج از سایت)</span>
-            </label>
-            
-            <label className={`block p-4 border rounded-lg cursor-pointer ${paymentMethod === 'online' ? 'border-gray-300 bg-gray-100' : 'bg-white'}`}>
-              <input
-                type="radio"
-                name="payment"
-                value="online"
-                checked={paymentMethod === "online"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                disabled // موقتاً غیرفعال
-                className="form-radio h-4 w-4 text-gray-400"
-              />
-              <span className="mr-3 font-semibold text-gray-500">پرداخت اینترنتی (فعلاً غیرفعال)</span>
-            </label>
-          </div>
-        </div>
-
-      </div>
-    </div>
+          {/* ستون چپ: خلاصه فاکتور */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 4,
+                borderRadius: "24px",
+                border: "1px solid #DED9CC",
+                bgcolor: "#F9F8F5",
+                position: "sticky",
+                top: "100px",
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold" mb={3}>
+                خلاصه سفارش
+              </Typography>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+              >
+                <Typography color="textSecondary">جمع محصولات:</Typography>
+                <Typography fontWeight="bold">
+                  {totalAmount.toLocaleString()} تومان
+                </Typography>
+              </Box>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+              >
+                <Typography color="textSecondary">هزینه ارسال:</Typography>
+                <Typography fontWeight="bold">
+                  {SHIPPING_COST.toLocaleString()} تومان
+                </Typography>
+              </Box>
+              <Divider sx={{ my: 2 }} />
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}
+              >
+                <Typography variant="h6" fontWeight="bold">
+                  مبلغ قابل پرداخت:
+                </Typography>
+                <Typography variant="h6" fontWeight="bold" color="#C5A35C">
+                  {(totalAmount + SHIPPING_COST).toLocaleString()} تومان
+                </Typography>
+              </Box>
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                onClick={handlePlaceOrder}
+                disabled={isPlacingOrder || !selectedAddress}
+                sx={{
+                  bgcolor: "#3F3F3F",
+                  py: 2,
+                  borderRadius: "15px",
+                  fontWeight: "bold",
+                }}
+              >
+                {isPlacingOrder ? "در حال ثبت..." : "ثبت و پرداخت نهایی"}
+              </Button>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </>
   );
 }

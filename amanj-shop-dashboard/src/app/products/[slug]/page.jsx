@@ -1,4 +1,4 @@
-// page.jsx
+// src/app/products/[slug]/page.jsx
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -11,8 +11,10 @@ import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import SwiperWrapper from "@/components/Swiper/SwiperWrapper";
 import { Suspense } from "react";
 import Loading from "@/components/Loading/Loading";
-// ✅ ایمپورت کردن کامپوننت مودال (پاپ‌آپ)
 import OrderModal from "@/components/Modal/OrderModal";
+import { useDispatch } from "react-redux"; // ۱. اضافه شد
+import { addItem } from "@/redux/slices/cartSlice"; // ۲. اضافه شد
+import { toast } from "react-hot-toast";
 
 // Import Swiper styles
 import "swiper/css";
@@ -29,6 +31,7 @@ function TabPanel({ children, value, index }) {
 }
 
 export default function ProductPage() {
+  const dispatch = useDispatch();
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +49,7 @@ export default function ProductPage() {
           `/api/products?filters[slug][$eq]=${slug}&populate=*`
         );
         if (response && response.length > 0) {
+          console.log(response[0]);
           setProduct(response[0]);
         }
         setLoading(false);
@@ -101,6 +105,40 @@ export default function ProductPage() {
         spaceBetween: 10,
       },
     },
+  };
+
+  const handleAddToCart = () => {
+    if (product.stock > 0) {
+      dispatch(
+        addItem({
+          id: product.id,
+          documentId: product.documentId,
+          title: product.name,
+          price: product.price,
+          image: `${STRAPI_URL}${product.thumbnail?.url}`,
+          quantity: 1,
+        })
+      );
+
+      // جایگزینی alert با toast
+      toast.success(`${product.name} به سبد خرید اضافه شد`, {
+        style: {
+          border: "1px solid #EDE9DE",
+          padding: "16px",
+          color: "#3F3F3F",
+          background: "#F9F8F5",
+          borderRadius: "12px",
+          fontSize: "14px",
+          fontWeight: "bold",
+        },
+        iconTheme: {
+          primary: "#C5A35C", // هماهنگ با رنگ طلایی برند شما
+          secondary: "#FFFAEE",
+        },
+      });
+    } else {
+      toast.error("متاسفانه موجودی این کالا به اتمام رسیده است.");
+    }
   };
 
   return (
@@ -159,7 +197,7 @@ export default function ProductPage() {
             </div>
             <div>
               {/* ✅ دکمه ثبت سفارش که مودال را باز می‌کند */}
-              <button
+              {/* <button
                 className="bg-primary text-[#696969] px-6 py-3 rounded-lg bg-[#EDE9DE] hover:bg-[#B4B4B4] cursor-pointer transition"
                 onClick={() => {
                   console.log("Opening modal...");
@@ -167,6 +205,17 @@ export default function ProductPage() {
                 }}
               >
                 ثبت سفارش
+              </button> */}
+              <button
+                disabled={product.stock <= 0}
+                className={`flex-1 px-8 py-4 rounded-xl font-bold transition-all shadow-lg ${
+                  product.stock > 0
+                    ? "bg-[#3F3F3F] text-[#EDE9DE] hover:bg-[#C5A35C] cursor-pointer"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+                onClick={handleAddToCart}
+              >
+                {product.stock > 0 ? "افزودن به سبد خرید" : "ناموجود"}
               </button>
             </div>
           </div>
@@ -208,14 +257,14 @@ export default function ProductPage() {
 
         {/* ✅ رندر کردن کامپوننت مودال (پاپ‌آپ) */}
         {/* این کامپوننت تا زمانی که 'open' false باشد، پنهان است */}
-        <OrderModal
+        {/* <OrderModal
           open={isOrderModalOpen}
           onClose={() => {
             console.log("Closing modal...");
             setIsOrderModalOpen(false);
           }}
           product={product}
-        />
+        /> */}
       </main>
       <Footer />
     </Suspense>

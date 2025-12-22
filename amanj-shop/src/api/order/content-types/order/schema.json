@@ -11,35 +11,37 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "customerName": {
-      "type": "string",
+    "order_id": {
+      "type": "uid",
       "required": true
     },
-    "customerPhone": {
-      "type": "string",
-      "default": "customerPhone",
-      "required": true,
-      "regex": "^09[0-9]{9}$"
-    },
-    "orderStatus": {
+    "statuses": {
       "type": "enumeration",
-      "required": false,
+      "required": true,
+      "default": "pending",
       "enum": [
-        "new",
+        "shipped",
         "processing",
-        "completed",
-        "canceled"
+        "pending",
+        "cancelled",
+        "delivered"
       ]
     },
-    "products": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::product.product",
-      "mappedBy": "order"
+    "items": {
+      "type": "json",
+      "required": true
     },
-    "totalPrice": {
-      "type": "decimal",
-      "required": false
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "orders"
+    },
+    "order_address": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::address.address",
+      "inversedBy": "orders"
     }
   }
 }

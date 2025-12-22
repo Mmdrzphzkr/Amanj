@@ -3,52 +3,105 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 // استفاده از متغیر محیطی آدرس استرپی
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL; 
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
 export async function GET() {
   const cookieStore = cookies();
   const token = cookieStore.get("strapi_jwt")?.value;
 
   if (!token) {
-    // کاربر لاگین نیست
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json([], { status: 401 });
   }
 
   try {
-    // 1. دریافت اطلاعات کاربری (برای گرفتن ID و ارسال توکن به استرپی)
-    // بهتر است این مرحله را تکرار کنیم تا مطمئن شویم توکن هنوز معتبر است و ID را داریم
+    // 1. تایید هویت کاربر و گرفتن ID
     const userRes = await fetch(`${STRAPI_URL}/api/users/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
     });
 
     if (!userRes.ok) {
-        // اگر توکن منقضی شده، به کاربر اجازه دسترسی نمی‌دهیم
-        return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+      return NextResponse.json([], { status: 401 });
     }
     const user = await userRes.json();
     const userId = user.id;
 
-    // 2. فچ کردن لیست سفارشات کاربر
-    // فیلتر: سفارشاتی که فیلد 'user' آنها برابر با userId است.
-    // Populate: برای نمایش جزییات بیشتر (مثلاً اگر در آینده رابطه‌ای با محصول اضافه کردید)
-    const ordersRes = await fetch(
-      `${STRAPI_URL}/api/orders?filters[user][id][$eq]=${userId}&sort=createdAt:desc&populate=*`, // جدیدترین‌ها اول نمایش داده شوند
-      {
-        headers: {
-          Authorization: `Bearer ${token}`, // ارسال توکن برای دسترسی به محتوای محافظت شده
-        },
-      }
-    );
+    // 2. فچ کردن سفارشات با نام صحیح رابطه: users_permissions_user
+    // همچنین اضافه کردن populate=* برای گرفتن جزئیات آدرس و آیتم‌ها
+    const url = `${STRAPI_URL}/api/orders?filters[users_permissions_user][id][$eq]=${userId}&sort=createdAt:desc&populate=*`;
+
+    const ordersRes = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
 
     const ordersData = await ordersRes.json();
-    
-    // برگرداندن داده‌ها به فرانت‌اند
-    return NextResponse.json(ordersData.data);
 
+    // استراپی دیتا را در فیلد data برمی‌گرداند. اگر خالی بود آرایه [] بدهید.
+    return NextResponse.json(ordersData.data || []);
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json([], { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  const cookieStore = cookies();
+  const token = cookieStore.get("strapi_jwt")?.value;
+
+  if (!token)
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+  try {
+    // 1. گرفتن کاربر
+    const userRes = await fetch(`${STRAPI_URL}/api/users/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!userRes.ok)
+      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+
+    const user = await userRes.json();
+    const userId = user.id;
+
+    const body = await request.json();
+
+    // 2. payload صحیح v5
+    const orderPayload = {
+      data: {
+        ...body.data,
+        users_permissions_user: {
+          connect: [userId],
+        },
+      },
+    };
+
+    // 3. ارسال به Strapi
+    const res = await fetch(`${STRAPI_URL}/api/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(orderPayload),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      console.error("STRAPI ERROR:", result);
+      return NextResponse.json(
+        { message: result?.error?.message || "Strapi error" },
+        { status: res.status }
+      );
+    }
+
+    return NextResponse.json(result.data);
+  } catch (error) {
+    console.error("ORDER POST ERROR:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

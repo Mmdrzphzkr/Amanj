@@ -1,55 +1,224 @@
 "use client";
 
-import { useAuth } from "@/context/AuthContext"; // ایمپورت useAuth
+import { useAuth } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
-import OrdersList from "@/components/OrdersList"; // این کامپوننت را بعدا می‌سازیم
+import Link from "next/link";
+// MUI Components
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Button,
+  Divider,
+  Avatar,
+  Stack,
+  IconButton,
+  Container,
+} from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import EditIcon from "@mui/icons-material/Edit";
+
 import Loading from "@/components/Loading/Loading";
+import OrdersList from "@/components/orderList/OrderList";
+import Header from "@/components/Header/Header";
 
 export default function ProfilePage() {
   const { user, loading, isAuthenticated, logout } = useAuth();
 
-  // اگر هنوز وضعیت لاگین مشخص نیست، یک لودر نشان بده
-   if (loading) {
-    return <Loading />;
-  }
-  
-  // اگر لاگین نیست، به صفحه اصلی برود (بهتر است از middleware استفاده کنید)
+  if (loading) return <Loading />;
+
   if (!isAuthenticated) {
-    // اگر از middleware استفاده نمی‌کنید:
-    redirect("/login?callbackUrl=/profile"); 
+    redirect("/login?callbackUrl=/profile");
   }
 
-  // حالا که مطمئنیم کاربر لاگین است، می‌توانیم اطلاعاتش را نمایش دهیم
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center border-b pb-3 mb-6">
-        <h1 className="text-3xl font-bold">پروفایل کاربری {user.username}</h1>
-        <button
-          onClick={logout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+    <>
+      <Header />
+      <Container maxWidth="lg" sx={{ mt: 12, mb: 6 }}>
+        {/* سربرگ صفحه با دکمه‌های عملیاتی */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mb: 6 }}
         >
-          خروج از حساب
-        </button>
-      </div>
+          <Typography variant="h4" fontWeight="bold" color="text.primary">
+            پروفایل کاربری {user.username}
+          </Typography>
 
-      <section className="mb-8 p-6 bg-gray-100 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">اطلاعات کاربری</h2>
-        <p><strong>نام کاربری:</strong> {user.username}</p>
-        <p><strong>ایمیل:</strong> {user.email}</p>
-        {/* بعداً فیلد آدرس را هم از استرپی اینجا نمایش می‌دهید */}
-        {/* <p><strong>آدرس پیش‌فرض:</strong> ...</p> */}
-        
-        {/* دکمه‌ای برای ویرایش اطلاعات */}
-        <button className="mt-4 text-blue-500 hover:underline">ویرایش اطلاعات</button>
-      </section>
+          <Stack direction="row" spacing={2}>
+            {/* دکمه بازگشت به صفحه اصلی */}
+            <Button
+              component={Link}
+              href="/"
+              variant="outlined"
+              startIcon={<HomeIcon />}
+              sx={{
+                borderColor: "#EDE9DE",
+                color: "#333",
+                "&:hover": {
+                  borderColor: "#D4CFC2",
+                  backgroundColor: "#F9F8F5",
+                },
+              }}
+            >
+              صفحه اصلی
+            </Button>
 
-      {/* لیست سفارشات (مرحله بعدی) */}
-      <section>
-        <h2 className="text-xl font-semibold mb-4">لیست سفارشات شما</h2>
-        {/* در اینجا باید کامپوننت لیست سفارشات را بگذارید */}
-        <OrdersList />
-        <p className="text-gray-500">لیست سفارشات به زودی در اینجا نمایش داده خواهد شد.</p>
-      </section>
-    </div>
+            {/* دکمه خروج */}
+            <Button
+              variant="contained"
+              color="error"
+              onClick={logout}
+              startIcon={<ExitToAppIcon />}
+              sx={{ px: 3, py: 1.5 }}
+            >
+              خروج از حساب
+            </Button>
+          </Stack>
+        </Stack>
+
+        {/* اطلاعات کاربری */}
+        <Card
+          sx={{
+            mb: 4,
+            backgroundColor: "#F9F8F5",
+            borderRadius: 3,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            border: "1px solid #EDE9DE",
+          }}
+        >
+          <CardHeader
+            avatar={
+              <Avatar
+                sx={{
+                  bgcolor: "#EDE9DE",
+                  color: "#333",
+                  width: 64,
+                  height: 64,
+                  fontSize: 28,
+                  fontWeight: "bold",
+                }}
+              >
+                {user.username?.charAt(0)?.toUpperCase() || "U"}
+              </Avatar>
+            }
+            title={
+              <Typography variant="h5" fontWeight="600" color="text.primary">
+                اطلاعات کاربری
+              </Typography>
+            }
+            action={
+              <Button
+                variant="outlined"
+                startIcon={<EditIcon />}
+                sx={{
+                  borderColor: "#EDE9DE",
+                  color: "#333",
+                  "&:hover": {
+                    borderColor: "#D4CFC2",
+                    backgroundColor: "#F9F8F5",
+                  },
+                }}
+              >
+                ویرایش اطلاعات
+              </Button>
+            }
+          />
+
+          <Divider sx={{ borderColor: "#EDE9DE", mx: 3 }} />
+
+          <CardContent sx={{ pt: 3 }}>
+            <Stack spacing={2.5}>
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  gutterBottom
+                >
+                  نام کاربری
+                </Typography>
+                <Typography variant="body1" fontWeight="500">
+                  {user.username}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  gutterBottom
+                >
+                  ایمیل
+                </Typography>
+                <Typography variant="body1" fontWeight="500">
+                  {user.email}
+                </Typography>
+              </Box>
+
+              {/* می‌توانید فیلدهای بیشتری اضافه کنید */}
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  gutterBottom
+                >
+                  تاریخ عضویت
+                </Typography>
+                <Typography variant="body1" fontWeight="500">
+                  {user.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString("fa-IR")
+                    : "نامشخص"}
+                </Typography>
+              </Box>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        {/* لیست سفارشات */}
+        <Card
+          sx={{
+            backgroundColor: "#F9F8F5",
+            borderRadius: 3,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            border: "1px solid #EDE9DE",
+          }}
+        >
+          <CardHeader
+            title={
+              <Typography variant="h5" fontWeight="600" color="text.primary">
+                تاریخچه سفارشات
+              </Typography>
+            }
+            subheader={
+              <Typography variant="body2" color="text.secondary">
+                تمام سفارشات شما در یک نگاه
+              </Typography>
+            }
+          />
+
+          <Divider sx={{ borderColor: "#EDE9DE", mx: 3 }} />
+
+          <CardContent sx={{ pt: 3 }}>
+            <OrdersList />
+
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                mt: 3,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              لیست سفارشات به زودی با جزئیات کامل نمایش داده خواهد شد.
+            </Typography>
+          </CardContent>
+        </Card>
+      </Container>
+    </>
   );
 }

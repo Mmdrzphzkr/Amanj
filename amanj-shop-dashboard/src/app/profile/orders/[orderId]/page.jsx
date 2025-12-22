@@ -1,157 +1,257 @@
-// src/app/profile/orders/[orderId]/page.jsx
-import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Box,
+  Grid,
+  Chip,
+  Divider,
+} from "@mui/material";
 
-// استفاده از متغیر محیطی آدرس استرپی
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
-// این یک Server Component است
 async function getOrderDetails(orderId) {
-    const cookieStore = cookies();
-    const token = cookieStore.get('strapi_jwt')?.value;
+  const cookieStore = cookies();
+  const token = cookieStore.get("strapi_jwt")?.value;
+  if (!token) return null;
 
-    if (!token) return null; // اگر لاگین نباشد، اجازه نمی‌دهیم فچ کند
+  try {
+    const res = await fetch(`${STRAPI_URL}/api/orders/${orderId}?populate=*`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
 
-    try {
-        // فچ کردن سفارش مشخص
-        const res = await fetch(`${STRAPI_URL}/api/orders/${orderId}?populate=*`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            // جلوگیری از کش (چون اطلاعات خصوصی کاربر است)
-            cache: 'no-store',
-        });
+    const data = await res.json();
+    const order = data.data;
 
-        if (res.status === 404 || res.status === 401) {
-            return null; // سفارش پیدا نشد یا دسترسی مجاز نیست
-        }
+    const userRes = await fetch(`${STRAPI_URL}/api/users/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
+    const currentUser = await userRes.json();
 
-        if (!res.ok) {
-            throw new Error('خطا در دریافت جزییات سفارش');
-        }
-
-        const data = await res.json();
-        const order = data.data;
-
-        // چک امنیتی: مطمئن شویم این سفارش متعلق به کاربر لاگین شده است
-        // این کار باید در Strapi با Policy انجام شود، اما برای اطمینان این چک را اینجا می‌گذاریم
-        const userRes = await fetch(`${STRAPI_URL}/api/users/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-            cache: 'no-store',
-        });
-        const currentUser = await userRes.json();
-
-        // اگر سفارش دارای فیلد user باشد و برابر با کاربر فعلی نباشد
-        if (order.attributes.user?.data?.id !== currentUser.id) {
-            return null; // اجازه دسترسی به سفارش دیگران را نمی‌دهیم
-        }
-
-        return order;
-    } catch (error) {
-        console.error("Fetch Order Details Error:", error);
-        return null;
+    if (order.attributes.users_permissions_user?.data?.id !== currentUser.id) {
+      return null;
     }
+    return order;
+  } catch (error) {
+    return null;
+  }
 }
 
-// تابع کمکی برای نمایش وضعیت
-const getStatusBadge = (status) => {
-    // ... (همان کد قبلی که رنگ‌ها را مشخص می‌کرد)
-    switch (status) {
-        case 'pending_payment':
-            return <span className="px-3 py-1 text-sm font-semibold leading-none rounded text-yellow-800 bg-yellow-200">در انتظار پرداخت</span>;
-        case 'paid':
-            return <span className="px-3 py-1 text-sm font-semibold leading-none rounded text-blue-800 bg-blue-200">پرداخت شده</span>;
-        case 'processing':
-            return <span className="px-3 py-1 text-sm font-semibold leading-none rounded text-indigo-800 bg-indigo-200">در حال آماده‌سازی</span>;
-        case 'shipped':
-            return <span className="px-3 py-1 text-sm font-semibold leading-none rounded text-purple-800 bg-purple-200">ارسال شده</span>;
-        case 'delivered':
-            return <span className="px-3 py-1 text-sm font-semibold leading-none rounded text-green-800 bg-green-200">تحویل موفق</span>;
-        case 'cancelled':
-            return <span className="px-3 py-1 text-sm font-semibold leading-none rounded text-red-800 bg-red-200">لغو شده</span>;
-        default:
-            return <span className="px-3 py-1 text-sm font-semibold leading-none rounded text-gray-800 bg-gray-200">{status}</span>;
-    }
+const getStatusChip = (status) => {
+  const statusMap = {
+    pending_payment: { label: "در انتظار پرداخت", color: "warning" },
+    paid: { label: "پرداخت شده", color: "info" },
+    processing: { label: "در حال آماده‌سازی", color: "primary" },
+    shipped: { label: "ارسال شده", color: "secondary" },
+    delivered: { label: "تحویل موفق", color: "success" },
+    cancelled: { label: "لغو شده", color: "error" },
+  };
+  const current = statusMap[status] || { label: status, color: "default" };
+  return (
+    <Chip
+      label={current.label}
+      color={current.color}
+      variant="outlined"
+      size="small"
+    />
+  );
 };
 
 export default async function OrderDetailsPage({ params }) {
-    const order = await getOrderDetails(params.orderId);
+  const order = await getOrderDetails(params.orderId);
+  if (!order) return notFound();
 
-    if (!order) {
-        return notFound();
-    }
+  const orderData = order.attributes;
+  const orderItems = orderData.items || [];
+  const addressData = orderData.order_address?.data?.attributes || {};
+  const date = new Date(orderData.createdAt).toLocaleDateString("fa-IR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-    const orderData = order.attributes;
-    // فرض می‌کنیم AddressSnapshot و OrderItems به صورت JSON ذخیره شده‌اند
-    const addressSnapshot = JSON.parse(orderData.AddressSnapshot || '{}');
-    const orderItems = JSON.parse(orderData.OrderItems || '[]');
-    const date = new Date(orderData.createdAt).toLocaleDateString('fa-IR', {
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
+  return (
+    <Box sx={{ maxWidth: 1000, mx: "auto", p: 3, mt: 4 }}>
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        gutterBottom
+        sx={{ borderBottom: "2px solid #eee", pb: 2 }}
+      >
+        جزئیات سفارش #{orderData.order_id || order.id}
+      </Typography>
 
-    return (
-        <div className="container mx-auto p-4 max-w-5xl">
-            <h1 className="text-3xl font-bold mb-6 border-b pb-2">جزئیات سفارش #{order.id}</h1>
+      <Grid container spacing={4}>
+        {/* بخش اصلی: جدول محصولات و اطلاعات کلی */}
+        <Grid item xs={12} md={8}>
+          <Paper
+            elevation={0}
+            sx={{ p: 3, mb: 3, border: "1px solid #eee", borderRadius: 4 }}
+          >
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              اطلاعات کلی
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="textSecondary">
+                  تاریخ ثبت:
+                </Typography>{" "}
+                <Typography variant="body1">{date}</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="textSecondary">
+                  وضعیت:
+                </Typography>{" "}
+                {getStatusChip(orderData.statuses)}
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="textSecondary">
+                  روش پرداخت:
+                </Typography>{" "}
+                <Typography variant="body1">
+                  {orderData.paymentMethod === "card_to_card"
+                    ? "کارت به کارت"
+                    : "آنلاین"}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="textSecondary">
+                  هزینه ارسال:
+                </Typography>{" "}
+                <Typography variant="body1">
+                  {orderData.shippingCost?.toLocaleString()} تومان
+                </Typography>
+              </Grid>
+            </Grid>
+          </Paper>
 
-            <div className="grid md:grid-cols-3 gap-6">
+          <Typography variant="h6" fontWeight="bold" mb={2}>
+            اقلام سفارش
+          </Typography>
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            sx={{ border: "1px solid #eee", borderRadius: 4 }}
+          >
+            <Table aria-label="order items table">
+              <TableHead sx={{ backgroundColor: "#f9f9f9" }}>
+                <TableRow>
+                  <TableCell align="right">نام محصول</TableCell>
+                  <TableCell align="center">تعداد</TableCell>
+                  <TableCell align="center">قیمت واحد</TableCell>
+                  <TableCell align="center">جمع کل</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {orderItems.map((item, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell align="right" component="th" scope="row">
+                      {item.title}
+                    </TableCell>
+                    <TableCell align="center">{item.quantity}</TableCell>
+                    <TableCell align="center">
+                      {item.price?.toLocaleString()} ت
+                    </TableCell>
+                    <TableCell align="center">
+                      {(item.price * item.quantity)?.toLocaleString()} ت
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
 
-                {/* ستون راست: اطلاعات اصلی و وضعیت */}
-                <div className="md:col-span-2 space-y-6">
-                    {/* اطلاعات وضعیت و پرداخت */}
-                    <div className="p-5 bg-white rounded-lg shadow-md border-r-4 border-blue-500">
-                        <h2 className="text-xl font-semibold mb-3">وضعیت و پرداخت</h2>
-                        <div className="space-y-2">
-                            <p><strong>وضعیت فعلی:</strong> {getStatusBadge(orderData.Status)}</p>
-                            <p><strong>تاریخ ثبت:</strong> {date}</p>
-                            <p><strong>روش پرداخت:</strong> {orderData.PaymentMethod === 'card_to_card' ? 'کارت به کارت' : 'پرداخت اینترنتی'}</p>
-                            <p><strong>روش ارسال:</strong> {orderData.ShippingMethod}</p>
-                        </div>
-                    </div>
+        {/* بخش کناری: آدرس و خلاصه مالی */}
+        <Grid item xs={12} md={4}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              mb: 3,
+              backgroundColor: "#fcfaf5",
+              border: "1px solid #ded9cc",
+              borderRadius: 4,
+            }}
+          >
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              خلاصه مالی
+            </Typography>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+            >
+              <Typography variant="body2">مجموع محصولات:</Typography>
+              <Typography variant="body2">
+                {(
+                  orderData.totalAmount - (orderData.shippingCost || 0)
+                ).toLocaleString()}{" "}
+                ت
+              </Typography>
+            </Box>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+            >
+              <Typography variant="body2">هزینه ارسال:</Typography>
+              <Typography variant="body2">
+                {(orderData.shippingCost || 0).toLocaleString()} ت
+              </Typography>
+            </Box>
+            <Divider sx={{ mb: 2, borderStyle: "dashed" }} />
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Typography fontWeight="bold">مبلغ نهایی:</Typography>
+              <Typography fontWeight="bold" color="success.main" variant="h6">
+                {orderData.totalAmount?.toLocaleString()} تومان
+              </Typography>
+            </Box>
+          </Paper>
 
-                    {/* اطلاعات محصولات */}
-                    <div className="p-5 bg-white rounded-lg shadow-md">
-                        <h2 className="text-xl font-semibold mb-3">محصولات سفارش داده شده ({orderItems.length} قلم)</h2>
-                        <ul className="divide-y divide-gray-200">
-                            {orderItems.map((item, index) => (
-                                <li key={index} className="py-3 flex justify-between items-center text-sm">
-                                    <div className="flex-1">
-                                        <div className="font-medium">{item.title}</div>
-                                        <div className="text-gray-500">تعداد: {item.quantity}</div>
-                                    </div>
-                                    <div className="font-semibold">{item.price_at_time_of_order.toLocaleString()} تومان</div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                </div>
-
-                {/* ستون چپ: خلاصه مبلغ و آدرس */}
-                <div className="md:col-span-1 space-y-6">
-
-                    {/* خلاصه مبلغ */}
-                    <div className="p-5 bg-gray-50 rounded-lg shadow-md">
-                        <h2 className="text-xl font-semibold mb-3 border-b pb-2">خلاصه مالی</h2>
-                        <div className="space-y-2 text-gray-700">
-                            <div className="flex justify-between"><span>جمع محصولات:</span><span>{(orderData.TotalAmount - orderData.ShippingCost).toLocaleString()}</span></div>
-                            <div className="flex justify-between"><span>هزینه ارسال:</span><span>{orderData.ShippingCost.toLocaleString()}</span></div>
-                        </div>
-                        <div className="flex justify-between text-lg font-bold mt-4 pt-4 border-t border-dashed">
-                            <span>مبلغ نهایی:</span><span className="text-blue-600">{orderData.TotalAmount.toLocaleString()} تومان</span>
-                        </div>
-                    </div>
-
-                    {/* آدرس ارسال */}
-                    <div className="p-5 bg-white rounded-lg shadow-md border-l-4 border-green-500">
-                        <h2 className="text-xl font-semibold mb-3">آدرس ارسال</h2>
-                        <p className="font-bold`">{addressSnapshot.Title}</p>
-                        <p className="text-sm">{addressSnapshot.FullAddress}، {addressSnapshot.City}</p>
-                        <p className="text-sm">کد پستی: {addressSnapshot.PostalCode}</p>
-                        <p className="text-sm mt-2">گیرنده: {addressSnapshot.RecipientName} ({addressSnapshot.RecipientPhone})</p>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    );
+          <Paper
+            elevation={0}
+            sx={{ p: 3, border: "1px solid #eee", borderRadius: 4 }}
+          >
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              آدرس تحویل
+            </Typography>
+            <Typography variant="subtitle2" color="primary" fontWeight="bold">
+              {addressData.title}
+            </Typography>
+            <Typography variant="body2" mt={1}>
+              {addressData.province}، {addressData.city}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              sx={{ mt: 1, lineHeight: 1.8 }}
+            >
+              {addressData.full_address}
+            </Typography>
+            <Typography
+              variant="caption"
+              display="block"
+              mt={2}
+              color="textSecondary"
+            >
+              کد پستی: {addressData.postal_code}
+            </Typography>
+            <Typography variant="caption" display="block" color="textSecondary">
+              تلفن: {addressData.phone}
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 }

@@ -1,125 +1,235 @@
-// src/components/OrdersList.jsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext'; // برای چک کردن توکن و لاگین
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Chip,
+  Button,
+  Skeleton,
+  Stack,
+  Divider,
+  useMediaQuery,
+} from "@mui/material";
+import { VisibilityOutlined, ShoppingBagOutlined } from "@mui/icons-material";
 
-// تابع کمکی برای نمایش وضعیت با رنگ مناسب
+// تابع کمکی برای نمایش وضعیت با رنگ‌های MUI
 const getStatusBadge = (status) => {
-    switch (status) {
-        case 'pending_payment':
-            return <span className="px-2 py-1 text-xs font-semibold leading-none rounded-full text-yellow-800 bg-yellow-200">در انتظار پرداخت</span>;
-        case 'paid':
-            return <span className="px-2 py-1 text-xs font-semibold leading-none rounded-full text-blue-800 bg-blue-200">پرداخت شده</span>;
-        case 'processing':
-            return <span className="px-2 py-1 text-xs font-semibold leading-none rounded-full text-indigo-800 bg-indigo-200">در حال آماده‌سازی</span>;
-        case 'shipped':
-            return <span className="px-2 py-1 text-xs font-semibold leading-none rounded-full text-purple-800 bg-purple-200">ارسال شده</span>;
-        case 'delivered':
-            return <span className="px-2 py-1 text-xs font-semibold leading-none rounded-full text-green-800 bg-green-200">تحویل موفق</span>;
-        case 'cancelled':
-            return <span className="px-2 py-1 text-xs font-semibold leading-none rounded-full text-red-800 bg-red-200">لغو شده</span>;
-        default:
-            return <span className="px-2 py-1 text-xs font-semibold leading-none rounded-full text-gray-800 bg-gray-200">{status}</span>;
-    }
+  const statusMap = {
+    pending_payment: { label: "در انتظار پرداخت", color: "warning" },
+    paid: { label: "پرداخت شده", color: "info" },
+    processing: { label: "در حال آماده‌سازی", color: "primary" },
+    shipped: { label: "ارسال شده", color: "secondary" },
+    delivered: { label: "تحویل موفق", color: "success" },
+    cancelled: { label: "لغو شده", color: "error" },
+  };
+  const current = statusMap[status] || { label: status, color: "default" };
+  return (
+    <Chip
+      label={current.label}
+      color={current.color}
+      size="small"
+      variant="filled"
+    />
+  );
 };
 
 export default function OrdersList() {
-    const { isAuthenticated, loading: authLoading } = useAuth();
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const isMobile = useMediaQuery("(max-width:600px)");
 
-    useEffect(() => {
-        if (!authLoading && isAuthenticated) {
-            const fetchOrders = async () => {
-                setLoading(true);
-                setError(null);
-                try {
-                    // فچ کردن از API Route داخلی (امن)
-                    const res = await fetch("/api/user/orders");
-
-                    if (res.status === 401) {
-                        // توکن منقضی شده یا نامعتبر
-                        throw new Error("نشست کاربری شما منقضی شده است. لطفاً دوباره وارد شوید.");
-                    }
-
-                    if (!res.ok) {
-                        throw new Error("خطا در دریافت لیست سفارشات.");
-                    }
-
-                    const data = await res.json();
-                    setOrders(data);
-                } catch (err) {
-                    setError(err.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchOrders();
-        }
-        // اگر لاگین نبود، کاری نمی‌کنیم چون صفحه پروفایل خودش کاربر را ریدایرکت می‌کند
-        if (!authLoading && !isAuthenticated) {
-            setLoading(false);
-        }
-
-    }, [isAuthenticated, authLoading]);
-
-    if (loading) {
-        return <div className="text-center p-8">در حال بارگذاری لیست سفارشات...</div>;
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      fetchOrders();
+    } else if (!authLoading && !isAuthenticated) {
+      setLoading(false);
     }
+  }, [isAuthenticated, authLoading]);
 
-    if (error) {
-        return <div className="text-center p-8 text-red-600 border border-red-300 bg-red-50 rounded">{error}</div>;
+  const fetchOrders = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/user/orders");
+
+      if (res.status === 401) {
+        throw new Error("نشست کاربری شما منقضی شده است.");
+      }
+
+      if (!res.ok) {
+        throw new Error("خطا در دریافت لیست سفارشات.");
+      }
+
+      const data = await res.json();
+      // دیتای دریافتی از استرپی معمولاً به صورت آرایه مستقیم (از API Route شما) برمی‌گردد
+      setOrders(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (orders.length === 0) {
-        return (
-            <div className="text-center p-8 bg-gray-50 rounded-lg">
-                شما تاکنون هیچ سفارشی ثبت نکرده‌اید.
-            </div>
-        );
-    }
-
+  if (loading) {
     return (
-        <div className="space-y-4">
-            {orders.map((order) => {
-                const orderData = order.attributes;
-                const orderId = order.id;
-
-                // تاریخ شمسی کردن
-                const date = new Date(orderData.createdAt).toLocaleDateString('fa-IR');
-
-                return (
-                    <div
-                        key={orderId}
-                        className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border rounded-lg hover:shadow-md transition-shadow bg-white"
-                    >
-                        <div className="flex flex-col space-y-1">
-                            <span className="font-semibold text-lg text-gray-800">سفارش #{orderId}</span>
-                            <span className="text-sm text-gray-600">تاریخ: {date}</span>
-                        </div>
-
-                        <div className="flex flex-col md:flex-row md:space-x-4 md:space-x-reverse items-start md:items-center mt-3 md:mt-0">
-                            <div className="text-lg font-bold text-green-700">
-                                {orderData.TotalAmount.toLocaleString()} تومان
-                            </div>
-
-                            <div className="my-2 md:my-0">
-                                {getStatusBadge(orderData.Status)}
-                            </div>
-
-                            <Link
-                                href={`/profile/orders/${orderId}`}
-                                className="text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
-                            >
-                                مشاهده جزئیات
-                            </Link>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
+      <Stack spacing={2}>
+        {[1, 2, 3].map((i) => (
+          <Skeleton
+            key={i}
+            variant="rectangular"
+            height={100}
+            sx={{ borderRadius: 4 }}
+          />
+        ))}
+      </Stack>
     );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          p: 4,
+          textAlign: "center",
+          bgcolor: "#FFF5F5",
+          borderRadius: 4,
+          border: "1px solid #FED7D7",
+        }}
+      >
+        <Typography color="error">{error}</Typography>
+        <Button onClick={fetchOrders} sx={{ mt: 2 }}>
+          تلاش مجدد
+        </Button>
+      </Box>
+    );
+  }
+
+  if (orders?.length === 0) {
+    return (
+      <Box
+        sx={{
+          p: 8,
+          textAlign: "center",
+          bgcolor: "#F9F8F5",
+          borderRadius: 8,
+          border: "1px dashed #DED9CC",
+        }}
+      >
+        <ShoppingBagOutlined sx={{ fontSize: 48, color: "#DED9CC", mb: 2 }} />
+        <Typography color="textSecondary">
+          شما تاکنون هیچ سفارشی ثبت نکرده‌اید.
+        </Typography>
+        <Button component={Link} href="/shop" sx={{ mt: 2, color: "#C5A35C" }}>
+          مشاهده محصولات
+        </Button>
+      </Box>
+    );
+  }
+
+  return (
+    <Stack spacing={2}>
+      {orders.map((order) => {
+        const orderData = order;
+        const orderId = order.id;
+        const date = new Date(orderData.createdAt).toLocaleDateString("fa-IR");
+        const calculateTotal = (items) => {
+          if (!items || !Array.isArray(items)) return 0;
+          return items.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+        };
+
+        const totalProductsPrice = calculateTotal(orderData.items);
+        const finalPayable = totalProductsPrice + (orderData.shippingCost || 0);
+        return (
+          <Card
+            key={orderId}
+            elevation={0}
+            sx={{
+              borderRadius: 4,
+              border: "1px solid #eee",
+              transition: "0.3s",
+              "&:hover": {
+                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                borderColor: "#C5A35C",
+              },
+            }}
+          >
+            <CardContent sx={{ p: "16px !important" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  justifyContent: "space-between",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  gap: 2,
+                }}
+              >
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    سفارش #{orderData.order_id || orderId}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    ثبت شده در تاریخ: {date}
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 3,
+                    width: isMobile ? "100%" : "auto",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box sx={{ textAlign: isMobile ? "right" : "left" }}>
+                    <Typography variant="body2" color="textSecondary">
+                      مبلغ کل
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="bold"
+                      color="success.main"
+                    >
+                      {finalPayable.toLocaleString()} تومان
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                      gap: 1,
+                    }}
+                  >
+                    {getStatusBadge(orderData.statuses)}
+                    <Button
+                      component={Link}
+                      href={`/profile/orders/${orderId}`}
+                      variant="text"
+                      size="small"
+                      startIcon={<VisibilityOutlined />}
+                      sx={{ color: "#3F3F3F", fontWeight: "bold" }}
+                    >
+                      جزئیات
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </Stack>
+  );
 }
