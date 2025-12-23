@@ -9,7 +9,11 @@ import ClientProviders from "@/components/ClientProviders/clientProviders";
 import { Toaster } from "react-hot-toast";
 import StoreProvider from "../redux/StoreProvider";
 
-const vazirmatn = Vazirmatn({ subsets: ["arabic"], display: "swap" });
+const vazirmatn = Vazirmatn({
+  subsets: ["arabic", "latin"], // Ensure necessary subsets are included
+  variable: "--font-vazirmatn",
+  display: "swap",
+});
 
 export const metadata = {
   title: "Amanj coffee",
@@ -25,9 +29,7 @@ export default function RootLayout({ children }) {
           reverseOrder={false} // ترتیب نمایش
         />
         <ClientProviders>
-          <StoreProvider>
-            {children}
-          </StoreProvider>
+          <StoreProvider>{children}</StoreProvider>
         </ClientProviders>
       </body>
     </html>

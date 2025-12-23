@@ -4,12 +4,15 @@ import { fetchHeaders } from "@/redux/slices/headerSlice";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "@/context/AuthContext";
+import { fetchCategory } from "@/redux/slices/categorySlice";
 import Link from "next/link";
 
 const Header = () => {
   const dispatch = useDispatch();
   const headers = useSelector((state) => state.headers.items);
   const totalCount = useSelector((state) => state.cart?.totalCount || 0);
+  const categories = useSelector((state) => state.categories.items);
+  const status = useSelector((state) => state.categories.status);
   const { user, isAuthenticated } = useAuth();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,6 +24,12 @@ const Header = () => {
   useEffect(() => {
     dispatch(fetchHeaders());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchCategory()); // اطمینان از بارگذاری داده‌ها
+    }
+  }, [status, dispatch]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -112,14 +121,32 @@ const Header = () => {
 
           {/* آیتم‌های منو */}
           <nav className="mt-8 flex flex-col gap-4">
+            <div className="text-sm text-gray-400 font-bold border-b pb-2">
+              دسته‌بندی محصولات
+            </div>
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/categories/${cat.slug}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-lg font-medium text-gray-700 hover:text-black pr-4 border-r-2 border-transparent hover:border-[#C5A35C]"
+              >
+                {cat.name}
+              </Link>
+            ))}
+
+            <div className="text-sm text-gray-400 font-bold border-b pb-2 mt-4">
+              صفحات
+            </div>
             {headers?.map((h) => (
-              <a
+              <Link
                 key={h.id}
                 href={h.url}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className="text-lg font-medium text-gray-700 hover:text-black"
               >
                 {h.name}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -197,14 +224,50 @@ const Header = () => {
 
           {/* منوی دسکتاپ */}
           <nav className="hidden md:flex justify-start items-center gap-6">
+            {/* بخش داینامیک دسته‌بندی‌ها با حالت Dropdown */}
+            <div className="relative group">
+              <button className="text-[#696969] text-[18px] font-[600] flex items-center gap-1 py-4 cursor-pointer">
+                دسته‌بندی‌ها
+                <svg
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 1L5 5L9 1"
+                    stroke="#696969"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              {/* زیرمنوی بازشونده */}
+              <div className="absolute top-full right-0 bg-white shadow-lg rounded-xl p-4 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-100">
+                {categories.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    href={`/categories/${cat.slug}`}
+                    className="block py-2 px-4 text-[#696969] hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* سایر آیتم‌های هدر که از دیتابیس می‌آیند (مقالات و غیره) */}
             {headers?.map((header) => (
               <div key={header.id}>
-                <a
-                  className="text-[#696969] text-[18px] font-[600]"
+                <Link
+                  className="text-[#696969] text-[18px] font-[600] hover:text-black transition-colors"
                   href={`${header.url}`}
                 >
                   {header.name}
-                </a>
+                </Link>
               </div>
             ))}
           </nav>
@@ -241,7 +304,7 @@ const Header = () => {
           {/* جستجو با افکت باز شدن نرم */}
           <div
             className={`flex items-center border border-gray-300 rounded-full overflow-hidden transition-all duration-500 bg-[#EDE9DE] ${
-              isSearchOpen ? "w-64 px-2" : "w-12 justify-center"
+              isSearchOpen ? "w-64 px-2" : "w-full justify-center"
             }`}
           >
             {isSearchOpen ? (
@@ -271,8 +334,8 @@ const Header = () => {
                 className="flex items-center justify-center"
               >
                 <svg
-                  width="48"
-                  height="49"
+                  width="40"
+                  height="40"
                   viewBox="0 0 48 49"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"

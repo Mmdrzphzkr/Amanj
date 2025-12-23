@@ -1,3 +1,4 @@
+// amanj-shop-dashboard/src/app/categories/[slug]/page.jsx
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
