@@ -841,7 +841,10 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'api::address.address'
     >;
     order_id: Schema.Attribute.UID & Schema.Attribute.Required;
+    payment_details: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
+    shipping_cost: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    shipping_method_name: Schema.Attribute.String & Schema.Attribute.Required;
     statuses: Schema.Attribute.Enumeration<
       ['shipped', 'processing', 'pending', 'cancelled', 'delivered']
     > &
@@ -854,6 +857,36 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+  };
+}
+
+export interface ApiPaymentSettingPaymentSetting
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'payment_settings';
+  info: {
+    displayName: 'PaymentSetting';
+    pluralName: 'payment-settings';
+    singularName: 'payment-setting';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    accountHolder: Schema.Attribute.String;
+    cardNumber: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::payment-setting.payment-setting'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1034,6 +1067,36 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
     product: Schema.Attribute.Relation<'oneToOne', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     rating: Schema.Attribute.Integer & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiShippingShipping extends Struct.CollectionTypeSchema {
+  collectionName: 'shippings';
+  info: {
+    displayName: 'Shipping';
+    pluralName: 'shippings';
+    singularName: 'shipping';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    baseCost: Schema.Attribute.Decimal;
+    cityCosts: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::shipping.shipping'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1564,11 +1627,13 @@ declare module '@strapi/strapi' {
       'api::header.header': ApiHeaderHeader;
       'api::main-slider.main-slider': ApiMainSliderMainSlider;
       'api::order.order': ApiOrderOrder;
+      'api::payment-setting.payment-setting': ApiPaymentSettingPaymentSetting;
       'api::place-order.place-order': ApiPlaceOrderPlaceOrder;
       'api::product-category.product-category': ApiProductCategoryProductCategory;
       'api::product.product': ApiProductProduct;
       'api::public-gallery.public-gallery': ApiPublicGalleryPublicGallery;
       'api::review.review': ApiReviewReview;
+      'api::shipping.shipping': ApiShippingShipping;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

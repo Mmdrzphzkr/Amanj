@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "payment_settings",
+  "info": {
+    "singularName": "payment-setting",
+    "pluralName": "payment-settings",
+    "displayName": "PaymentSetting"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "cardNumber": {
+      "type": "string"
+    },
+    "accountHolder": {
+      "type": "string"
+    }
+  }
+}

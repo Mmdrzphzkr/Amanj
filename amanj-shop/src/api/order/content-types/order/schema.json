@@ -42,6 +42,18 @@
       "relation": "manyToOne",
       "target": "api::address.address",
       "inversedBy": "orders"
+    },
+    "payment_details": {
+      "type": "json",
+      "required": false
+    },
+    "shipping_cost": {
+      "type": "decimal",
+      "required": true
+    },
+    "shipping_method_name": {
+      "type": "string",
+      "required": true
     }
   }
 }

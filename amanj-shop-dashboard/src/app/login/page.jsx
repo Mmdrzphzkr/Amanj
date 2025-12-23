@@ -11,12 +11,13 @@ import {
   Paper,
 } from "@mui/material";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const auth = useAuth();
-
+  const router = useRouter();
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -97,6 +98,13 @@ export default function LoginPage() {
             ورود
           </Button>
         </Box>
+        <Button
+          variant="outlined"
+          onClick={() => router.push("/register?callbackUrl=/checkout")}
+          sx={{ color: "#3F3F3F", borderColor: "#3F3F3F" }}
+        >
+          ثبت نام
+        </Button>
       </Paper>
     </Container>
   );

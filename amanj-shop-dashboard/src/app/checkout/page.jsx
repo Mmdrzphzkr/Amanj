@@ -8,6 +8,7 @@ import { clearCart } from "@/redux/slices/cartSlice";
 import { toast } from "react-hot-toast";
 import Header from "@/components/Header/Header";
 import Loading from "@/components/Loading/Loading";
+import { useRef } from "react";
 import {
   Grid,
   TextField,
@@ -18,28 +19,42 @@ import {
   CircularProgress,
   Divider,
   Container,
+  Radio,
+  Stepper,
+  Step,
+  StepLabel,
 } from "@mui/material";
 import {
   LocalShippingOutlined,
   AddLocationAltOutlined,
 } from "@mui/icons-material";
 
+const steps = ["آدرس ارسال", "روش ارسال", "اطلاعات پرداخت"];
+
 export default function CheckoutPage() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
   const router = useRouter();
   const dispatch = useDispatch();
-
+  const paymentFormRef = useRef(null);
   const cartItems = useSelector((state) => state.cart.items);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
 
+  const [activeStep, setActiveStep] = useState(0);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [shippingMethod] = useState("پست پیشتاز");
-  const [paymentMethod] = useState("card_to_card");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
 
-  // استیت مطابق با تصویر دیتابیس استرپی
+  // استیت‌های جدید برای سیستم ارسال و پرداخت هوشمند
+  const [shippingMethods, setShippingMethods] = useState([]);
+  const [selectedShipping, setSelectedShipping] = useState(null);
+  const [calculatedShippingCost, setCalculatedShippingCost] = useState(0);
+  const [showReceiptForm, setShowReceiptForm] = useState(false);
+  const [paymentSettings, setPaymentSettings] = useState(null);
+  const [paymentInfo, setPaymentInfo] = useState({
+    lastFourDigits: "",
+    trackingCode: "",
+  });
   const [newAddress, setNewAddress] = useState({
     title: "",
     province: "",
@@ -49,8 +64,6 @@ export default function CheckoutPage() {
     phone: "",
   });
   const [isSubmittingAddress, setIsSubmittingAddress] = useState(false);
-
-  const SHIPPING_COST = 30000;
 
   // ۱. بررسی وضعیت سبد خرید
   useEffect(() => {
@@ -63,8 +76,23 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (isAuthenticated) {
       fetchAddresses();
+      fetchShippingMethods();
+      fetchPaymentSettings();
     }
   }, [isAuthenticated]);
+
+  // ۲. محاسبه هزینه ارسال بر اساس شهر آدرس انتخاب شده
+  useEffect(() => {
+    if (selectedAddress && selectedShipping) {
+      const city = selectedAddress.city;
+      // استرپی داده‌ها را در attributes برمی‌گرداند
+      const attrs = selectedShipping;
+      const customCosts = attrs.cityCosts || {};
+
+      const finalCost = customCosts[city] || attrs.baseCost || 0;
+      setCalculatedShippingCost(finalCost);
+    }
+  }, [selectedAddress, selectedShipping]);
 
   // داخل src/app/checkout/page.jsx
 
@@ -91,6 +119,98 @@ export default function CheckoutPage() {
     } catch (error) {
       console.error("Error:", error);
       setAddresses([]);
+    }
+  };
+
+  const fetchShippingMethods = async () => {
+    try {
+      // توجه: آدرس API را مطابق با Strapi تنظیم کنید (مثلاً /api/shippings)
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/shippings`
+      );
+      const data = await res.json();
+      console.log("data: ", data);
+      if (data.data) {
+        setShippingMethods(data.data);
+        setSelectedShipping(data.data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching shipping methods:", error);
+    }
+  };
+
+  const fetchPaymentSettings = async () => {
+    try {
+      // توجه: آدرس API را مطابق با Strapi تنظیم کنید (مثلاً /api/shippings)
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/payment-settings`
+      );
+      const data = await res.json();
+      console.log("data: ", data);
+      if (data.data) {
+        setPaymentSettings(data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching shipping methods:", error);
+    }
+  };
+
+  const handleNext = () => {
+    if (activeStep === 0 && !selectedAddress) {
+      toast.error("لطفاً ابتدا آدرس را انتخاب کنید");
+      return;
+    }
+    if (activeStep === 1 && !selectedShipping) {
+      toast.error("لطفاً روش ارسال را انتخاب کنید");
+      return;
+    }
+
+    // اگر مرحله آخر بود، تابع اصلی ثبت سفارش صدا زده شود
+    if (activeStep === steps.length - 1) {
+      handlePlaceOrder();
+    } else {
+      setActiveStep((prev) => prev + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleBack = () => {
+    setActiveStep((prev) => prev - 1);
+  };
+
+  // تابعی برای رندر کردن محتوای هر مرحله
+  const getStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <Box>
+            {/* کدهای مربوط به بخش آدرس که قبلاً داشتیم */}
+            <Typography variant="h6" mb={2}>
+              انتخاب آدرس تحویل
+            </Typography>
+            {/* ... محتوای آدرس‌ها ... */}
+          </Box>
+        );
+      case 1:
+        return (
+          <Box>
+            <Typography variant="h6" mb={2}>
+              انتخاب شیوه ارسال
+            </Typography>
+            {/* ... کدهای مربوط به Grid روش‌های ارسال ... */}
+          </Box>
+        );
+      case 2:
+        return (
+          <Box ref={paymentFormRef}>
+            <Typography variant="h6" mb={2}>
+              تایید نهایی و پرداخت
+            </Typography>
+            {/* ... کدهای مربوط به فرم کارت به کارت و فیش ... */}
+          </Box>
+        );
+      default:
+        return "Unknown step";
     }
   };
 
@@ -150,6 +270,27 @@ export default function CheckoutPage() {
       return;
     }
 
+    // مرحله اول کلیک: نمایش فرم پرداخت کارت به کارت
+    if (!showReceiptForm) {
+      setShowReceiptForm(true);
+      toast.info("لطفاً اطلاعات واریز را وارد کنید");
+
+      return;
+    }
+
+    setTimeout(() => {
+      paymentFormRef.current?.scrollIntoView({
+        behavior: "smooth", // اسکرول نرم
+        block: "start", // قرار گرفتن ابتدای فرم در بالای صفحه
+      });
+    }, 100);
+
+    // مرحله دوم کلیک: اعتبارسنجی فیش و ثبت نهایی
+    if (!paymentInfo.lastFourDigits || !paymentInfo.trackingCode) {
+      toast.error("تکمیل فیلدهای پرداخت الزامی است");
+      return;
+    }
+
     setIsPlacingOrder(true);
 
     // ۱. آماده‌سازی آیتم‌ها مطابق فیلد items در دیتابیس (JSON)
@@ -173,7 +314,12 @@ export default function CheckoutPage() {
 
         // ایجاد رابطه با آدرس انتخاب شده (ارسال فقط ID)
         order_address: selectedAddress.id,
-
+        shipping_cost: calculatedShippingCost,
+        payment_details: {
+          ...paymentInfo,
+          total_paid: totalAmount + calculatedShippingCost,
+        },
+        shipping_method_name: selectedShipping.title,
       },
     };
 
@@ -246,181 +392,327 @@ export default function CheckoutPage() {
   return (
     <>
       <Header />
-      <Container maxWidth="lg" sx={{ py: 6, paddingTop: "90px" }}>
-        <Grid container spacing={4}>
-          {/* ستون راست: آدرس */}
-          <Grid item xs={12} md={8}>
+      <Container maxWidth="lg" sx={{ py: 6, paddingTop: "120px" }}>
+        {/* ۱. نوار وضعیت مراحل (Stepper) */}
+        <Stepper
+          activeStep={activeStep}
+          alternativeLabel
+          sx={{
+            mb: 6,
+            "& .MuiStepIcon-root.Mui-active": { color: "#C5A35C" },
+            "& .MuiStepIcon-root.Mui-completed": { color: "#C5A35C" },
+          }}
+        >
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
+        <Grid container spacing={4} sx={{justifyContent: 'center'}}>
+          {/* ستون سمت راست: محتوای مراحل */}
+          <Grid item xs={12} md={4}>
             <Paper
               elevation={0}
-              sx={{ p: 4, borderRadius: "24px", border: "1px solid #eee" }}
+              sx={{
+                p: { xs: 2, md: 4 },
+                borderRadius: "24px",
+                border: "1px solid #eee",
+                minHeight: "350px",
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+              }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 4,
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                >
-                  <LocalShippingOutlined /> ۱. اطلاعات ارسال
-                </Typography>
-                {!showAddressForm && (
-                  <Button
-                    startIcon={<AddLocationAltOutlined />}
-                    onClick={() => setShowAddressForm(true)}
-                    sx={{ color: "#C5A35C" }}
-                  >
-                    افزودن آدرس جدید
-                  </Button>
-                )}
-              </Box>
-
-              {!showAddressForm ? (
-                <Grid container spacing={2}>
-                  {addresses?.map((addr) => (
-                    <Grid item xs={12} key={addr.id}>
-                      <Paper
-                        onClick={() => setSelectedAddress(addr)}
-                        sx={{
-                          p: 3,
-                          cursor: "pointer",
-                          borderRadius: "16px",
-                          border:
-                            selectedAddress?.id === addr.id
-                              ? "2px solid #C5A35C"
-                              : "1px solid #eee",
-                          bgcolor:
-                            selectedAddress?.id === addr.id
-                              ? "#FFFAEE"
-                              : "white",
-                        }}
-                      >
-                        <Typography fontWeight="bold">{addr.title}</Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          {addr.province}، {addr.city}، {addr.full_address}
-                        </Typography>
-                        <Typography variant="caption">
-                          تلفن: {addr.phone}
-                        </Typography>
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
-              ) : (
-                <Box component="form">
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="عنوان آدرس"
-                        value={newAddress.title}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            title: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        fullWidth
-                        label="استان"
-                        value={newAddress.province}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            province: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        fullWidth
-                        label="شهر"
-                        value={newAddress.city}
-                        onChange={(e) =>
-                          setNewAddress({ ...newAddress, city: e.target.value })
-                        }
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        fullWidth
-                        label="کد پستی"
-                        value={newAddress.postal_code}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            postal_code: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        fullWidth
-                        label="شماره تماس"
-                        value={newAddress.phone}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            phone: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        rows={3}
-                        label="آدرس دقیق"
-                        value={newAddress.full_address}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            full_address: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12} sx={{ display: "flex", gap: 2, mt: 2 }}>
-                      <Button
-                        variant="contained"
-                        onClick={handleAddNewAddress}
-                        disabled={isSubmittingAddress}
-                        sx={{ bgcolor: "#3F3F3F" }}
-                      >
-                        {isSubmittingAddress
-                          ? "در حال ثبت..."
-                          : "ذخیره و انتخاب آدرس"}
-                      </Button>
-                      {addresses?.length > 0 && (
-                        <Button onClick={() => setShowAddressForm(false)}>
-                          انصراف
+              <Box sx={{ flexGrow: 1 }}>
+                {activeStep === 0 && (
+                  <Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 3,
+                      }}
+                    >
+                      <Typography variant="h6" fontWeight="bold">
+                        ۱. انتخاب آدرس تحویل
+                      </Typography>
+                      {!showAddressForm && (
+                        <Button
+                          startIcon={<AddLocationAltOutlined />}
+                          onClick={() => setShowAddressForm(true)}
+                          sx={{ color: "#C5A35C" }}
+                        >
+                          آدرس جدید
                         </Button>
                       )}
+                    </Box>
+
+                    {!showAddressForm ? (
+                      <Grid container spacing={2}>
+                        {addresses.map((addr) => (
+                          <Grid item xs={12} key={addr.id}>
+                            <Paper
+                              onClick={() => setSelectedAddress(addr)}
+                              sx={{
+                                p: 2,
+                                cursor: "pointer",
+                                borderRadius: "16px",
+                                border:
+                                  selectedAddress?.id === addr.id
+                                    ? "2px solid #C5A35C"
+                                    : "1px solid #eee",
+                                bgcolor:
+                                  selectedAddress?.id === addr.id
+                                    ? "#FFFAEE"
+                                    : "white",
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
+                                <Radio
+                                  checked={selectedAddress?.id === addr.id}
+                                  color="warning"
+                                />
+                                <Box>
+                                  <Typography fontWeight="bold">
+                                    {addr.title}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    color="textSecondary"
+                                  >
+                                    {addr.province}، {addr.city}،{" "}
+                                    {addr.full_address}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Paper>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    ) : (
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="عنوان آدرس"
+                            value={newAddress.title}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                title: e.target.value,
+                              })
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="استان"
+                            value={newAddress.province}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                province: e.target.value,
+                              })
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="شهر"
+                            value={newAddress.city}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                city: e.target.value,
+                              })
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            multiline
+                            rows={2}
+                            label="آدرس کامل"
+                            value={newAddress.full_address}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                full_address: e.target.value,
+                              })
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="کد پستی"
+                            value={newAddress.postal_code}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                postal_code: e.target.value,
+                              })
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="تلفن"
+                            value={newAddress.phone}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                phone: e.target.value,
+                              })
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={12} sx={{ display: "flex", gap: 1 }}>
+                          <Button
+                            variant="contained"
+                            onClick={handleAddNewAddress}
+                            sx={{ bgcolor: "#3F3F3F" }}
+                          >
+                            ذخیره
+                          </Button>
+                          <Button onClick={() => setShowAddressForm(false)}>
+                            انصراف
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    )}
+                  </Box>
+                )}
+
+                {activeStep === 1 && (
+                  <Box>
+                    <Typography variant="h6" fontWeight="bold" mb={3}>
+                      ۲. انتخاب روش ارسال
+                    </Typography>
+                    <Grid container spacing={2}>
+                      {shippingMethods.map((method) => {
+                        const cost =
+                          method.cityCosts?.[selectedAddress?.city] ||
+                          method.baseCost;
+                        return (
+                          <Grid item xs={12} sm={6} key={method.id}>
+                            <Paper
+                              onClick={() => setSelectedShipping(method)}
+                              sx={{
+                                p: 3,
+                                cursor: "pointer",
+                                borderRadius: "16px",
+                                border:
+                                  selectedShipping?.id === method.id
+                                    ? "2px solid #C5A35C"
+                                    : "1px solid #eee",
+                                bgcolor:
+                                  selectedShipping?.id === method.id
+                                    ? "#FFFAEE"
+                                    : "white",
+                              }}
+                            >
+                              <Typography fontWeight="bold">
+                                {method.title}
+                              </Typography>
+                              <Typography
+                                variant="h6"
+                                sx={{ color: "#C5A35C", mt: 1 }}
+                              >
+                                {cost === 0
+                                  ? "رایگان"
+                                  : `${cost?.toLocaleString()} تومان`}
+                              </Typography>
+                            </Paper>
+                          </Grid>
+                        );
+                      })}
                     </Grid>
-                  </Grid>
-                </Box>
-              )}
+                  </Box>
+                )}
+
+                {activeStep === 2 && (
+                  <Box>
+                    <Typography variant="h6" fontWeight="bold" mb={3}>
+                      ۳. اطلاعات پرداخت
+                    </Typography>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 3,
+                        borderRadius: "16px",
+                        border: "1px solid #DED9CC",
+                        bgcolor: "#FFFBF2",
+                        mb: 3,
+                      }}
+                    >
+                      <Typography variant="subtitle2" gutterBottom>
+                        شماره کارت جهت واریز:
+                      </Typography>
+                      <Typography
+                        variant="h5"
+                        fontWeight="bold"
+                        textAlign="center"
+                        sx={{ my: 2, letterSpacing: 2 }}
+                      >
+                        ۶۰۳۷ - ۹۹۷۷ - ۱۲۳۴ - ۵۶۷۸
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        textAlign="center"
+                        color="textSecondary"
+                      >
+                        بنام مدیریت فروشگاه قهوه امانجی
+                      </Typography>
+                    </Paper>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="۴ رقم آخر کارت"
+                          value={paymentInfo.lastFourDigits}
+                          onChange={(e) =>
+                            setPaymentInfo({
+                              ...paymentInfo,
+                              lastFourDigits: e.target.value,
+                            })
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="کد پیگیری"
+                          value={paymentInfo.trackingCode}
+                          onChange={(e) =>
+                            setPaymentInfo({
+                              ...paymentInfo,
+                              trackingCode: e.target.value,
+                            })
+                          }
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
+              </Box>
             </Paper>
           </Grid>
 
-          {/* ستون چپ: خلاصه فاکتور */}
+          {/* ستون سمت چپ: خلاصه مالی (همیشه ثابت) */}
           <Grid item xs={12} md={4}>
             <Paper
               elevation={0}
@@ -430,7 +722,7 @@ export default function CheckoutPage() {
                 border: "1px solid #DED9CC",
                 bgcolor: "#F9F8F5",
                 position: "sticky",
-                top: "100px",
+                top: "120px",
               }}
             >
               <Typography variant="h6" fontWeight="bold" mb={3}>
@@ -441,7 +733,7 @@ export default function CheckoutPage() {
               >
                 <Typography color="textSecondary">جمع محصولات:</Typography>
                 <Typography fontWeight="bold">
-                  {totalAmount.toLocaleString()} تومان
+                  {totalAmount.toLocaleString()} ت
                 </Typography>
               </Box>
               <Box
@@ -449,38 +741,80 @@ export default function CheckoutPage() {
               >
                 <Typography color="textSecondary">هزینه ارسال:</Typography>
                 <Typography fontWeight="bold">
-                  {SHIPPING_COST.toLocaleString()} تومان
+                  {calculatedShippingCost.toLocaleString()} ت
                 </Typography>
               </Box>
               <Divider sx={{ my: 2 }} />
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}
+                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
               >
                 <Typography variant="h6" fontWeight="bold">
-                  مبلغ قابل پرداخت:
+                  مبلغ نهایی:
                 </Typography>
                 <Typography variant="h6" fontWeight="bold" color="#C5A35C">
-                  {(totalAmount + SHIPPING_COST).toLocaleString()} تومان
+                  {(totalAmount + calculatedShippingCost).toLocaleString()}{" "}
+                  تومان
                 </Typography>
               </Box>
-              <Button
-                fullWidth
-                variant="contained"
-                size="large"
-                onClick={handlePlaceOrder}
-                disabled={isPlacingOrder || !selectedAddress}
+
+              {/* نمایش کوچک اطلاعات انتخاب شده برای اطمینان کاربر */}
+              <Box
                 sx={{
-                  bgcolor: "#3F3F3F",
-                  py: 2,
-                  borderRadius: "15px",
-                  fontWeight: "bold",
+                  mt: 3,
+                  p: 2,
+                  bgcolor: "#fff",
+                  borderRadius: "12px",
+                  border: "1px solid #eee",
                 }}
               >
-                {isPlacingOrder ? "در حال ثبت..." : "ثبت و پرداخت نهایی"}
-              </Button>
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  display="block"
+                >
+                  آدرس: {selectedAddress?.title || "---"}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  display="block"
+                >
+                  ارسال: {selectedShipping?.title || "---"}
+                </Typography>
+              </Box>
             </Paper>
           </Grid>
         </Grid>
+        {/* دکمه‌های ناوبری پایین پنل */}
+        <Divider sx={{ my: 3 }} />
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Button
+            disabled={activeStep === 0 || isPlacingOrder}
+            onClick={handleBack}
+            startIcon={<span>→</span>}
+          >
+            مرحله قبلی
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleNext}
+            disabled={isPlacingOrder}
+            sx={{
+              bgcolor: "#3F3F3F",
+              px: 4,
+              borderRadius: "12px",
+              "&:hover": { bgcolor: "#000" },
+            }}
+          >
+            {isPlacingOrder ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : activeStep === steps.length - 1 ? (
+              "ثبت نهایی سفارش"
+            ) : (
+              "مرحله بعدی"
+            )}
+          </Button>
+        </Box>
       </Container>
     </>
   );

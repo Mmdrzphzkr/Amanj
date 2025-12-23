@@ -16,21 +16,24 @@ const CartPage = () => {
   // اگر سبد خرید خالی بود
   if (items.length === 0) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-4">
-        <ShoppingBag size={80} className="text-[#DED9CC]" />
-        <h1 className="text-2xl font-bold text-[#3F3F3F]">
-          سبد خرید شما خالی است
-        </h1>
-        <p className="text-gray-500">
-          به نظر می‌رسد هنوز محصولی به سبد خود اضافه نکرده‌اید.
-        </p>
-        <Link
-          href="/"
-          className="mt-4 bg-[#3F3F3F] text-[#EDE9DE] px-8 py-3 rounded-full hover:bg-[#C5A35C] transition-colors"
-        >
-          بازگشت به فروشگاه
-        </Link>
-      </div>
+      <>
+        <Header />
+        <div className="min-h-[70vh] flex flex-col items-center justify-center gap-4">
+          <ShoppingBag size={80} className="text-[#DED9CC]" />
+          <h1 className="text-2xl font-bold text-[#3F3F3F]">
+            سبد خرید شما خالی است
+          </h1>
+          <p className="text-gray-500">
+            به نظر می‌رسد هنوز محصولی به سبد خود اضافه نکرده‌اید.
+          </p>
+          <Link
+            href="/"
+            className="mt-4 bg-[#3F3F3F] text-[#EDE9DE] px-8 py-3 rounded-full hover:bg-[#C5A35C] transition-colors"
+          >
+            بازگشت به فروشگاه
+          </Link>
+        </div>
+      </>
     );
   }
 
