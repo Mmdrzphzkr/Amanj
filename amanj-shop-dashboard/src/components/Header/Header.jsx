@@ -154,7 +154,7 @@ const Header = () => {
 
       {/* --- هدر دسکتاپ و موبایل --- */}
       <header
-        className={`flex justify-between items-center px-[15px] py-[10px] md:py-[16px] md:px-[58px] fixed top-0 left-0 right-0 z-40 transition-all duration-500 
+        className={`flex justify-between items-center px-[15px] py-[5px] md:py-[0px] md:px-[58px] fixed top-0 left-0 right-0 z-40 transition-all duration-500 
         ${
           isScrolled
             ? "backdrop-blur-md bg-[#F9F8F580] shadow-sm"
@@ -164,26 +164,28 @@ const Header = () => {
         <div className="flex justify-between md:justify-start items-center gap-6 w-full">
           {/* دکمه منوی موبایل */}
           {isMobile && (
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden bg-[#EDE9DE] rounded-full p-2 flex items-center justify-center border border-gray-700"
-            >
-              <svg
-                width="24px"
-                height="24px"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
+            <>
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="md:hidden bg-[#EDE9DE] rounded-full p-2 flex items-center justify-center border border-gray-700"
               >
-                <path
-                  stroke="#000000"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6H20M4 12H20M4 18H20"
-                />
-              </svg>
-            </button>
+                <svg
+                  width="24px"
+                  height="24px"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                >
+                  <path
+                    stroke="#000000"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6H20M4 12H20M4 18H20"
+                  />
+                </svg>
+              </button>
+            </>
           )}
 
           {/* لوگو */}

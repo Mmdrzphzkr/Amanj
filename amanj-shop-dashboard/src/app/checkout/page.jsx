@@ -311,7 +311,7 @@ export default function CheckoutPage() {
 
         // مطابق نام فیلد در عکس (items) - ارسال به صورت آرایه/آبجکت برای فیلد JSON
         items: itemsArray,
-
+        payment_method: "card_to_card",
         // ایجاد رابطه با آدرس انتخاب شده (ارسال فقط ID)
         order_address: selectedAddress.id,
         shipping_cost: calculatedShippingCost,

@@ -54,6 +54,14 @@
     "shipping_method_name": {
       "type": "string",
       "required": true
+    },
+    "payment_method": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "card_to_card",
+        "online_gateway"
+      ]
     }
   }
 }

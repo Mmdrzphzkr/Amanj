@@ -9,6 +9,7 @@ import BottomSliderContainer from "@/components/Sliders/BottomSlider/BottomSlide
 import ProductSliderContainer from "@/components/Sliders/ProductSlider/ProductSliderContainer";
 import FaqAccordion from "@/components/Accordion/FaqAccordion";
 import Footer from "@/components/Footer/Footer";
+import MobileNav from "@/components/MobileNav/MobileNav";
 import { fetchPublicGallery } from "@/redux/slices/publicGallerySlice";
 
 const HomePage = () => {
@@ -16,7 +17,7 @@ const HomePage = () => {
 
   const publicGallery = useSelector((s) => s.publicGallery.items || []);
 
-   const STRAPI_URL = (
+  const STRAPI_URL = (
     process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
   ).replace(/\/+$/, "");
 
@@ -189,7 +190,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 44.4119 33.5833)"
                     fill="#D9D9D9"
                   />
-                  <circle cx="40.6991" cy="17.3995" r="0.159546" fill="#EDE9DE" />
+                  <circle
+                    cx="40.6991"
+                    cy="17.3995"
+                    r="0.159546"
+                    fill="#EDE9DE"
+                  />
                   <circle
                     cx="18.5521"
                     cy="38.5995"
@@ -213,7 +219,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 40.9446 38.8877)"
                     fill="#EDE9DE"
                   />
-                  <circle cx="48.326" cy="22.1243" r="0.159546" fill="#EDE9DE" />
+                  <circle
+                    cx="48.326"
+                    cy="22.1243"
+                    r="0.159546"
+                    fill="#EDE9DE"
+                  />
                   <circle
                     cx="10.9252"
                     cy="33.8749"
@@ -237,7 +248,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 34.187 43.9346)"
                     fill="#EDE9DE"
                   />
-                  <circle cx="36.8519" cy="7.9502" r="0.159546" fill="#EDE9DE" />
+                  <circle
+                    cx="36.8519"
+                    cy="7.9502"
+                    r="0.159546"
+                    fill="#EDE9DE"
+                  />
                   <circle
                     cx="22.3995"
                     cy="48.049"
@@ -505,16 +521,21 @@ const HomePage = () => {
             </p>
           </div>
           <div className="flex flex-col justify-center items-center garatee-box__container">
-            <div className="grid grid-cols-1 gap-5 items-center w-full mb-6 
-                    md:grid-cols-12 md:gap-5">
-
-              <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
-                        md:col-span-5">
+            <div
+              className="grid grid-cols-1 gap-5 items-center w-full mb-6 
+                    md:grid-cols-12 md:gap-5"
+            >
+              <div
+                className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-5"
+              >
                 <div className="grantee-box-image w-full h-[253px]">
                   <img
                     src={`${STRAPI_URL}${publicGallery[1]?.image?.url}`}
-                    alt={`${publicGallery[1]?.image?.alternativeText || "grantee image"
-                      }`}
+                    alt={`${
+                      publicGallery[1]?.image?.alternativeText ||
+                      "grantee image"
+                    }`}
                     width={`${publicGallery[1]?.image?.width || 150}`}
                     height={`${publicGallery[1]?.image?.height || 150}`}
                     loading="lazy"
@@ -529,13 +550,17 @@ const HomePage = () => {
                 </p>
               </div>
 
-              <div className="garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
-                        md:col-span-7">
+              <div
+                className="garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-7"
+              >
                 <div className="grantee-box-image w-full h-[253px]">
                   <img
                     src={`${STRAPI_URL}${publicGallery[0]?.image?.url}`}
-                    alt={`${publicGallery[0]?.image?.alternativeText || "grantee image"
-                      }`}
+                    alt={`${
+                      publicGallery[0]?.image?.alternativeText ||
+                      "grantee image"
+                    }`}
                     width={`${publicGallery[0]?.image?.width || 150}`}
                     height={`${publicGallery[0]?.image?.height || 150}`}
                     loading="lazy"
@@ -551,35 +576,46 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 items-center w-full
-                    md:grid-cols-12 md:gap-6">
-
-              <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
-                        md:col-span-4">
+            <div
+              className="grid grid-cols-1 gap-6 items-center w-full
+                    md:grid-cols-12 md:gap-6"
+            >
+              <div
+                className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-4"
+              >
                 <div className="grantee-box-image w-full h-[253px]">
                   <img
                     src={`${STRAPI_URL}${publicGallery[3]?.image?.url}`}
-                    alt={`${publicGallery[3]?.image?.alternativeText || "grantee image"
-                      }`}
+                    alt={`${
+                      publicGallery[3]?.image?.alternativeText ||
+                      "grantee image"
+                    }`}
                     width={`${publicGallery[3]?.image?.width || 150}`}
                     height={`${publicGallery[3]?.image?.height || 150}`}
                     loading="lazy"
                     className="w-full h-full"
                   />
                 </div>
-                <p className="garantee-box-title text-2xl font-bold">اصالت کالا</p>
+                <p className="garantee-box-title text-2xl font-bold">
+                  اصالت کالا
+                </p>
                 <p className="garantee-box-description text-[#696969] text-lg">
                   تمام محصولات با تضمین اورجینال بودن
                 </p>
               </div>
 
-              <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
-                        md:col-span-4">
+              <div
+                className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-4"
+              >
                 <div className="grantee-box-image w-full h-[253px]">
                   <img
                     src={`${STRAPI_URL}${publicGallery[2]?.image?.url}`}
-                    alt={`${publicGallery[2]?.image?.alternativeText || "grantee image"
-                      }`}
+                    alt={`${
+                      publicGallery[2]?.image?.alternativeText ||
+                      "grantee image"
+                    }`}
                     width={`${publicGallery[2]?.image?.width || 150}`}
                     height={`${publicGallery[2]?.image?.height || 150}`}
                     loading="lazy"
@@ -594,13 +630,17 @@ const HomePage = () => {
                 </p>
               </div>
 
-              <div className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
-                        md:col-span-4">
+              <div
+                className="garantee-box garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px]
+                        md:col-span-4"
+              >
                 <div className="grantee-box-image w-full h-[253px]">
                   <img
                     src={`${STRAPI_URL}${publicGallery[4]?.image?.url}`}
-                    alt={`${publicGallery[4]?.image?.alternativeText || "grantee image"
-                      }`}
+                    alt={`${
+                      publicGallery[4]?.image?.alternativeText ||
+                      "grantee image"
+                    }`}
                     width={`${publicGallery[4]?.image?.width || 150}`}
                     height={`${publicGallery[4]?.image?.height || 150}`}
                     loading="lazy"
@@ -766,7 +806,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 43.9119 32.9473)"
                     fill="#D9D9D9"
                   />
-                  <circle cx="40.1991" cy="16.7635" r="0.159546" fill="#EDE9DE" />
+                  <circle
+                    cx="40.1991"
+                    cy="16.7635"
+                    r="0.159546"
+                    fill="#EDE9DE"
+                  />
                   <circle
                     cx="18.0521"
                     cy="37.9635"
@@ -790,7 +835,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 40.4446 38.2517)"
                     fill="#EDE9DE"
                   />
-                  <circle cx="47.826" cy="21.4884" r="0.159546" fill="#EDE9DE" />
+                  <circle
+                    cx="47.826"
+                    cy="21.4884"
+                    r="0.159546"
+                    fill="#EDE9DE"
+                  />
                   <circle
                     cx="10.4252"
                     cy="33.2389"
@@ -814,7 +864,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 33.687 43.2986)"
                     fill="#EDE9DE"
                   />
-                  <circle cx="36.3519" cy="7.31409" r="0.159546" fill="#EDE9DE" />
+                  <circle
+                    cx="36.3519"
+                    cy="7.31409"
+                    r="0.159546"
+                    fill="#EDE9DE"
+                  />
                   <circle
                     cx="21.8995"
                     cy="47.413"
@@ -1203,7 +1258,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 43.9119 32.9473)"
                     fill="#D9D9D9"
                   />
-                  <circle cx="40.1991" cy="16.7635" r="0.159546" fill="#F9F8F5" />
+                  <circle
+                    cx="40.1991"
+                    cy="16.7635"
+                    r="0.159546"
+                    fill="#F9F8F5"
+                  />
                   <circle
                     cx="18.0521"
                     cy="37.9635"
@@ -1227,7 +1287,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 40.4446 38.2517)"
                     fill="#F9F8F5"
                   />
-                  <circle cx="47.826" cy="21.4884" r="0.159546" fill="#F9F8F5" />
+                  <circle
+                    cx="47.826"
+                    cy="21.4884"
+                    r="0.159546"
+                    fill="#F9F8F5"
+                  />
                   <circle
                     cx="10.4252"
                     cy="33.2389"
@@ -1251,7 +1316,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 33.687 43.2986)"
                     fill="#F9F8F5"
                   />
-                  <circle cx="36.3519" cy="7.31409" r="0.159546" fill="#F9F8F5" />
+                  <circle
+                    cx="36.3519"
+                    cy="7.31409"
+                    r="0.159546"
+                    fill="#F9F8F5"
+                  />
                   <circle
                     cx="21.8995"
                     cy="47.413"
@@ -1655,7 +1725,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 43.9119 32.9473)"
                     fill="#D9D9D9"
                   />
-                  <circle cx="40.1991" cy="16.7635" r="0.159546" fill="#F9F8F5" />
+                  <circle
+                    cx="40.1991"
+                    cy="16.7635"
+                    r="0.159546"
+                    fill="#F9F8F5"
+                  />
                   <circle
                     cx="18.0521"
                     cy="37.9635"
@@ -1679,7 +1754,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 40.4446 38.2517)"
                     fill="#F9F8F5"
                   />
-                  <circle cx="47.826" cy="21.4884" r="0.159546" fill="#F9F8F5" />
+                  <circle
+                    cx="47.826"
+                    cy="21.4884"
+                    r="0.159546"
+                    fill="#F9F8F5"
+                  />
                   <circle
                     cx="10.4252"
                     cy="33.2389"
@@ -1703,7 +1783,12 @@ const HomePage = () => {
                     transform="matrix(-0.37576 0.926717 -0.8985 -0.438973 33.687 43.2986)"
                     fill="#F9F8F5"
                   />
-                  <circle cx="36.3519" cy="7.31409" r="0.159546" fill="#F9F8F5" />
+                  <circle
+                    cx="36.3519"
+                    cy="7.31409"
+                    r="0.159546"
+                    fill="#F9F8F5"
+                  />
                   <circle
                     cx="21.8995"
                     cy="47.413"
@@ -1938,6 +2023,7 @@ const HomePage = () => {
           <FaqAccordion />
         </div>
       </section>
+      <MobileNav />
       <Footer />
     </main>
   );

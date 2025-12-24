@@ -14,6 +14,8 @@ import {
   Container,
   Paper,
 } from "@mui/material";
+import MobileNav from "@/components/MobileNav/MobileNav";
+import Footer from "@/components/Footer/Footer";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -115,6 +117,8 @@ export default function RegisterPage() {
           </Link>
         </Typography>
       </Paper>
+      <MobileNav />
+      <Footer />
     </Container>
   );
 }
