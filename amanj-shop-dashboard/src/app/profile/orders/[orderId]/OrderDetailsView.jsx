@@ -148,7 +148,13 @@ export default function OrderDetailsView({ order }) {
                           <TableCell align="right">{item.title}</TableCell>
                           <TableCell align="center">{item.quantity}</TableCell>
                           <TableCell align="left">
-                            <PriceDisplay amount={item.price} />
+                            <PriceDisplay
+                              amount={
+                                item.quantity > 1
+                                  ? item.price * item.quantity
+                                  : item.price
+                              }
+                            />
                           </TableCell>
                         </TableRow>
                       ))}
@@ -194,7 +200,12 @@ export default function OrderDetailsView({ order }) {
                       مبلغ نهایی:
                     </Typography>
                     <PriceDisplay
-                      amount={order.payment_details?.total_paid}
+                      amount={
+                        order.items[0]?.quantity > 1
+                          ? (order.shipping_cost + order.items[0]?.price) *
+                            order.items[0]?.quantity
+                          : order.shipping_cost + order.items[0]?.price
+                      }
                       bold
                     />
                   </Box>

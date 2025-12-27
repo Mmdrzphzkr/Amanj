@@ -11,11 +11,39 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "cardNumber": {
+    "card_number": {
       "type": "string"
     },
-    "accountHolder": {
+    "card_holder_name": {
       "type": "string"
+    },
+    "is_manual_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "bank_name": {
+      "type": "string"
+    },
+    "shaba_number": {
+      "type": "string"
+    },
+    "is_online_active": {
+      "type": "boolean",
+      "default": false
+    },
+    "gateway_name": {
+      "type": "string"
+    },
+    "api_key": {
+      "type": "string"
+    },
+    "instruction_text": {
+      "type": "string"
+    },
+    "active_methods": {
+      "type": "boolean",
+      "required": true,
+      "default": true
     }
   }
 }

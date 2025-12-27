@@ -108,10 +108,7 @@ export default function ProductPage() {
 
   return (
     <Suspense fallback={<Loading />}>
-      <main
-        className="container mx-auto"
-        style={{ backgroundColor: brandColors.bg }}
-      >
+      <main className="container mx-auto">
         <Header />
 
         <Box sx={{ mt: 12, mb: 4, px: { xs: 2, md: 7.25 } }}>
@@ -182,7 +179,10 @@ export default function ProductPage() {
           </div>
 
           {/* بخش توضیحات و دکمه */}
-          <div className="md:w-1/2 w-full flex flex-col justify-start">
+          <div
+            className="md:w-1/2 w-full flex flex-col justify-start p-3 rounded-3xl"
+            style={{ backgroundColor: brandColors.bg }}
+          >
             <Typography
               variant="h3"
               fontWeight="900"

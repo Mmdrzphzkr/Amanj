@@ -876,11 +876,22 @@ export interface ApiPaymentSettingPaymentSetting
     draftAndPublish: false;
   };
   attributes: {
-    accountHolder: Schema.Attribute.String;
-    cardNumber: Schema.Attribute.String;
+    active_methods: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    api_key: Schema.Attribute.String;
+    bank_name: Schema.Attribute.String;
+    card_holder_name: Schema.Attribute.String;
+    card_number: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    gateway_name: Schema.Attribute.String;
+    instruction_text: Schema.Attribute.String;
+    is_manual_active: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    is_online_active: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -888,6 +899,7 @@ export interface ApiPaymentSettingPaymentSetting
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    shaba_number: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
