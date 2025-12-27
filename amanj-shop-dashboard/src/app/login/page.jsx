@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import Footer from "@/components/Footer/Footer";
+import Header from "@/components/Header/Header";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
@@ -45,67 +47,71 @@ export default function LoginPage() {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper
-        elevation={3}
-        sx={{
-          mt: 8,
-          p: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          background: "#EDE9DE",
-        }}
-      >
-        <Typography component="h1" variant="h5">
-          ورود به حساب کاربری
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="نام کاربری"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            className="bg-[#F9F8F5]"
-            dir="ltr"
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="رمز عبور"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="bg-[#F9F8F5]"
-            dir="ltr"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2, background: "#868686" }}
-          >
-            ورود
-          </Button>
-        </Box>
-        <Button
-          variant="outlined"
-          onClick={() => router.push("/register?callbackUrl=/checkout")}
-          sx={{ color: "#3F3F3F", borderColor: "#3F3F3F" }}
+    <>
+      <Header />
+      <Container component="main" maxWidth="xs" sx={{ my: 10 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            mt: 8,
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            background: "#EDE9DE",
+          }}
         >
-          ثبت نام
-        </Button>
-      </Paper>
-    </Container>
+          <Typography component="h1" variant="h5">
+            ورود به حساب کاربری
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="نام کاربری"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              className="bg-[#F9F8F5]"
+              dir="ltr"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="رمز عبور"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-[#F9F8F5]"
+              dir="ltr"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2, background: "#868686" }}
+            >
+              ورود
+            </Button>
+          </Box>
+          <Button
+            variant="outlined"
+            onClick={() => router.push("/register?callbackUrl=/checkout")}
+            sx={{ color: "#3F3F3F", borderColor: "#3F3F3F" }}
+          >
+            ثبت نام
+          </Button>
+        </Paper>
+      </Container>
+      <Footer />
+    </>
   );
 }

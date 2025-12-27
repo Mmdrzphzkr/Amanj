@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import MobileNav from "@/components/MobileNav/MobileNav";
 import Footer from "@/components/Footer/Footer";
+import Header from "@/components/Header/Header";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -64,61 +65,64 @@ export default function RegisterPage() {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ mt: 10 }}>
-      <Paper sx={{ p: 4, borderRadius: "20px", background: "#EDE9DE" }}>
-        <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
-          ثبت‌نام در آمانج
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="نام کاربری"
-            margin="normal"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="ایمیل"
-            type="email"
-            margin="normal"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="رمز عبور"
-            type="password"
-            margin="normal"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="تکرار رمز عبور"
-            type="password"
-            margin="normal"
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          <Button
-            fullWidth
-            variant="contained"
-            type="submit"
-            disabled={loading}
-            sx={{ mt: 3, py: 1.5, background: "#3F3F3F" }}
-          >
-            {loading ? "در حال ثبت‌نام..." : "تایید و عضویت"}
-          </Button>
-        </form>
-        <Typography variant="body2" textAlign="center" mt={2}>
-          حساب دارید؟{" "}
-          <Link
-            href={`/login?callbackUrl=${callbackUrl}`}
-            className="text-[#C5A35C] font-bold"
-          >
-            وارد شوید
-          </Link>
-        </Typography>
-      </Paper>
-      <MobileNav />
+    <>
+      <Header />
+      <Container maxWidth="xs" sx={{ my: 10 }}>
+        <Paper sx={{ p: 4, borderRadius: "20px", background: "#EDE9DE" }}>
+          <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
+            ثبت‌نام در آمانج
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="نام کاربری"
+              margin="normal"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              label="ایمیل"
+              type="email"
+              margin="normal"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              label="رمز عبور"
+              type="password"
+              margin="normal"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              label="تکرار رمز عبور"
+              type="password"
+              margin="normal"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <Button
+              fullWidth
+              variant="contained"
+              type="submit"
+              disabled={loading}
+              sx={{ mt: 3, py: 1.5, background: "#3F3F3F" }}
+            >
+              {loading ? "در حال ثبت‌نام..." : "تایید و عضویت"}
+            </Button>
+          </form>
+          <Typography variant="body2" textAlign="center" mt={2}>
+            حساب دارید؟{" "}
+            <Link
+              href={`/login?callbackUrl=${callbackUrl}`}
+              className="text-[#C5A35C] font-bold"
+            >
+              وارد شوید
+            </Link>
+          </Typography>
+        </Paper>
+        <MobileNav />
+      </Container>
       <Footer />
-    </Container>
+    </>
   );
 }

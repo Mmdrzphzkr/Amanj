@@ -48,6 +48,7 @@ export const useCheckoutData = (isAuthenticated) => {
   return {
     addresses,
     selectedAddress,
+    setAddresses,
     setSelectedAddress,
     shippingMethods,
     selectedShipping,

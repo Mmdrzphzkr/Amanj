@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 
 import Header from "@/components/Header/Header";
+import Footer from "@/components/Footer/Footer";
 import Loading from "@/components/Loading/Loading";
 import { useAuth } from "@/context/AuthContext";
 import { useSelector, useDispatch } from "react-redux";
@@ -27,6 +28,7 @@ import AddressStep from "@/components/AddressStep/AddressStep";
 import ShippingStep from "@/components/ShippingStep/ShippingStep";
 import PaymentStep from "@/components/PaymentStep/PaymentStep";
 import OrderSummary from "@/components/OrderSummary/OrderSummary";
+import NewAddressForm from "@/components/NewAddressForm/NewAddressForm";
 
 const steps = ["آدرس ارسال", "روش ارسال", "روش پرداخت", "اطلاعات نهایی"];
 
@@ -49,8 +51,19 @@ export default function CheckoutPage() {
     date: "",
     image: null,
   });
+  const [newAddress, setNewAddress] = useState({
+    title: "",
+    province: "",
+    city: "",
+    full_address: "",
+    phone: "",
+    postal_code: "",
+  });
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+
   const {
     addresses,
+    setAddresses,
     selectedAddress,
     setSelectedAddress,
     shippingMethods,
@@ -88,36 +101,92 @@ export default function CheckoutPage() {
     receiptData,
   ]);
 
+  const handleAddressChange = (field, value) => {
+    setNewAddress((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveNewAddress = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+
+    if (
+      !newAddress.title ||
+      !newAddress.full_address ||
+      !newAddress.phone ||
+      !newAddress.province ||
+      !newAddress.city
+    ) {
+      toast.error("لطفاً تمام فیلدهای اجباری را پر کنید");
+      return;
+    }
+
+    setIsSavingAddress(true);
+    try {
+      const res = await fetch("/api/user/addresses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: newAddress }),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        setAddresses((prev) =>
+          Array.isArray(prev) ? [...prev, result] : [result]
+        );
+        setSelectedAddress(result);
+        setShowAddressForm(false);
+        setNewAddress({
+          title: "",
+          province: "",
+          city: "",
+          postal_code: "",
+          full_address: "",
+          phone: "",
+        });
+        toast.success("آدرس با موفقیت ثبت شد");
+      } else {
+        toast.error(result.error || "خطا در ثبت آدرس");
+      }
+    } catch (error) {
+      toast.error("ارتباط با سرور برقرار نشد");
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
+
   if (authLoading) return <Loading />;
   if (!isAuthenticated) {
     return (
-      <Container maxWidth="sm" sx={{ py: 10 }}>
-        <Paper
-          elevation={0}
-          sx={{ p: 5, textAlign: "center", borderRadius: 3 }}
-        >
-          <Typography variant="h5" fontWeight={800} mb={2}>
-            نیاز به ورود به حساب
-          </Typography>
-          <Box
-            sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 3 }}
+      <>
+        <Header />
+        <Container maxWidth="sm" sx={{ py: 10 }}>
+          <Paper
+            elevation={0}
+            sx={{ p: 5, textAlign: "center", borderRadius: 3 }}
           >
-            <Button
-              variant="contained"
-              onClick={() => router.push("/login?callbackUrl=/checkout")}
-              sx={{ bgcolor: "#3F3F3F" }}
+            <Typography variant="h5" fontWeight={800} mb={2}>
+              نیاز به ورود به حساب
+            </Typography>
+            <Box
+              sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 3 }}
             >
-              ورود
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => router.push("/register?callbackUrl=/checkout")}
-            >
-              ثبت نام
-            </Button>
-          </Box>
-        </Paper>
-      </Container>
+              <Button
+                variant="contained"
+                onClick={() => router.push("/login?callbackUrl=/checkout")}
+                sx={{ bgcolor: "#3F3F3F" }}
+              >
+                ورود
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => router.push("/register?callbackUrl=/checkout")}
+              >
+                ثبت نام
+              </Button>
+            </Box>
+          </Paper>
+        </Container>
+        <Footer />
+      </>
     );
   }
 
@@ -160,10 +229,10 @@ export default function CheckoutPage() {
           payment_details:
             paymentMethod === "receipt"
               ? {
-                  receipt_amount: receiptData.amount,
-                  receipt_tracking_code: receiptData.trackingCode,
-                  receipt_date: receiptData.date,
-                }
+                receipt_amount: receiptData.amount,
+                receipt_tracking_code: receiptData.trackingCode,
+                receipt_date: receiptData.date,
+              }
               : {},
         },
       };
@@ -222,15 +291,31 @@ export default function CheckoutPage() {
           <Grid item xs={12} md={7}>
             <Paper sx={{ p: 3, borderRadius: 3 }}>
               {activeStep === 0 && (
-                <AddressStep
-                  addresses={addresses}
-                  selectedAddress={selectedAddress}
-                  onSelect={(a) => {
-                    setSelectedAddress(a);
-                    setShowAddressForm(false);
-                  }}
-                  onShowNewAddress={() => setShowAddressForm(true)}
-                />
+                <>
+                  {/* فرم افزودن آدرس جدید */}
+                  {showAddressForm && (
+                    <NewAddressForm
+                      values={newAddress}
+                      onChange={handleAddressChange}
+                      onSubmit={handleSaveNewAddress}
+                      onCancel={() => setShowAddressForm(false)}
+                      loading={isSavingAddress}
+                    />
+                  )}
+
+                  {/* لیست آدرس‌ها */}
+                  {!showAddressForm && (
+                    <AddressStep
+                      addresses={addresses}
+                      selectedAddress={selectedAddress}
+                      onSelect={(a) => {
+                        setSelectedAddress(a);
+                        setShowAddressForm(false);
+                      }}
+                      onShowNewAddress={() => setShowAddressForm(true)}
+                    />
+                  )}
+                </>
               )}
 
               {activeStep === 1 && (
@@ -308,6 +393,7 @@ export default function CheckoutPage() {
           </Box>
         </Box>
       </Container>
+      <Footer />
     </>
   );
 }
