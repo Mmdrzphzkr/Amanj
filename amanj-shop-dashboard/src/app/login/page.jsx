@@ -11,7 +11,7 @@ import {
   Paper,
 } from "@mui/material";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Footer from "@/components/Footer/Footer";
 import Header from "@/components/Header/Header";
 
@@ -20,6 +20,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const auth = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -37,7 +40,7 @@ export default function LoginPage() {
       const strapiData = await strapiRes.json();
 
       if (strapiData.jwt) {
-        await auth.login(strapiData.jwt, strapiData.user);
+        await auth.login(strapiData.jwt, strapiData.user, callbackUrl);
       } else {
         alert(`Error: ${strapiData.error.message}`);
       }

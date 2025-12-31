@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     checkUser();
   }, []);
 
-  const login = async (strapiJwt, strapiUser) => {
+  const login = async (strapiJwt, strapiUser, callbackUrl) => {
     const res = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -35,7 +35,8 @@ export const AuthProvider = ({ children }) => {
     if (res.ok) {
       setUser(strapiUser);
       // Use a hard reload to prevent race conditions
-      window.location.href = "/dashboard";
+      // window.location.href = "/dashboard";
+      window.location.href = callbackUrl;
     } else {
       console.error("Failed to set session cookie");
     }

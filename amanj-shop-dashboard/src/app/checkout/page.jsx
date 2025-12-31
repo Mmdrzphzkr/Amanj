@@ -147,7 +147,7 @@ export default function CheckoutPage() {
         toast.error(result.error || "خطا در ثبت آدرس");
       }
     } catch (error) {
-      toast.error("ارتباط با سرور برقرار نشد");
+      toast.error("ارتباط با سرور برقرار نشد: ", error);
     } finally {
       setIsSavingAddress(false);
     }

@@ -87,5 +87,4 @@ out/
 
 # Coverage reports
 coverage/
-amanj-shop/config/
-config
+config/
