@@ -1119,6 +1119,39 @@ export interface ApiShippingShipping extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiTechnicalReservationTechnicalReservation
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'technical_reservations';
+  info: {
+    description: 'Reservations for technical service requests';
+    displayName: 'Technical Reservation';
+    pluralName: 'technical-reservations';
+    singularName: 'technical-reservation';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    lastname: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::technical-reservation.technical-reservation'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    phone: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1650,6 +1683,7 @@ declare module '@strapi/strapi' {
       'api::public-gallery.public-gallery': ApiPublicGalleryPublicGallery;
       'api::review.review': ApiReviewReview;
       'api::shipping.shipping': ApiShippingShipping;
+      'api::technical-reservation.technical-reservation': ApiTechnicalReservationTechnicalReservation;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
