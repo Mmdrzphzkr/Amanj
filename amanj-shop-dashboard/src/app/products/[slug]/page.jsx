@@ -111,12 +111,12 @@ export default function ProductPage() {
       <main className="container mx-auto">
         <Header />
 
-        <Box sx={{ mt: 12, mb: 4, px: { xs: 2, md: 7.25 } }}>
+        <Box sx={{ mt: { xs: 6, md: 12 }, mb: 4, px: { xs: 2, md: 7.25 } }}>
           <Breadcrumb category={product.category} currentTitle={product.name} />
         </Box>
 
         {/* چیدمان فلکس شما حفظ شده است */}
-        <div className="flex md:flex-row flex-col gap-8 justify-center px-[58px] mb-16">
+        <div className="flex md:flex-row flex-col gap-6 md:gap-8 justify-center px-4 md:px-[58px] mb-12 md:mb-16">
           {/* بخش گالری */}
           <div className="md:w-1/2 w-full">
             <Paper
@@ -141,7 +141,7 @@ export default function ProductPage() {
                   borderRadius: "20px",
                   fontWeight: "bold",
                   color: "#696969",
-                  z_index: 2,
+                  zIndex: 2,
                 }}
               >
                 {product.brand?.name}
@@ -156,7 +156,13 @@ export default function ProductPage() {
             <SwiperWrapper
               items={product.gallery}
               modules={[FreeMode, Navigation, Thumbs]}
-              swiperOptions={{ spaceBetween: 10, slidesPerView: 4 }}
+              swiperOptions={{
+                spaceBetween: 10,
+                breakpoints: {
+                  0: { slidesPerView: 3 },
+                  600: { slidesPerView: 4 },
+                },
+              }}
               renderItem={(image, index) => (
                 <Box
                   className={`cursor-pointer border-2 rounded-xl overflow-hidden transition-all ${
@@ -171,7 +177,7 @@ export default function ProductPage() {
                       image.formats?.thumbnail?.url || image.url
                     }`}
                     alt={product.name}
-                    className="w-full h-auto"
+                    className="w-full h-auto object-cover"
                   />
                 </Box>
               )}
@@ -180,30 +186,25 @@ export default function ProductPage() {
 
           {/* بخش توضیحات و دکمه */}
           <div
-            className="md:w-1/2 w-full flex flex-col justify-start p-3 rounded-3xl"
+            className="md:w-1/2 w-full flex flex-col justify-start p-2 sm:p-3 rounded-3xl"
             style={{ backgroundColor: brandColors.bg }}
           >
             <Typography
-              variant="h3"
+              variant="h5"
               fontWeight="900"
-              sx={{ color: brandColors.textMain, mb: 2 }}
+              sx={{ color: brandColors.textMain, mb: 1, fontSize: { xs: '1.25rem', md: '2rem' } }}
             >
               {product.name}
             </Typography>
 
             <Typography
-              variant="body1"
-              sx={{ color: "text.secondary", mb: 4, lineHeight: 1.8 }}
+              variant="body2"
+              sx={{ color: "text.secondary", mb: 3, lineHeight: 1.6, fontSize: { xs: '0.95rem', md: '1rem' } }}
             >
               {product.short_description}
             </Typography>
 
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-              sx={{ mb: 4 }}
-            >
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
               <Typography
                 variant="h4"
                 fontWeight="800"
@@ -225,16 +226,16 @@ export default function ProductPage() {
               sx={{
                 bgcolor: brandColors.dark,
                 color: brandColors.accent,
-                py: 2,
+                py: { xs: 1.25, md: 2 },
                 borderRadius: "50px", // لبه گرد مشابه تصویر برند
                 fontWeight: "bold",
-                fontSize: "1.1rem",
+                fontSize: { xs: '0.95rem', md: '1.1rem' },
                 "&:hover": {
                   bgcolor: brandColors.gold,
                   color: brandColors.dark,
                 },
                 boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-                mt: "20px",
+                mt: "16px",
               }}
             >
               {product.stock > 0 ? "افزودن به سبد خرید" : "ناموجود"}
@@ -243,7 +244,7 @@ export default function ProductPage() {
         </div>
 
         {/* بخش Tabs با استایل MUI */}
-        <Box sx={{ px: { xs: 4, md: 7.25 }, mb: 10 }}>
+        <Box sx={{ px: { xs: 3, md: 7.25 }, mb: 10 }}>
           <Box sx={{ borderBottom: 1, borderColor: brandColors.accent }}>
             <Tabs
               value={tabValue}
@@ -270,7 +271,7 @@ export default function ProductPage() {
             <Paper
               elevation={0}
               sx={{
-                p: 4,
+                p: { xs: 2, md: 4 },
                 borderRadius: "20px",
                 bgcolor: "#fff",
                 border: `1px solid ${brandColors.accent}`,
