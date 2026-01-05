@@ -1089,6 +1089,36 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiServiceService extends Struct.CollectionTypeSchema {
+  collectionName: 'services';
+  info: {
+    description: 'List of available services for technical reservations';
+    displayName: 'Service';
+    pluralName: 'services';
+    singularName: 'service';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::service.service'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiShippingShipping extends Struct.CollectionTypeSchema {
   collectionName: 'shippings';
   info: {
@@ -1146,6 +1176,7 @@ export interface ApiTechnicalReservationTechnicalReservation
     name: Schema.Attribute.String & Schema.Attribute.Required;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    services: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1682,6 +1713,7 @@ declare module '@strapi/strapi' {
       'api::product.product': ApiProductProduct;
       'api::public-gallery.public-gallery': ApiPublicGalleryPublicGallery;
       'api::review.review': ApiReviewReview;
+      'api::service.service': ApiServiceService;
       'api::shipping.shipping': ApiShippingShipping;
       'api::technical-reservation.technical-reservation': ApiTechnicalReservationTechnicalReservation;
       'plugin::content-releases.release': PluginContentReleasesRelease;

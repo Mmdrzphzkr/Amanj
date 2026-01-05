@@ -13,14 +13,23 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkUser = async () => {
-      const res = await fetch("/api/me");
-      if (res.ok) {
-        const { user } = await res.json();
-        if (user) {
-          setUser(user);
+      try {
+        const res = await fetch("/api/me");
+        if (res.ok) {
+          const { user } = await res.json();
+          if (user) {
+            console.log("User data with role:", user);
+            // The user object now includes role from the backend
+            setUser(user);
+          }
+        } else {
+          console.warn("Failed to fetch /api/me");
         }
+      } catch (err) {
+        console.error("Error checking user:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     checkUser();
   }, []);

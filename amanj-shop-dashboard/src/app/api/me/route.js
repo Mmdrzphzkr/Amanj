@@ -13,7 +13,7 @@ export async function GET(request) {
   }
 
   try {
-    const res = await fetch(`${STRAPI_URL}/api/users/me`, {
+    const res = await fetch(`${STRAPI_URL}/api/users/me?populate=role`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

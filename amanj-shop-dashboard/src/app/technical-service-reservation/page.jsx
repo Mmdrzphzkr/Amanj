@@ -1,25 +1,79 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { Container, Box, TextField, Button, Typography, Paper, CircularProgress } from "@mui/material";
+import {
+  Container,
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+} from "@mui/material";
 import { toast } from "react-hot-toast";
 
 export default function TechnicalServiceReservation() {
-  const [form, setForm] = useState({ name: "", lastname: "", phone: "", description: "" });
+  const [form, setForm] = useState({
+    name: "",
+    lastname: "",
+    phone: "",
+    description: "",
+    services: [],
+  });
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState({ name: "", lastname: "", phone: "", description: "" });
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const [errors, setErrors] = useState({
+    name: "",
+    lastname: "",
+    phone: "",
+    description: "",
+  });
+  const [serviceOptions, setServiceOptions] = useState([]);
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  useEffect(() => {
+    // fetch services from Strapi
+    const STRAPI =
+      process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+    const load = async () => {
+      try {
+        const res = await fetch(
+          `${STRAPI}/api/services?pagination[pageSize]=100&sort=order:asc`
+        );
+        if (!res.ok) return;
+        const json = await res.json();
+        // Strapi v5: json.data is array of { id, attributes }
+        const items = (json.data || []).map((d) => ({
+          id: d.id,
+          name: d.name || "",
+        }));
+        setServiceOptions(items);
+      } catch (err) {
+        console.error("Failed to load services:", err);
+      }
+    };
+    load();
+  }, []);
 
   const validate = (values) => {
     const next = { name: "", lastname: "", phone: "", description: "" };
     const phoneRe = /^09\d{9}$/;
 
     if (!values.name || !values.name.trim()) next.name = "نام الزامی است";
-    if (!values.lastname || !values.lastname.trim()) next.lastname = "نام خانوادگی الزامی است";
-    if (!values.phone || !values.phone.trim()) next.phone = "شماره موبایل الزامی است";
-    else if (!phoneRe.test(values.phone.trim())) next.phone = "شماره موبایل معتبر نیست (مثال: 09123456789)";
-    if (!values.description || !values.description.trim()) next.description = "توضیحات لازم است";
+    if (!values.lastname || !values.lastname.trim())
+      next.lastname = "نام خانوادگی الزامی است";
+    if (!values.phone || !values.phone.trim())
+      next.phone = "شماره موبایل الزامی است";
+    else if (!phoneRe.test(values.phone.trim()))
+      next.phone = "شماره موبایل معتبر نیست (مثال: 09123456789)";
+    if (!values.description || !values.description.trim())
+      next.description = "توضیحات لازم است";
 
     return next;
   };
@@ -31,6 +85,7 @@ export default function TechnicalServiceReservation() {
       lastname: form.lastname.trim(),
       phone: form.phone.trim(),
       description: form.description.trim(),
+      services: form.services,
     };
 
     const nextErrors = validate(trimmed);
@@ -45,14 +100,19 @@ export default function TechnicalServiceReservation() {
 
     setSubmitting(true);
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_STRAPI_URL + "/api/technical-reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: trimmed }),
-      });
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_STRAPI_URL + "/api/technical-reservations",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: trimmed }),
+        }
+      );
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
-        const message = errBody?.error?.message || "خطا در ارسال درخواست. لطفا دوباره تلاش کنید.";
+        const message =
+          errBody?.error?.message ||
+          "خطا در ارسال درخواست. لطفا دوباره تلاش کنید.";
         toast.error(message);
         throw new Error(message);
       }
@@ -62,7 +122,8 @@ export default function TechnicalServiceReservation() {
       setErrors({ name: "", lastname: "", phone: "", description: "" });
     } catch (err) {
       console.error(err);
-      if (!err.message) toast.error("خطا در ارسال درخواست. لطفا دوباره تلاش کنید.");
+      if (!err.message)
+        toast.error("خطا در ارسال درخواست. لطفا دوباره تلاش کنید.");
     } finally {
       setSubmitting(false);
     }
@@ -72,13 +133,58 @@ export default function TechnicalServiceReservation() {
     <>
       <Header />
       <Container maxWidth="md" sx={{ mt: "70px", mb: 6 }}>
-        <Paper elevation={3} sx={{ p: { xs: 3, sm: 4 }, backgroundColor: "#EDE9DE" }}>
-          <Typography variant="h5" component="h1" gutterBottom sx={{ textAlign: "center", mb: 2 }}>
+        <Paper
+          elevation={3}
+          sx={{ p: { xs: 3, sm: 4 }, backgroundColor: "#EDE9DE" }}
+        >
+          <Typography
+            variant="h5"
+            component="h1"
+            gutterBottom
+            sx={{ textAlign: "center", mb: 2 }}
+          >
             ثبت درخواست خدمات فنی
           </Typography>
 
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <Box sx={{ display: "flex", gap: 2, mb: 2, flexDirection: { xs: "column", sm: "row" } }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            {/* Services multi-select (multiple choices) */}
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="services-label">انتخاب سرویس‌ها</InputLabel>
+              <Select
+                labelId="services-label"
+                id="services"
+                multiple
+                value={form?.services ? form?.services : []}
+                label="انتخاب سرویس‌ها"
+                onChange={(e) => setForm({ ...form, services: e.target.value })}
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((item) => (
+                      <Chip key={item.id} label={item.name} size="small" />
+                    ))}
+                  </Box>
+                )}
+              >
+                {serviceOptions.map((opt) => (
+                  <MenuItem key={opt.id} value={opt}>
+                    {opt.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                mb: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <TextField
                 required
                 name="name"
@@ -108,7 +214,7 @@ export default function TechnicalServiceReservation() {
               fullWidth
               disabled={submitting}
               inputProps={{ maxLength: 11 }}
-              sx={{ mb: 2, '& input': { textAlign: 'right' } }}
+              sx={{ mb: 2, "& input": { textAlign: "right" } }}
             />
 
             <TextField
@@ -122,7 +228,15 @@ export default function TechnicalServiceReservation() {
               disabled={submitting}
             />
 
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'flex-start', flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                alignItems: "center",
+                justifyContent: "flex-start",
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Button
                 type="submit"
                 variant="contained"
@@ -132,12 +246,16 @@ export default function TechnicalServiceReservation() {
                   px: 3,
                   mt: 3,
                   py: 1.2,
-                  bgcolor: '#696969',
-                  '&:hover': { bgcolor: '#B4B4B4' },
-                  transition: 'all 0.3s',
+                  bgcolor: "#696969",
+                  "&:hover": { bgcolor: "#B4B4B4" },
+                  transition: "all 0.3s",
                 }}
               >
-                {submitting ? <CircularProgress size={22} sx={{ color: 'white' }} /> : 'ارسال درخواست'}
+                {submitting ? (
+                  <CircularProgress size={22} sx={{ color: "white" }} />
+                ) : (
+                  "ارسال درخواست"
+                )}
               </Button>
               <Box sx={{ flex: 1 }} />
             </Box>
