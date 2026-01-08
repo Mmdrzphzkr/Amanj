@@ -44,8 +44,8 @@ export const AuthProvider = ({ children }) => {
     if (res.ok) {
       setUser(strapiUser);
       // Use a hard reload to prevent race conditions
-      // window.location.href = "/dashboard";
-      window.location.href = callbackUrl;
+      const destination = callbackUrl || "/";
+      window.location.href = destination;
     } else {
       console.error("Failed to set session cookie");
     }
@@ -54,7 +54,8 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await fetch("/api/logout", { method: "POST" });
     setUser(null);
-    router.push("/login");
+    // navigate to homepage after logout
+    window.location.href = "/";
   };
 
   return (

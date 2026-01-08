@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
   const auth = useAuth();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"; // اگر از جایی نیامده بود، برود داشبورد
+  const callbackUrl = searchParams.get("callbackUrl") || "/"; // اگر از جایی نیامده بود، برود صفحه اصلی
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,8 +52,7 @@ export default function RegisterPage() {
       if (res.ok) {
         toast.success("ثبت‌نام موفق! در حال انتقال...");
         // لاگین خودکار و هدایت به آدرسی که از آن آمده بود (مثلاً /checkout)
-        await auth.login(data.jwt, data.user);
-        window.location.href = callbackUrl;
+        await auth.login(data.jwt, data.user, callbackUrl);
       } else {
         toast.error(data.error?.message || "خطا در ثبت‌نام");
       }
