@@ -124,11 +124,11 @@ const Footer = () => {
               <ul className="flex items-center justify-start md:items-start md:justify-start flex-col w-full">
                 <li>
                   <a
-                    href="#"
+                    href="tel:+989032523711"
                     rel="nofollow"
                     className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                   >
-                    تلفن: ۰۹۰۰۱۶۹۶۹۹۹
+                    تلفن: 09032523711
                   </a>
                 </li>
                 <li>
@@ -137,14 +137,14 @@ const Footer = () => {
                     rel="nofollow"
                     className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                   >
-                    آدرس: مشهد خیابان سیدی
+                    آدرس: مشهد - بلوار وکیل آباد - وکیل آباد 24
                   </a>
                 </li>
               </ul>
             </div>
             <div className="footer-content__part-four">Namads</div>
           </div>
-          <p style="direction: ltr; color: white;">
+          <p style={{ direction: "ltr", color: "white" }}>
             &copy; {new Date().getFullYear()} Amanj Shop. All rights reserved.
           </p>
         </div>
