@@ -516,7 +516,7 @@ const HomePage = () => {
                 </defs>
               </svg>
             </div>
-            <p className="text-3xl font-bold mt-3">
+            <p className="text-xl md:text-3xl font-bold mt-3">
               مزیت هایی که مارا متمایز می کنند
             </p>
           </div>
@@ -1103,7 +1103,7 @@ const HomePage = () => {
                 </defs>
               </svg>
             </div>
-            <p className="text-3xl font-bold mt-3">محصولات پر فروش</p>
+            <p className="text-xl md:text-3xl font-bold mt-3">محصولات پر فروش</p>
           </div>
           <ProductSliderContainer />
         </div>
@@ -1555,7 +1555,7 @@ const HomePage = () => {
                 </defs>
               </svg>
             </div>
-            <p className="text-3xl font-bold mt-3">نظرات مشتریان</p>
+            <p className="text-xl md:text-3xl font-bold mt-3">نظرات مشتریان</p>
           </div>
           <div className="text-lg font-bold text-black text-center">
             Comming Soon
@@ -2018,7 +2018,7 @@ const HomePage = () => {
                 </defs>
               </svg>
             </div>
-            <p className="text-3xl font-bold mt-3">سوالات متداول</p>
+            <p className="text-xl md:text-3xl font-bold mt-3">سوالات متداول</p>
           </div>
           <FaqAccordion />
         </div>

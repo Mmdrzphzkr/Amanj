@@ -9,11 +9,28 @@ const MainSlide = ({ item, strapiUrl }) => {
   } else {
     img = item?.image ?? {};
   }
-  const src = `${strapiUrl}${img.url?.startsWith("/") ? "" : "/"}${
-    img.url || ""
-  }`;
+  const src = `${strapiUrl}${img.url?.startsWith("/") ? "" : "/"}${img.url || ""
+    }`;
   return (
     <>
+      {/* در صورت نیاز overlay محتوا */}
+      {item?.body && (
+        <div className="md:absolute inset-0 pointer-events-none md:top-[30%] px-[15px] py-[15px] md:py-0 md:px-[58px] md:w-[30%] mt-[60px] md:mt-0">
+          <div className="slider-content-overlay pointer-events-auto">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: Array.isArray(item.body)
+                  ? item.body
+                    .flatMap((p) => p.children || [])
+                    .map((c) => c.text || "")
+                    .join("")
+                  : "",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       <img
         src={src}
         alt={img.alternativeText || img.name || "main slide"}
@@ -23,24 +40,6 @@ const MainSlide = ({ item, strapiUrl }) => {
         loading="eager"
         fetchPriority="high"
       />
-
-      {/* در صورت نیاز overlay محتوا */}
-      {item?.body && (
-        <div className="md:absolute inset-0 pointer-events-none md:top-[30%] px-[15px] py-[15px] md:py-0 md:px-[58px] md:w-[30%] hidden md:block">
-          <div className="slider-content-overlay pointer-events-auto">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: Array.isArray(item.body)
-                  ? item.body
-                      .flatMap((p) => p.children || [])
-                      .map((c) => c.text || "")
-                      .join("")
-                  : "",
-              }}
-            />
-          </div>
-        </div>
-      )}
     </>
   );
 };

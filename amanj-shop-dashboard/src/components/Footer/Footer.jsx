@@ -144,7 +144,7 @@ const Footer = () => {
             </div>
             <div className="footer-content__part-four">Namads</div>
           </div>
-          <p style={{ direction: "ltr", color: "white" }}>
+          <p style={{ direction: "ltr"}}  className="text-white text-center md:text-right">
             &copy; {new Date().getFullYear()} Amanj Shop. All rights reserved.
           </p>
         </div>
