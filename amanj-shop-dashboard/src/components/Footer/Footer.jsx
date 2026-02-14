@@ -144,7 +144,9 @@ const Footer = () => {
             </div>
             <div className="footer-content__part-four">Namads</div>
           </div>
-          &copy; {new Date().getFullYear()} Amanj Shop. All rights reserved.
+          <p style="direction: ltr; color: white;">
+            &copy; {new Date().getFullYear()} Amanj Shop. All rights reserved.
+          </p>
         </div>
       </footer>
     </>
