@@ -10,11 +10,11 @@ import {
   Typography,
   Paper,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Chip,
+  Link,
+  Autocomplete,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import { toast } from "react-hot-toast";
 
@@ -59,6 +59,43 @@ export default function TechnicalServiceReservation() {
       }
     };
     load();
+  }, []);
+
+  // Load logo image from Strapi public-gallery (look for item named 'teknicaservice')
+  const [logoUrl, setLogoUrl] = useState(null);
+  useEffect(() => {
+    const STRAPI = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+    const loadLogo = async () => {
+      try {
+        const res = await fetch(`${STRAPI}/api/public-galleries?pagination[pageSize]=100`);
+        if (!res.ok) return;
+        const json = await res.json();
+        const items = json.data || [];
+        for (const d of items) {
+          const attrs = d || {};
+          const name = (attrs.name || attrs.title || "").toString().toLowerCase();
+          if (name === "teknicaservice") {
+            const imgData = attrs.image?.data;
+            let url = null;
+            if (imgData) {
+              const imgAttrs = imgData.attributes || {};
+              url = imgAttrs.url || null;
+              if (!url && imgAttrs.formats) {
+                const f = imgAttrs.formats.small || imgAttrs.formats.thumbnail || Object.values(imgAttrs.formats)[0];
+                url = f?.url || null;
+              }
+            }
+            if (url) {
+              setLogoUrl(url.startsWith("http") ? url : STRAPI + url);
+              return;
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load logo:", err);
+      }
+    };
+    loadLogo();
   }, []);
 
   const validate = (values) => {
@@ -137,14 +174,69 @@ export default function TechnicalServiceReservation() {
           elevation={3}
           sx={{ p: { xs: 3, sm: 4 }, backgroundColor: "#EDE9DE" }}
         >
-          <Typography
-            variant="h5"
-            component="h1"
-            gutterBottom
-            sx={{ textAlign: "center", mb: 2 }}
+          {/* Styled header: logo in elevated Paper, bold title, subtitle and divider */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 1,
+              mb: 3,
+            }}
           >
-            ثبت درخواست خدمات فنی
-          </Typography>
+            <Paper
+              elevation={6}
+              sx={{
+                p: 1.25,
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "background.paper",
+              }}
+            >
+              <Box
+                component="img"
+                src={logoUrl || "/uploads/teknicaservice.jpg"}
+                alt="teknicaservice"
+                fetchPriority="high"
+                sx={{
+                  width: { xs: 110, sm: 210, md: 300 },
+                  height: "auto",
+                  borderRadius: 1,
+                  display: "block",
+                }}
+              />
+            </Paper>
+
+            <Typography
+              variant="h6"
+              component="h1"
+              sx={{ fontWeight: 700, textAlign: "center" }}
+            >
+              Teknica Service
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", textAlign: "center" }}
+            >
+              ثبت آنلاین درخواست تعمیرات و خدمات — سریع و قابل پیگیری
+            </Typography>
+
+            <Link  sx={{ color: "text.secondary", textAlign: "center" }} href="tel:+989105739084">شماره تماس: 09105739084</Link>
+
+            <Box
+              sx={{
+                width: 64,
+                height: 4,
+                bgcolor: "#696969",
+                borderRadius: 2,
+                mt: 1,
+              }}
+            />
+          </Box>
+
 
           <Box
             component="form"
@@ -152,31 +244,45 @@ export default function TechnicalServiceReservation() {
             noValidate
             sx={{ mt: 1 }}
           >
-            {/* Services multi-select (multiple choices) */}
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id="services-label">انتخاب سرویس‌ها</InputLabel>
-              <Select
-                labelId="services-label"
-                id="services"
-                multiple
-                value={form?.services ? form?.services : []}
-                label="انتخاب سرویس‌ها"
-                onChange={(e) => setForm({ ...form, services: e.target.value })}
-                renderValue={(selected) => (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((item) => (
-                      <Chip key={item.id} label={item.name} size="small" />
-                    ))}
-                  </Box>
-                )}
-              >
-                {serviceOptions.map((opt) => (
-                  <MenuItem key={opt.id} value={opt}>
-                    {opt.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {/* Services multi-select (multiple choices) - switched to Autocomplete to show chips with delete and checkboxes in the list */}
+            <Autocomplete
+              multiple
+              disableCloseOnSelect
+              options={serviceOptions}
+              getOptionLabel={(option) => option.name || ""}
+              value={form.services || []}
+              onChange={(event, newValue) => setForm({ ...form, services: newValue })}
+              renderOption={(props, option, { selected }) => (
+                <li {...props}>
+                  <Checkbox
+                    checked={selected}
+                    size="small"
+                    sx={{ mr: 1 }}
+                  />
+                  <ListItemText primary={option.name} />
+                </li>
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option.name}
+                    {...getTagProps({ index })}
+                    key={option.id}
+                    size="small"
+                    color="primary"
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="انتخاب سرویس‌ها"
+                  placeholder="سرویس‌ها را انتخاب کنید"
+                  fullWidth
+                  sx={{ mb: 2 }}
+                />
+              )}
+            />
             <Box
               sx={{
                 display: "flex",
