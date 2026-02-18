@@ -174,9 +174,7 @@ export default function ReservationsPage() {
               <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>نام خانوادگی:</strong> {selectedReservation.lastname}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>موبایل:</strong> {selectedReservation.phone}
-              </Typography>
+              <Link  sx={{ mb: 1 }} href={`tel:${selectedReservation.phone}`}><strong>موبایل:</strong> {selectedReservation.phone}</Link>
               <Typography variant="body2" sx={{ mb: 1 }}>
                 <strong>سرویس‌های انتخاب شده:</strong>
               </Typography>
