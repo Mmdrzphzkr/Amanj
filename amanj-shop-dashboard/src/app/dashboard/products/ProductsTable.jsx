@@ -1,4 +1,5 @@
 // src/app/dashboard/products/ProductsTable.jsx
+// need to npm install xlsx
 "use client";
 
 import {
@@ -12,11 +13,15 @@ import {
   Button,
 } from "@mui/material";
 import Link from "next/link";
+import BulkExcelControls from "./BulkExcelControls";
 
 export default function ProductsTable({ products }) {
   console.log("ProductsTable products:", products);
   return (
     <TableContainer component={Paper}>
+      <div style={{ padding: 12 }}>
+        <BulkExcelControls products={products} />
+      </div>
       <Table sx={{ minWidth: 650 }}>
         <TableHead>
           <TableRow>
@@ -28,26 +33,30 @@ export default function ProductsTable({ products }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((product) => {
-            console.log("Product documentId:", product.documentId);
+          {products.map((productItem) => {
+            // Normalize Strapi response shape: productItem may be { id, attributes }
+            const id = productItem.id ?? productItem.documentId ?? productItem._id;
+            const attrs = productItem.attributes ?? productItem;
+            const name = attrs?.name ?? attrs?.title ?? "";
+            const price = attrs?.price ?? attrs?.amount ?? "";
+            const stock = attrs?.stock ?? "";
+            const categoryName =
+              attrs?.category?.data?.attributes?.name ||
+              attrs?.category?.name ||
+              "N/A";
+
             return (
-              <TableRow key={product.documentId}>
+              <TableRow key={id}>
                 <TableCell component="th" scope="row">
-                  {product.name}
+                  {name}
                 </TableCell>
-                <TableCell align="right">${product.price}</TableCell>
-                <TableCell align="right">{product.stock}</TableCell>
+                <TableCell align="right">{price}</TableCell>
+                <TableCell align="right">{stock}</TableCell>
+                <TableCell align="right">{categoryName}</TableCell>
                 <TableCell align="right">
-                  {product.category?.data?.name || "N/A"}
-                </TableCell>
-                <TableCell align="right">
-                  <Button
-                    component={Link}
-                    href={`/dashboard/products/${product.documentId}`}
-                  >
+                  <Button component={Link} href={`/dashboard/products/${id}`}>
                     ویرایش
                   </Button>
-                  {/* Delete functionality will require another API call */}
                 </TableCell>
               </TableRow>
             );
