@@ -3,24 +3,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-} from "@mui/material";
 
 export default function ReservationsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -33,17 +15,13 @@ export default function ReservationsPage() {
   useEffect(() => {
     if (!authLoading && user) {
       const isAdmin = user.role?.type === "admin";
-      if (!isAdmin) {
-        router.push("/login");
-      }
+      if (!isAdmin) router.push("/login");
     }
   }, [authLoading, user, router]);
 
   useEffect(() => {
     const isAdmin = user?.role?.type === "admin";
-    if (user && isAdmin) {
-      loadReservations();
-    }
+    if (user && isAdmin) loadReservations();
   }, [user]);
 
   const loadReservations = async () => {
@@ -52,10 +30,7 @@ export default function ReservationsPage() {
       const res = await fetch(`${STRAPI}/api/technical-reservations?pagination[pageSize]=100&sort=createdAt:desc`);
       if (!res.ok) throw new Error("Failed to load reservations");
       const json = await res.json();
-      const items = (json.data || []).map((d) => ({
-        id: d.id,
-        ...d,
-      }));
+      const items = (json.data || []).map((d) => ({ id: d.id, ...d }));
       setReservations(items);
     } catch (err) {
       console.error("Error loading reservations:", err);
@@ -76,141 +51,130 @@ export default function ReservationsPage() {
 
   if (authLoading) {
     return (
-      <Container sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-        <CircularProgress />
-      </Container>
+      <div className="flex justify-center mt-8">
+        <svg className="animate-spin h-8 w-8 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
     );
   }
 
   const isAdmin = user?.role?.type === "admin";
   if (!user || !isAdmin) {
-    return <Typography>دسترسی غیرمجاز.</Typography>;
+    return <div className="text-right">دسترسی غیرمجاز.</div>;
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 4 }, mb: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          درخواست‌های سرویس فنی
-        </Typography>
-        <Button
-          variant="contained"
+    <div className="max-w-6xl mx-auto mt-6 mb-8 px-4 text-black" dir="rtl">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <h1 className="text-2xl font-semibold mb-3 md:mb-0 text-white">درخواست‌های سرویس فنی</h1>
+        <button
           onClick={() => router.push("/dashboard")}
-          sx={{ bgcolor: "#696969", "&:hover": { bgcolor: "#B4B4B4" } }}
+          className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded"
         >
           بازگشت به داشبورد
-        </Button>
-      </Box>
+        </button>
+      </div>
 
       {loading ? (
-        <CircularProgress />
+        <div className="flex justify-center mt-6">
+          <svg className="animate-spin h-8 w-8 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+        </div>
       ) : reservations.length === 0 ? (
-        <Typography>درخواستی موجود نیست.</Typography>
+        <div className="text-right text-gray-700">درخواستی موجود نیست.</div>
       ) : (
         <>
-          {/* Desktop / Tablet: show table on md+ */}
-          <TableContainer component={Paper} sx={{ direction: "rtl", display: { xs: 'none', md: 'block' }, overflowX: 'auto' }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                  <TableCell align="right">نام</TableCell>
-                  <TableCell align="right">نام خانوادگی</TableCell>
-                  <TableCell align="right">موبایل</TableCell>
-                  <TableCell align="right">تاریخ</TableCell>
-                  <TableCell align="center">عملیات</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+          {/* Desktop / Tablet table */}
+          <div className="overflow-x-auto hidden md:block bg-white rounded shadow" style={{ direction: 'rtl' }}>
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-right">نام</th>
+                  <th className="px-4 py-2 text-right">نام خانوادگی</th>
+                  <th className="px-4 py-2 text-right">موبایل</th>
+                  <th className="px-4 py-2 text-right">تاریخ</th>
+                  <th className="px-4 py-2 text-center">عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
                 {reservations.map((res) => (
-                  <TableRow key={res.id} hover>
-                    <TableCell align="right" sx={{ fontSize: { xs: '0.85rem', md: '0.95rem' } }}>{res.name}</TableCell>
-                    <TableCell align="right" sx={{ fontSize: { xs: '0.85rem', md: '0.95rem' } }}>{res.lastname}</TableCell>
-                    <TableCell align="right" sx={{ fontSize: { xs: '0.85rem', md: '0.95rem' } }}>{res.phone}</TableCell>
-                    <TableCell align="right" sx={{ fontSize: { xs: '0.85rem', md: '0.95rem' } }}>{new Date(res.createdAt).toLocaleDateString("fa-IR")}</TableCell>
-                    <TableCell align="center">
-                      <Button
-                        variant="contained"
-                        size="small"
+                  <tr key={res.id} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-3 text-right">{res.name}</td>
+                    <td className="px-4 py-3 text-right">{res.lastname}</td>
+                    <td className="px-4 py-3 text-right">{res.phone}</td>
+                    <td className="px-4 py-3 text-right">{new Date(res.createdAt).toLocaleDateString("fa-IR")}</td>
+                    <td className="px-4 py-3 text-center">
+                      <button
                         onClick={() => handleOpenDialog(res)}
-                        sx={{ bgcolor: "#696969", "&:hover": { bgcolor: "#B4B4B4" }, fontSize: { xs: '0.75rem', md: '0.85rem' } }}
+                        className="bg-gray-600 hover:bg-gray-500 text-white text-xs md:text-sm px-3 py-1 rounded"
                       >
                         جزئیات
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              </tbody>
+            </table>
+          </div>
 
-          {/* Mobile: show compact cards list */}
-          <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+          {/* Mobile: cards */}
+          <div className="md:hidden">
             {reservations.map((res) => (
-              <Paper key={res.id} sx={{ p: 2, mb: 2, borderRadius: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Box>
-                    <Typography sx={{ fontWeight: 600, fontSize: '0.95rem' }}>{res.name} {res.lastname}</Typography>
-                    <Typography sx={{ color: '#666', fontSize: '0.9rem' }}>{res.phone}</Typography>
-                  </Box>
-                  <Button size="small" variant="contained" onClick={() => handleOpenDialog(res)} sx={{ bgcolor: '#696969', '&:hover': { bgcolor: '#B4B4B4' }, minWidth: 80 }}>
+              <div key={res.id} className="p-4 mb-3 bg-white rounded shadow">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="font-semibold text-base">{res.name} {res.lastname}</div>
+                    <div className="text-gray-600">{res.phone}</div>
+                  </div>
+                  <button onClick={() => handleOpenDialog(res)} className="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded min-w-[80px] text-sm">
                     جزئیات
-                  </Button>
-                </Box>
-                <Typography sx={{ color: 'gray', fontSize: '0.85rem' }}>{new Date(res.createdAt).toLocaleDateString('fa-IR')}</Typography>
-              </Paper>
+                  </button>
+                </div>
+                <div className="text-gray-500 text-sm">{new Date(res.createdAt).toLocaleDateString('fa-IR')}</div>
+              </div>
             ))}
-          </Box>
+          </div>
         </>
       )}
 
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ textAlign: "right" }}>جزئیات درخواست</DialogTitle>
-        <DialogContent sx={{ direction: "rtl" }}>
-          {selectedReservation && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>نام:</strong> {selectedReservation.name}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>نام خانوادگی:</strong> {selectedReservation.lastname}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>موبایل:</strong> {selectedReservation.phone}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>سرویس‌های انتخاب شده:</strong>
-              </Typography>
+      {/* Dialog */}
+      {openDialog && selectedReservation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={handleCloseDialog}></div>
+          <div className="relative bg-white rounded max-w-lg w-full mx-4 shadow-lg" dir="rtl" onClick={(e) => e.stopPropagation()}>
+            <div className="px-5 py-3 border-b text-right">
+              <h2 className="text-lg font-medium">جزئیات درخواست</h2>
+            </div>
+            <div className="p-5 text-right space-y-3">
+              <div><strong>نام:</strong> {selectedReservation.name}</div>
+              <div><strong>نام خانوادگی:</strong> {selectedReservation.lastname}</div>
+              <div><strong>موبایل:</strong> <a className="text-blue-600" href={`tel:${selectedReservation.phone}`}>{selectedReservation.phone}</a></div>
+              <div><strong>سرویس‌های انتخاب شده:</strong></div>
               {Array.isArray(selectedReservation.services) && selectedReservation.services.length > 0 ? (
-                <Box sx={{ ml: 2, mb: 2 }}>
-                  {selectedReservation.services?.map((svc, idx) => (
-                    <Typography key={idx} variant="body2">
-                      • {typeof svc === 'object' ? svc.name : svc}
-                    </Typography>
+                <div className="mr-3">
+                  {selectedReservation.services.map((svc, idx) => (
+                    <div key={idx}>• {typeof svc === 'object' ? svc.name : svc}</div>
                   ))}
-                </Box>
+                </div>
               ) : (
-                <Typography variant="body2" sx={{ ml: 2, mb: 2 }}>
-                  هیچ سرویسی انتخاب نشده
-                </Typography>
+                <div className="mr-3">هیچ سرویسی انتخاب نشده</div>
               )}
-              <Typography variant="body2" sx={{ mb: 1 }}>
+              <div>
                 <strong>توضیحات:</strong>
-              </Typography>
-              <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", ml: 2, mb: 2, p: 1, backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
-                {selectedReservation.description}
-              </Typography>
-              <Typography variant="caption" sx={{ color: "gray" }}>
-                <strong>تاریخ:</strong> {new Date(selectedReservation.createdAt).toLocaleString("fa-IR")}
-              </Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} variant="contained">
-            بستن
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+                <div className="mt-1 p-2 bg-gray-100 rounded whitespace-pre-wrap">{selectedReservation.description}</div>
+              </div>
+              <div className="text-sm text-gray-500"><strong>تاریخ:</strong> {new Date(selectedReservation.createdAt).toLocaleString("fa-IR")}</div>
+            </div>
+            <div className="px-5 py-3 border-t flex justify-end">
+              <button onClick={handleCloseDialog} className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded">بستن</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
