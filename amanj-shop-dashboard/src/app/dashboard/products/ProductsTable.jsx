@@ -35,11 +35,11 @@ export default function ProductsTable({ products }) {
         <TableBody>
           {products.map((productItem) => {
             // Normalize Strapi response shape: productItem may be { id, attributes }
-            const id = productItem.id ?? productItem.documentId ?? productItem._id;
+            const id = productItem.documentId;
             const attrs = productItem.attributes ?? productItem;
-            const name = attrs?.name ?? attrs?.title ?? "";
-            const price = attrs?.price ?? attrs?.amount ?? "";
-            const stock = attrs?.stock ?? "";
+            const name = attrs?.name ?? "Unnamed Product";
+            const price = attrs?.price ?? "No price found";
+            const stock = attrs?.stock ?? "No stock information";
             const categoryName =
               attrs?.category?.data?.attributes?.name ||
               attrs?.category?.name ||

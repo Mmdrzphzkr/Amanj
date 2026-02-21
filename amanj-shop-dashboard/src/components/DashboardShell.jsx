@@ -22,6 +22,7 @@ const DRAWER_WIDTH = 240;
 
 const navItems = [
   { text: "داشبورد", href: "/dashboard" },
+  { text: "درخواست های سرویس", href: "/dashboard/reservations" },
   { text: "محصولات", href: "/dashboard/products" },
   { text: "دسته بندی ها", href: "/dashboard/categories" },
   { text: "برندها", href: "/dashboard/brands" },

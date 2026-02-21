@@ -34,27 +34,50 @@ export default function ProductForm({ categories = [], brands = [], initialData 
   });
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailId, setThumbnailId] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (isEditMode && initialData) {
       const attrs = initialData.attributes ?? initialData;
+      // normalize relation ids (always use string values for Select control)
+      const extractRelId = (rel) => {
+        const id = rel?.data?.id ?? rel?.id ?? rel ?? null;
+        return id == null ? "" : String(id);
+      };
+      const categoryId = extractRelId(attrs.category);
+      const brandId = extractRelId(attrs.brand);
+
       setFormData({
         name: attrs.name ?? "",
         slug: attrs.slug ?? "",
-        description: attrs.description ?? "",
+        description: JSON.stringify(attrs.description ?? []) ?? "",
         short_description: attrs.short_description ?? "",
         price: attrs.price ?? "",
         stock: attrs.stock ?? "",
-        category: attrs.category?.data?.id ?? attrs.category ?? "",
-        brand: attrs.brand?.data?.id ?? attrs.brand ?? "",
+        category: categoryId,
+        brand: brandId,
         specifications: attrs.specifications ?? [],
         SEO: attrs.SEO ?? {},
       });
 
-      // existing thumbnail id
-      const existingThumb = attrs.thumbnail?.data?.id;
-      if (existingThumb) setThumbnailId(existingThumb);
+      // existing thumbnail id and preview url
+      const thumb = attrs.thumbnail?.data ?? attrs.thumbnail ?? null;
+      const existingThumbId = thumb?.id ?? null;
+      if (existingThumbId) setThumbnailId(existingThumbId);
+      const getMediaUrl = (m) => {
+        if (!m) return null;
+        // Strapi v4 shape: m.attributes.url or m.url, or formats.thumbnail.url
+        const attrsFormats = m?.attributes?.formats ?? m?.formats ?? null;
+        const urlFromFormats = attrsFormats?.thumbnail?.url ?? null;
+        const urlFromAttrs = m?.attributes?.url ?? m?.url ?? null;
+        const base = process.env.NEXT_PUBLIC_STRAPI_URL ?? "";
+        const url = urlFromFormats || urlFromAttrs;
+        if (!url) return null;
+        return url.startsWith("/") ? `${base}${url}` : url;
+      };
+
+      setThumbnailPreview(getMediaUrl(thumb));
     }
   }, [initialData, isEditMode]);
 
@@ -66,6 +89,14 @@ export default function ProductForm({ categories = [], brands = [], initialData 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) setThumbnailFile(file);
+    if (file) {
+      try {
+        const url = URL.createObjectURL(file);
+        setThumbnailPreview(url);
+      } catch (e) {
+        // ignore
+      }
+    }
   };
 
   const uploadThumbnail = async () => {
@@ -175,28 +206,43 @@ export default function ProductForm({ categories = [], brands = [], initialData 
         <FormControl fullWidth margin="normal">
           <InputLabel>دسته‌بندی</InputLabel>
           <Select name="category" value={formData.category} label="دسته‌بندی" onChange={handleChange}>
-            {categories?.map((c) => (
-              <MenuItem key={c.id} value={c.id}>
-                {c.attributes?.name ?? c.name}
-              </MenuItem>
-            ))}
+            {(Array.isArray(categories) ? categories : categories?.data ?? []).map((c) => {
+              const item = c.attributes ?? c;
+              const id = c.id ?? item?.id ?? item?.documentId ?? "";
+              const label = item?.name ?? item?.title ?? item?.slug ?? String(id);
+              return (
+                <MenuItem key={id} value={String(id)}>
+                  {label}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
 
         <FormControl fullWidth margin="normal">
           <InputLabel>برند</InputLabel>
           <Select name="brand" value={formData.brand} label="برند" onChange={handleChange}>
-            {brands?.map((b) => (
-              <MenuItem key={b.id} value={b.id}>
-                {b.attributes?.name ?? b.name}
-              </MenuItem>
-            ))}
+            {(Array.isArray(brands) ? brands : brands?.data ?? []).map((b) => {
+              const item = b.attributes ?? b;
+              const id = b.id ?? item?.id ?? item?.documentId ?? "";
+              const label = item?.name ?? item?.title ?? item?.slug ?? String(id);
+              return (
+                <MenuItem key={id} value={String(id)}>
+                  {label}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
 
         <Typography variant="h6" sx={{ mt: 2 }}>
           تصویر شاخص
         </Typography>
+        {thumbnailPreview && (
+          <Box sx={{ mt: 1, mb: 2 }}>
+            <img src={thumbnailPreview} alt="thumbnail preview" style={{ maxWidth: 240, maxHeight: 160, display: "block", marginBottom: 8 }} />
+          </Box>
+        )}
         <Input type="file" onChange={handleFileChange} sx={{ mt: 1, mb: 2 }} />
 
         <TextField
