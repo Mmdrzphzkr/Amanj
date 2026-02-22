@@ -169,30 +169,40 @@ export default function TechnicalServiceReservation() {
   return (
     <>
       <Header />
-      <Container maxWidth="md" sx={{ mt: "70px", mb: 6 }}>
+
+      <Container maxWidth="md" sx={{ mt: "90px", mb: 8 }}>
         <Paper
-          elevation={3}
-          sx={{ p: { xs: 3, sm: 4 }, backgroundColor: "#EDE9DE" }}
+          elevation={0}
+          sx={{
+            p: { xs: 3, sm: 5 },
+            borderRadius: "28px",
+            background: "linear-gradient(145deg, #ffffff, #f9f9f9)",
+            border: "1px solid rgba(0,0,0,0.05)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            backdropFilter: "blur(6px)",
+          }}
         >
-          {/* Styled header: logo in elevated Paper, bold title, subtitle and divider */}
+          {/* Header Section */}
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 1,
-              mb: 3,
+              gap: 1.5,
+              mb: 4,
             }}
           >
             <Paper
-              elevation={6}
+              elevation={0}
               sx={{
-                p: 1.25,
-                borderRadius: 2,
+                p: 1.5,
+                borderRadius: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                bgcolor: "background.paper",
+                background: "white",
+                border: "1px solid rgba(0,0,0,0.06)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.05)",
               }}
             >
               <Box
@@ -201,63 +211,112 @@ export default function TechnicalServiceReservation() {
                 alt="teknicaservice"
                 fetchPriority="high"
                 sx={{
-                  width: { xs: 110, sm: 210, md: 300 },
+                  width: { xs: 120, sm: 220, md: 300 },
                   height: "auto",
-                  borderRadius: 1,
+                  borderRadius: "14px",
                   display: "block",
                 }}
               />
             </Paper>
 
             <Typography
-              variant="h6"
+              variant="h5"
               component="h1"
-              sx={{ fontWeight: 700, textAlign: "center" }}
+              sx={{
+                fontWeight: 800,
+                textAlign: "center",
+                color: "#fd4d00",
+                letterSpacing: ".5px",
+              }}
             >
               Teknica Service
             </Typography>
 
             <Typography
               variant="body2"
-              sx={{ color: "text.secondary", textAlign: "center" }}
+              sx={{
+                color: "text.secondary",
+                textAlign: "center",
+                maxWidth: 400,
+              }}
             >
               ثبت آنلاین درخواست تعمیرات و خدمات — سریع و قابل پیگیری
             </Typography>
 
-            <Link  sx={{ color: "text.secondary", textAlign: "center" }} href="tel:+989105739084">شماره تماس: 09105739084</Link>
+            <Link
+              sx={{
+                color: "#568f00",
+                fontWeight: 600,
+                textDecoration: "none",
+                transition: "all .3s",
+                "&:hover": {
+                  color: "#fd4d00",
+                },
+              }}
+              href="tel:+989105739084"
+            >
+              شماره تماس: 09105739084
+            </Link>
 
             <Box
               sx={{
-                width: 64,
-                height: 4,
-                bgcolor: "#696969",
-                borderRadius: 2,
-                mt: 1,
+                width: 80,
+                height: 5,
+                background:
+                  "linear-gradient(90deg, #fd4d00, #568f00)",
+                borderRadius: 4,
+                mt: 1.5,
               }}
             />
           </Box>
 
-
+          {/* Form */}
           <Box
             component="form"
             onSubmit={handleSubmit}
             noValidate
-            sx={{ mt: 1 }}
+            sx={{
+              mt: 1,
+              "& .MuiTextField-root": {
+                mb: 2,
+              },
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "14px",
+                transition: "all .3s",
+                "&:hover fieldset": {
+                  borderColor: "#fd4d00",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#fd4d00",
+                  borderWidth: 2,
+                },
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "#fd4d00",
+              },
+            }}
           >
-            {/* Services multi-select (multiple choices) - switched to Autocomplete to show chips with delete and checkboxes in the list */}
             <Autocomplete
               multiple
               disableCloseOnSelect
               options={serviceOptions}
               getOptionLabel={(option) => option.name || ""}
               value={form.services || []}
-              onChange={(event, newValue) => setForm({ ...form, services: newValue })}
+              onChange={(event, newValue) =>
+                setForm({ ...form, services: newValue })
+              }
               renderOption={(props, option, { selected }) => (
                 <li {...props}>
                   <Checkbox
                     checked={selected}
                     size="small"
-                    sx={{ mr: 1 }}
+                    sx={{
+                      mr: 1,
+                      color: "#568f00",
+                      "&.Mui-checked": {
+                        color: "#fd4d00",
+                      },
+                    }}
                   />
                   <ListItemText primary={option.name} />
                 </li>
@@ -269,7 +328,13 @@ export default function TechnicalServiceReservation() {
                     {...getTagProps({ index })}
                     key={option.id}
                     size="small"
-                    color="primary"
+                    sx={{
+                      borderRadius: "8px",
+                      background:
+                        "linear-gradient(135deg, #fd4d00, #568f00)",
+                      color: "white",
+                      fontWeight: 600,
+                    }}
                   />
                 ))
               }
@@ -279,15 +344,14 @@ export default function TechnicalServiceReservation() {
                   label="انتخاب سرویس‌ها"
                   placeholder="سرویس‌ها را انتخاب کنید"
                   fullWidth
-                  sx={{ mb: 2 }}
                 />
               )}
             />
+
             <Box
               sx={{
                 display: "flex",
                 gap: 2,
-                mb: 2,
                 flexDirection: { xs: "column", sm: "row" },
               }}
             >
@@ -320,7 +384,7 @@ export default function TechnicalServiceReservation() {
               fullWidth
               disabled={submitting}
               inputProps={{ maxLength: 11 }}
-              sx={{ mb: 2, "& input": { textAlign: "right" } }}
+              sx={{ "& input": { textAlign: "right" } }}
             />
 
             <TextField
@@ -337,24 +401,32 @@ export default function TechnicalServiceReservation() {
             <Box
               sx={{
                 display: "flex",
-                gap: 2,
                 alignItems: "center",
-                justifyContent: "flex-start",
                 flexDirection: { xs: "column", sm: "row" },
               }}
             >
               <Button
                 type="submit"
                 variant="contained"
-                fullWidth={false}
                 disabled={submitting}
                 sx={{
-                  px: 3,
-                  mt: 3,
-                  py: 1.2,
-                  bgcolor: "#696969",
-                  "&:hover": { bgcolor: "#B4B4B4" },
-                  transition: "all 0.3s",
+                  px: 5,
+                  mt: 4,
+                  py: 1.5,
+                  borderRadius: "14px",
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  textTransform: "none",
+                  background:
+                    "linear-gradient(135deg, #fd4d00, #568f00)",
+                  boxShadow:
+                    "0 10px 25px rgba(253,77,0,.25)",
+                  transition: "all .3s ease",
+                  "&:hover": {
+                    transform: "translateY(-3px)",
+                    boxShadow:
+                      "0 15px 35px rgba(86,143,0,.3)",
+                  },
                 }}
               >
                 {submitting ? (
@@ -363,11 +435,13 @@ export default function TechnicalServiceReservation() {
                   "ارسال درخواست"
                 )}
               </Button>
+
               <Box sx={{ flex: 1 }} />
             </Box>
           </Box>
         </Paper>
       </Container>
+
       <Footer />
     </>
   );

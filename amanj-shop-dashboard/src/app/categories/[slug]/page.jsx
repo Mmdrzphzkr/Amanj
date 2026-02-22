@@ -9,6 +9,7 @@ import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import Breadcrumb from "@/components/Breadcrumb/Breadcrumb";
 import ProductCard from "@/components/ProdcutCard/ProductCard";
+import { Container, Box, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "@/components/Loading/Loading";
@@ -66,32 +67,38 @@ export default function CategoryPage() {
   return (
     <Suspense fallback={<Loading />}>
       <Header />
-      <div class="bread-crumb__container pt-20 bg-[#F9F8F5]">
-        <Breadcrumb
-          category={currentCategory}
-          currentTitle={currentCategory.name}
-        />
-      </div>
-      <main className="container mx-auto bg-[#F9F8F5]">
-        <div className="px-[58px] py-8">
-          <h1 className="text-3xl font-bold mb-8 text-neutral-800">{currentCategory.name}</h1>
+      <Box sx={{ pt: { xs: 8, md: 10 }, backgroundColor: "#F9F8F5" }}>
+        <Container maxWidth="lg">
+          <Breadcrumb
+            category={currentCategory}
+            currentTitle={currentCategory.name}
+          />
+        </Container>
+      </Box>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <Box component="main" sx={{ backgroundColor: "#F9F8F5" }}>
+        <Container maxWidth="lg" sx={{ px: { xs: 2, md: 7.25 }, py: 6 }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 800, mb: 4, color: "text.primary" }}>
+            {currentCategory.name}
+          </Typography>
+
+          <Grid container spacing={3}>
             {products.map((product) => (
-              <Link
-                href={`/products/${product.slug}`}
-                className="block w-full h-full p-1"
-              >
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  strapiUrl={process.env.NEXT_PUBLIC_STRAPI_URL}
-                />
-              </Link>
+              <Grid key={product.id} size={{ xs: 6, md: 4, lg: 3 }} >
+                <Link
+                  href={`/products/${product.slug}`}
+                  style={{ display: "block", height: "100%" }}
+                >
+                  <ProductCard
+                    product={product}
+                    strapiUrl={process.env.NEXT_PUBLIC_STRAPI_URL}
+                  />
+                </Link>
+              </Grid>
             ))}
-          </div>
-        </div>
-      </main>
+          </Grid>
+        </Container>
+      </Box>
       <Footer />
     </Suspense>
   );
