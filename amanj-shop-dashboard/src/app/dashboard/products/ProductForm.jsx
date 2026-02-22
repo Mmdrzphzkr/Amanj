@@ -130,7 +130,7 @@ export default function ProductForm({ categories = [], brands = [], initialData 
 
       if (isEditMode) {
         // initialData expected to contain id
-        const id = initialData.id ?? initialData;
+        const id = initialData.documentId;
         const res = await fetch(`/api/products/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

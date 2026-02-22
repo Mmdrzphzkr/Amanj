@@ -1,7 +1,9 @@
 // src/app/dashboard/products/[id]/page.jsx
 import { getStrapiData } from "@/lib/strapi";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import ProductForm from "../ProductForm";
+import Link from "next/link";
+
 export default async function EditProductPage(params) {
   const { id } = params.params;
 
@@ -62,9 +64,25 @@ export default async function EditProductPage(params) {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 4 }}>
-        ویرایش محصول
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+        }}
+      >
+        <Typography variant="h4">
+          ویرایش محصول
+        </Typography>
+        <Button
+          variant="contained"
+          component={Link}
+          href="/dashboard/products"
+        >
+          برگشت
+        </Button>
+      </Box>
       <ProductForm initialData={product} categories={categories} brands={brands} />
     </Box>
   );

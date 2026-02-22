@@ -56,10 +56,26 @@ export default async function NewProductPage() {
   // 3. If categories exist, render the form and pass them as a prop
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 4 }}>
-        محصول جدید
-      </Typography>
-      <ProductForm categories={categories} brands={brands}/>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+        }}
+      >
+        <Typography variant="h4">
+          ویرایش محصول
+        </Typography>
+        <Button
+          variant="contained"
+          component={Link}
+          href="/dashboard/products"
+        >
+          برگشت
+        </Button>
+      </Box>
+      <ProductForm categories={categories} brands={brands} />
     </Box>
   );
 }

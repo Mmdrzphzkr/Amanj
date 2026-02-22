@@ -124,11 +124,11 @@ const Footer = () => {
               <ul className="flex items-center justify-start md:items-start md:justify-start flex-col w-full">
                 <li>
                   <a
-                    href="tel:+989032523711"
+                    href="tel:+989105739084"
                     rel="nofollow"
                     className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                   >
-                    تلفن: 09032523711
+                    تلفن: ۰۹۱۰۵۷۳۹۰۸۴
                   </a>
                 </li>
                 <li>
@@ -137,7 +137,7 @@ const Footer = () => {
                     rel="nofollow"
                     className="text-[#868686] text-[16px] font-medium text-center md:text-start"
                   >
-                    آدرس: مشهد - بلوار وکیل آباد - وکیل آباد 24
+                    آدرس: مشهد - بلوار وکیل آباد - وکیل آباد ۲۳
                   </a>
                 </li>
               </ul>
