@@ -16,7 +16,7 @@ import Link from "next/link";
 
 export default async function CategoriesPage() {
   const { data: categories } = await getStrapiData("/api/product-categories");
-  console.log(categories);
+  
   return (
     <Box>
       <Box

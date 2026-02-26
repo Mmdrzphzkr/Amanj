@@ -79,8 +79,7 @@ export async function POST(request) {
     const result = await res.json();
 
     if (!res.ok) {
-      // اگر استراپی خطای کلید نامعتبر بدهد، اینجا مشخص می‌شود
-      // console.log(result.error?.message);
+      
       return NextResponse.json(
         { message: result.error?.message || "Strapi Error" },
         { status: res.status }

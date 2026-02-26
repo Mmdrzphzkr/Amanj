@@ -7,9 +7,8 @@ import BrandSlide from "./BrandSlider";
 import { Autoplay, Navigation } from "swiper/modules";
 
 const ImageSlide = ({ img, strapiUrl }) => {
-  const src = `${strapiUrl}${img.url?.startsWith("/") ? "" : "/"}${
-    img.url || ""
-  }`;
+  const src = `${strapiUrl}${img.url?.startsWith("/") ? "" : "/"}${img.url || ""
+    }`;
   return (
     <div className="flex items-center justify-center py-6">
       <img
@@ -43,14 +42,6 @@ const BrandSliderContainer = () => {
       brandName: brand.name ?? null,
     }))
   );
-
-  // debug مفید: باز کردن console و چک کن که تعداد تصاویر چنده
-  // console.log(
-  //   "brands length:",
-  //   brands.length,
-  //   "allImages length:",
-  //   allImages.length
-  // );
 
   const options = {
     slidesPerView: 2, // چند اسلاید در نما؛ تنظیم کن مطابق نیاز (یا responsive بگذار)

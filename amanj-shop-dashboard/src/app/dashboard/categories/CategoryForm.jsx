@@ -74,7 +74,7 @@ export default function CategoryForm({ allCategories, initialData }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    console.log("Response:", res);
+    
     if (res.ok) {
       alert(`دسته بندی با موفقیت ${isEditMode ? "به‌روزرسانی" : "ایجاد"} شد`);
       router.refresh();

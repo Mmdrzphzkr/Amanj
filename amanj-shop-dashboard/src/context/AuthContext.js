@@ -18,8 +18,6 @@ export const AuthProvider = ({ children }) => {
         if (res.ok) {
           const { user } = await res.json();
           if (user) {
-            console.log("User data with role:", user);
-            // The user object now includes role from the backend
             setUser(user);
           }
         } else {

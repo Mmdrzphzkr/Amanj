@@ -44,7 +44,6 @@ export const submitOrder = createAsyncThunk(
         throw new Error("خطا در ارتباط با سرور");
       }
 
-      console.log("Order submitted successfully:", response);
       return response;
     } catch (error) {
       console.error("Submit order error:", error);

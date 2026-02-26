@@ -8,7 +8,7 @@ import { useEffect } from "react";
 export default function DashboardPage() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
-  console.log(user);
+  
   useEffect(() => {
     if (!loading && user) {
       const isAdmin = user.role?.type === "admin";

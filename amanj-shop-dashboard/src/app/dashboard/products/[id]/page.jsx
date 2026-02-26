@@ -7,8 +7,6 @@ import Link from "next/link";
 export default async function EditProductPage(params) {
   const { id } = params.params;
 
-  console.log("params:", id);
-
   const { data: product } = await getStrapiData(`/api/products/${id}?populate=*`);
 
   if (!product) {

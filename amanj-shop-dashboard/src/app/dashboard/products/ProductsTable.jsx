@@ -16,7 +16,7 @@ import Link from "next/link";
 import BulkExcelControls from "./BulkExcelControls";
 
 export default function ProductsTable({ products }) {
-  console.log("ProductsTable products:", products);
+
   return (
     <TableContainer component={Paper}>
       <div style={{ padding: 12 }}>
