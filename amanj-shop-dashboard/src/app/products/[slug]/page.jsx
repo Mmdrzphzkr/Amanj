@@ -119,71 +119,72 @@ export default function ProductPage() {
         {/* چیدمان فلکس شما حفظ شده است */}
         <div className="flex md:flex-row flex-col gap-6 md:gap-8 justify-center px-4 md:px-[58px] mb-12 md:mb-16">
           {/* بخش گالری */}
-          <div className="md:w-1/2 w-full">
-            <Paper
-              elevation={0}
-              sx={{
-                position: "relative",
-                borderRadius: "24px",
-                overflow: "hidden",
-                mb: 2,
-                border: `1px solid ${brandColors.accent}`,
-              }}
-            >
-              <Box
-                className="brand-name"
-                sx={{
-                  position: "absolute",
-                  top: 20,
-                  right: 20,
-                  bgcolor: brandColors.accent,
-                  px: 2,
-                  py: 0.5,
-                  borderRadius: "20px",
-                  fontWeight: "bold",
-                  color: "#696969",
-                  zIndex: 2,
-                }}
-              >
-                {product.brand?.name}
-              </Box>
-              <img
-                src={`${STRAPI_URL}${product.gallery[selectedImage].url}`}
-                alt={product.name}
-                className="w-full h-auto"
-              />
-            </Paper>
-
-            <SwiperWrapper
-              items={product.gallery}
-              modules={[FreeMode, Navigation, Thumbs]}
-              swiperOptions={{
-                spaceBetween: 10,
-                breakpoints: {
-                  0: { slidesPerView: 3 },
-                  600: { slidesPerView: 4 },
-                },
-              }}
-              renderItem={(image, index) => (
-                <Box
-                  className={`cursor-pointer border-2 rounded-xl overflow-hidden transition-all ${
-                    selectedImage === index
-                      ? "border-[#C5A35C]"
-                      : "border-transparent"
-                  }`}
-                  onClick={() => setSelectedImage(index)}
+          {
+            product.gallery ?
+              <div className="md:w-1/2 w-full">
+                <Paper
+                  elevation={0}
+                  sx={{
+                    position: "relative",
+                    borderRadius: "24px",
+                    overflow: "hidden",
+                    mb: 2,
+                    border: `1px solid ${brandColors.accent}`,
+                  }}
                 >
+                  <Box
+                    className="brand-name"
+                    sx={{
+                      position: "absolute",
+                      top: 20,
+                      right: 20,
+                      bgcolor: brandColors.accent,
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                      color: "#696969",
+                      zIndex: 2,
+                    }}
+                  >
+                    {product.brand?.name}
+                  </Box>
                   <img
-                    src={`${STRAPI_URL}${
-                      image.formats?.thumbnail?.url || image.url
-                    }`}
+                    src={`${STRAPI_URL}${product.gallery[selectedImage].url}`}
                     alt={product.name}
-                    className="w-full h-auto object-cover"
+                    className="w-full h-auto"
                   />
-                </Box>
-              )}
-            />
-          </div>
+                </Paper>
+
+                <SwiperWrapper
+                  items={product.gallery}
+                  modules={[FreeMode, Navigation, Thumbs]}
+                  swiperOptions={{
+                    spaceBetween: 10,
+                    breakpoints: {
+                      0: { slidesPerView: 3 },
+                      600: { slidesPerView: 4 },
+                    },
+                  }}
+                  renderItem={(image, index) => (
+                    <Box
+                      className={`cursor-pointer border-2 rounded-xl overflow-hidden transition-all ${selectedImage === index
+                        ? "border-[#C5A35C]"
+                        : "border-transparent"
+                        }`}
+                      onClick={() => setSelectedImage(index)}
+                    >
+                      <img
+                        src={`${STRAPI_URL}${image.formats?.thumbnail?.url || image.url
+                          }`}
+                        alt={product.name}
+                        className="w-full h-auto object-cover"
+                      />
+                    </Box>
+                  )}
+                />
+              </div> : ""
+          }
 
           {/* بخش توضیحات و دکمه */}
           <div

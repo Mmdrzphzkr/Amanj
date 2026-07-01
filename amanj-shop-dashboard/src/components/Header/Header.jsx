@@ -168,6 +168,7 @@ const Header = () => {
             <>
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
+                title="side bar trigger"
                 className="md:hidden bg-[#EDE9DE] rounded-full p-2 flex items-center justify-center border border-gray-700"
               >
                 <svg

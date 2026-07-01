@@ -35,6 +35,7 @@ export default function TechnicalServiceReservation() {
     description: "",
   });
   const [serviceOptions, setServiceOptions] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(true);
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -43,6 +44,7 @@ export default function TechnicalServiceReservation() {
     const STRAPI =
       process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
     const load = async () => {
+      setLoadingServices(true);
       try {
         const res = await fetch(
           `${STRAPI}/api/services?pagination[pageSize]=100&sort=order:asc`
@@ -57,6 +59,8 @@ export default function TechnicalServiceReservation() {
         setServiceOptions(items);
       } catch (err) {
         console.error("Failed to load services:", err);
+      } finally {
+        setLoadingServices(false);
       }
     };
     load();
@@ -130,7 +134,6 @@ export default function TechnicalServiceReservation() {
     const hasError = Object.values(nextErrors).some((v) => v);
     setErrors(nextErrors);
     if (hasError) {
-      // Show first error as toast as well
       const first = Object.values(nextErrors).find((v) => v);
       if (first) toast.error(first);
       return;
@@ -138,6 +141,7 @@ export default function TechnicalServiceReservation() {
 
     setSubmitting(true);
     try {
+      // ۱. ثبت در استرپی
       const res = await fetch(
         process.env.NEXT_PUBLIC_STRAPI_URL + "/api/technical-reservations",
         {
@@ -146,18 +150,58 @@ export default function TechnicalServiceReservation() {
           body: JSON.stringify({ data: trimmed }),
         }
       );
+
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
-        const message =
-          errBody?.error?.message ||
-          "خطا در ارسال درخواست. لطفا دوباره تلاش کنید.";
+        const message = errBody?.error?.message || "خطا در ارسال درخواست";
         toast.error(message);
         throw new Error(message);
       }
 
-      toast.success("درخواست شما با موفقیت ارسال شد. متشکریم.");
-      setForm({ name: "", lastname: "", phone: "", description: "" });
+      // ۲. ارسال اس‌ام‌اس به مدیران با پترن
+      const smsResponse = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: trimmed.name,
+          lastname: trimmed.lastname,
+          phone: trimmed.phone,
+          services: trimmed.services,
+          description: trimmed.description,
+        }),
+      });
+
+      const smsResult = await smsResponse.json();
+
+      if (!smsResult.success) {
+        console.warn('SMS warning:', smsResult.message);
+      }
+
+      // ۳. (اختیاری) ارسال پیام تایید به مشتری
+      try {
+        await fetch('/api/send-sms-customer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: trimmed.name,
+            lastname: trimmed.lastname,
+            phone: trimmed.phone,
+          }),
+        });
+      } catch (customerSmsError) {
+        console.warn('Customer SMS failed but form submitted:', customerSmsError);
+      }
+
+      toast.success("درخواست شما با موفقیت ارسال شد. پیامک تایید برای شما ارسال گردید.");
+      setForm({
+        name: "",
+        lastname: "",
+        phone: "",
+        description: "",
+        services: []
+      });
       setErrors({ name: "", lastname: "", phone: "", description: "" });
+
     } catch (err) {
       console.error(err);
       if (!err.message)
@@ -306,6 +350,9 @@ export default function TechnicalServiceReservation() {
               onChange={(event, newValue) =>
                 setForm({ ...form, services: newValue })
               }
+              loading={loadingServices}
+              loadingText="در حال بارگذاری سرویس‌ها..."
+              noOptionsText={loadingServices ? "..." : "سرویسی یافت نشد"}
               renderOption={(props, option, { selected }) => (
                 <li {...props}>
                   <Checkbox
@@ -345,6 +392,17 @@ export default function TechnicalServiceReservation() {
                   label="انتخاب سرویس‌ها"
                   placeholder="سرویس‌ها را انتخاب کنید"
                   fullWidth
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingServices ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
                 />
               )}
             />

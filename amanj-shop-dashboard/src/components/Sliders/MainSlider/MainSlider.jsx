@@ -39,6 +39,7 @@ const MainSlide = ({ item, strapiUrl }) => {
         height={img.height || 825}
         loading="eager"
         fetchPriority="high"
+        style={{ width: "100%", height: "auto" }}
       />
     </>
   );

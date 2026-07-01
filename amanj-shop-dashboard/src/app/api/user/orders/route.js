@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 // استفاده از متغیر محیطی آدرس استرپی
-const STRAPI_URL = "http://localhost:8000" //process.env.NEXT_PUBLIC_STRAPI_URL;
+const STRAPI_URL = (
+    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
+  ).replace(/\/+$/, ""); //process.env.NEXT_PUBLIC_STRAPI_URL;
 
 export async function GET() {
   const cookieStore = cookies();

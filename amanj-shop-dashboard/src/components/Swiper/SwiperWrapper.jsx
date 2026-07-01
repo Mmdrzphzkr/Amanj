@@ -2,7 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-const SwiperWrapper = ({ items = [], renderItem, swiperOptions = {}, modules = [], className = "" }) => {
+const SwiperWrapper = ({
+  items = [],
+  renderItem,
+  swiperOptions = {},
+  modules = [],
+  className = "",
+  placeholderClassName = "min-h-[260px] bg-[#F7F7F7]",
+}) => {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => setIsClient(true), []);
 
@@ -10,7 +17,11 @@ const SwiperWrapper = ({ items = [], renderItem, swiperOptions = {}, modules = [
     console.warn("SwiperWrapper: renderItem prop is required.");
     return null;
   }
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) {
+    return (
+      <div className={`static-swiper-fallback ${className} ${placeholderClassName}`} />
+    );
+  }
 
   return (
     <>
@@ -23,7 +34,9 @@ const SwiperWrapper = ({ items = [], renderItem, swiperOptions = {}, modules = [
           ))}
         </Swiper>
       ) : (
-        <div className="static-swiper-fallback">{renderItem(items[0], 0)}</div>
+        <div className={`static-swiper-fallback ${className}`}>
+          {renderItem(items[0], 0)}
+        </div>
       )}
     </>
   );

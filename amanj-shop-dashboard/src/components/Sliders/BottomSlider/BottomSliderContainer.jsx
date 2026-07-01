@@ -32,6 +32,7 @@ const BottomSliderContainer = () => {
       swiperOptions={options}
       modules={[Navigation, Pagination]}
       className="bottom-swiper"
+      placeholderClassName="min-h-[360px] bg-[#f5f5f5]"
     />
   );
 };

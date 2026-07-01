@@ -3,35 +3,18 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Box,
-  TextField,
-  Button,
-  Paper,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from "@mui/material";
 
-// 1. REMOVED the 'slugify' library import
-// 2. ADDED our new custom function for Farsi slugs
 const persianSlugify = (text) => {
   if (!text) return "";
-  return text
-    .toString()
-    .trim()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/[^\u0600-\u06FF0-9-]/g, "") // Remove all non-Farsi, non-numeric, non-dash characters
-    .replace(/--+/g, "-"); // Replace multiple - with single -
+  return text.toString().trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\u0600-\u06FF0-9-]/g, "")
+    .replace(/--+/g, "-");
 };
 
 export default function CategoryForm({ allCategories, initialData }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    parent: "",
-  });
+  const [formData, setFormData] = useState({ name: "", slug: "", parent: "" });
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   const isEditMode = Boolean(initialData);
 
@@ -49,91 +32,108 @@ export default function CategoryForm({ allCategories, initialData }) {
     const { name, value } = e.target;
     setFormData((prev) => {
       const newState = { ...prev, [name]: value };
-      if (name === "name") {
-        // 3. USE our new custom function
-        newState.slug = persianSlugify(value);
-      }
+      if (name === "name") newState.slug = persianSlugify(value);
       return newState;
     });
   };
 
-  // ... the rest of your component (handleSubmit, JSX) remains exactly the same ...
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      name: formData.name,
-      slug: formData.slug,
-      parent: formData.parent || null,
-    };
-    const url = isEditMode
-      ? `/api/product-categories/${initialData.id}`
-      : "/api/product-categories";
-    const method = isEditMode ? "PUT" : "POST";
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    
-    if (res.ok) {
-      alert(`دسته بندی با موفقیت ${isEditMode ? "به‌روزرسانی" : "ایجاد"} شد`);
-      router.refresh();
-      router.push("/dashboard/categories");
-    } else {
-      alert(`خطا در ${isEditMode ? "به‌روزرسانی" : "ایجاد"} دسته بندی`);
+    setSaving(true);
+    try {
+      const payload = {
+        name: formData.name,
+        slug: formData.slug,
+        parent: formData.parent || null,
+      };
+      const url = isEditMode
+        ? `/api/product-categories/${initialData.id}`
+        : "/api/product-categories";
+      const method = isEditMode ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        router.refresh();
+        router.push("/dashboard/categories");
+      } else {
+        alert(`خطا در ${isEditMode ? "به‌روزرسانی" : "ایجاد"} دسته‌بندی`);
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
+  const inputStyle = {
+    width: "100%", background: "var(--bg-input)", border: "1px solid var(--border)",
+    borderRadius: "var(--radius-md)", color: "var(--text-primary)",
+    fontFamily: "inherit", fontSize: "14px", padding: "11px 14px", outline: "none",
+    transition: "border-color 0.15s, box-shadow 0.15s"
+  };
+  const onFocus = (e) => { e.target.style.borderColor = "var(--accent)"; e.target.style.boxShadow = "0 0 0 3px var(--accent-dim)"; };
+  const onBlur = (e) => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; };
+
   return (
-    <Paper sx={{ p: 4 }}>
-      <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          name="name"
-          label="نام دسته بندی"
-          value={formData.name}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          name="slug"
-          label="اسلاگ (آدرس)"
-          value={formData.slug}
-          InputProps={{ readOnly: true, style: { direction: "rtl" } }} // Ensure slug is LTR
-          helperText="این فیلد به صورت خودکار ساخته می‌شود."
-        />
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="parent-category-select-label">
-            دسته بندی مادر
-          </InputLabel>
-          <Select
-            labelId="parent-category-select-label"
-            name="parent"
-            value={formData.parent}
-            label="دسته بندی مادر"
-            onChange={handleChange}
-          >
-            <MenuItem value="">
-              <em>هیچکدام (دسته بندی اصلی)</em>
-            </MenuItem>
-            {allCategories?.map(
-              (cat) =>
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">{isEditMode ? "ویرایش دسته‌بندی" : "دسته‌بندی جدید"}</h1>
+          <p className="page-subtitle">{isEditMode ? "اطلاعات دسته‌بندی را ویرایش کنید" : "دسته‌بندی جدیدی اضافه کنید"}</p>
+        </div>
+        <button onClick={() => router.back()} className="btn-ghost">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          بازگشت
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} style={{ maxWidth: "520px" }}>
+        <div className="card" style={{ padding: "28px", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div>
+            <label className="label">نام دسته‌بندی <span style={{ color: "var(--danger)" }}>*</span></label>
+            <input
+              name="name" required value={formData.name}
+              onChange={handleChange} onFocus={onFocus} onBlur={onBlur}
+              style={inputStyle} placeholder="مثال: لپ‌تاپ"
+            />
+          </div>
+
+          <div>
+            <label className="label">اسلاگ (آدرس URL)</label>
+            <input
+              name="slug" value={formData.slug}
+              readOnly onFocus={onFocus} onBlur={onBlur}
+              style={{ ...inputStyle, direction: "ltr", background: "rgba(18,20,28,0.5)", cursor: "default" }}
+            />
+            <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "5px" }}>
+              این فیلد به‌صورت خودکار از نام ساخته می‌شود
+            </p>
+          </div>
+
+          <div>
+            <label className="label">دسته‌بندی مادر</label>
+            <select
+              name="parent" value={formData.parent}
+              onChange={handleChange} onFocus={onFocus} onBlur={onBlur}
+              style={{ ...inputStyle, cursor: "pointer" }}
+            >
+              <option value="">— دسته‌بندی اصلی (بدون والد)</option>
+              {allCategories?.map((cat) =>
                 initialData?.id !== cat.id && (
-                  <MenuItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </MenuItem>
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 )
-            )}
-          </Select>
-        </FormControl>
-        <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-          {isEditMode ? "به‌روزرسانی" : "ذخیره"}
-        </Button>
-      </Box>
-    </Paper>
+              )}
+            </select>
+          </div>
+
+          <button type="submit" className="btn-primary" disabled={saving} style={{ justifyContent: "center", padding: "13px", opacity: saving ? 0.7 : 1 }}>
+            {saving ? "در حال ذخیره..." : (isEditMode ? "به‌روزرسانی دسته‌بندی" : "ذخیره دسته‌بندی")}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

@@ -1,3 +1,4 @@
+// src/app/dashboard/reservations/page.jsx
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
@@ -10,7 +11,6 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReservation, setSelectedReservation] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -28,7 +28,7 @@ export default function ReservationsPage() {
     try {
       const STRAPI = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
       const res = await fetch(`${STRAPI}/api/technical-reservations?pagination[pageSize]=100&sort=createdAt:desc`);
-      if (!res.ok) throw new Error("Failed to load reservations");
+      if (!res.ok) throw new Error("Failed to load");
       const json = await res.json();
       const items = (json.data || []).map((d) => ({ id: d.id, ...d }));
       setReservations(items);
@@ -39,138 +39,205 @@ export default function ReservationsPage() {
     }
   };
 
-  const handleOpenDialog = (reservation) => {
-    setSelectedReservation(reservation);
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setSelectedReservation(null);
-  };
-
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
-      <div className="flex justify-center mt-8">
-        <svg className="animate-spin h-8 w-8 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-        </svg>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "50vh" }}>
+        <div style={{
+          width: "36px", height: "36px", border: "3px solid var(--border)",
+          borderTopColor: "var(--accent)", borderRadius: "50%",
+          animation: "spin 0.8s linear infinite"
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   const isAdmin = user?.role?.type === "admin";
   if (!user || !isAdmin) {
-    return <div className="text-right">دسترسی غیرمجاز.</div>;
+    return (
+      <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--danger)" }}>
+        <div style={{ fontSize: "48px", marginBottom: "12px" }}>⛔</div>
+        <div style={{ fontSize: "18px", fontWeight: 600 }}>دسترسی غیرمجاز</div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto mt-6 mb-8 px-4 text-black" dir="rtl">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-        <h1 className="text-2xl font-semibold mb-3 md:mb-0 text-white">درخواست‌های سرویس فنی</h1>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded"
-        >
-          بازگشت به داشبورد
-        </button>
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">درخواست‌های سرویس فنی</h1>
+          <p className="page-subtitle">{reservations.length} درخواست ثبت شده</p>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center mt-6">
-          <svg className="animate-spin h-8 w-8 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-          </svg>
+      {reservations.length === 0 ? (
+        <div style={{
+          textAlign: "center", padding: "80px 20px",
+          background: "var(--bg-card)", border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)"
+        }}>
+          <div style={{ fontSize: "48px", marginBottom: "12px" }}>📅</div>
+          <div style={{ fontSize: "16px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "6px" }}>درخواستی موجود نیست</div>
+          <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>هنوز هیچ درخواست سرویس فنی دریافت نشده است.</div>
         </div>
-      ) : reservations.length === 0 ? (
-        <div className="text-right text-gray-700">درخواستی موجود نیست.</div>
       ) : (
-        <>
-          {/* Desktop / Tablet table */}
-          <div className="overflow-x-auto hidden md:block bg-white rounded shadow" style={{ direction: 'rtl' }}>
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-2 text-right">نام</th>
-                  <th className="px-4 py-2 text-right">نام خانوادگی</th>
-                  <th className="px-4 py-2 text-right">موبایل</th>
-                  <th className="px-4 py-2 text-right">تاریخ</th>
-                  <th className="px-4 py-2 text-center">عملیات</th>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>نام و نام خانوادگی</th>
+                <th>موبایل</th>
+                <th>تاریخ ثبت</th>
+                <th style={{ textAlign: "center" }}>عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservations.map((res) => (
+                <tr key={res.id}>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{res.name} {res.lastname}</div>
+                  </td>
+                  <td>
+                    <a href={`tel:${res.phone}`} style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500, fontFamily: "monospace" }}>
+                      {res.phone}
+                    </a>
+                  </td>
+                  <td style={{ color: "var(--text-secondary)", fontSize: "13px" }}>
+                    {new Date(res.createdAt).toLocaleDateString("fa-IR", {
+                      year: "numeric", month: "long", day: "numeric"
+                    })}
+                  </td>
+                  <td style={{ textAlign: "center" }}>
+                    <button
+                      onClick={() => setSelectedReservation(res)}
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: "6px",
+                        padding: "7px 14px", borderRadius: "var(--radius-sm)",
+                        background: "var(--bg-hover)", border: "1px solid var(--border)",
+                        color: "var(--text-secondary)", fontSize: "13px", fontWeight: 500,
+                        cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s"
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+                    >
+                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                      جزئیات
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {reservations.map((res) => (
-                  <tr key={res.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 text-right">{res.name}</td>
-                    <td className="px-4 py-3 text-right">{res.lastname}</td>
-                    <td className="px-4 py-3 text-right">{res.phone}</td>
-                    <td className="px-4 py-3 text-right">{new Date(res.createdAt).toLocaleDateString("fa-IR")}</td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => handleOpenDialog(res)}
-                        className="bg-gray-600 hover:bg-gray-500 text-white text-xs md:text-sm px-3 py-1 rounded"
-                      >
-                        جزئیات
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile: cards */}
-          <div className="md:hidden">
-            {reservations.map((res) => (
-              <div key={res.id} className="p-4 mb-3 bg-white rounded shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <div className="font-semibold text-base">{res.name} {res.lastname}</div>
-                    <div className="text-gray-600">{res.phone}</div>
-                  </div>
-                  <button onClick={() => handleOpenDialog(res)} className="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded min-w-[80px] text-sm">
-                    جزئیات
-                  </button>
-                </div>
-                <div className="text-gray-500 text-sm">{new Date(res.createdAt).toLocaleDateString('fa-IR')}</div>
-              </div>
-            ))}
-          </div>
-        </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      {/* Dialog */}
-      {openDialog && selectedReservation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={handleCloseDialog}></div>
-          <div className="relative bg-white rounded max-w-lg w-full mx-4 shadow-lg" dir="rtl" onClick={(e) => e.stopPropagation()}>
-            <div className="px-5 py-3 border-b text-right">
-              <h2 className="text-lg font-medium">جزئیات درخواست</h2>
+      {/* Detail Modal */}
+      {selectedReservation && (
+        <div
+          onClick={() => setSelectedReservation(null)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)",
+            display: "flex", alignItems: "start", justifyContent: "center",
+            zIndex: 50, padding: "20px", backdropFilter: "blur(4px)"
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="card fade-up"
+            style={{
+              maxWidth: "500px", width: "100%",
+              maxHeight: "90vh", overflowY: "auto"
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "20px 24px", borderBottom: "1px solid var(--border)"
+            }}>
+              <h2 style={{ fontSize: "17px", fontWeight: 700, color: "var(--text-primary)" }}>جزئیات درخواست</h2>
+              <button
+                onClick={() => setSelectedReservation(null)}
+                style={{
+                  background: "var(--bg-hover)", border: "1px solid var(--border)",
+                  borderRadius: "var(--radius-sm)", width: "32px", height: "32px",
+                  cursor: "pointer", color: "var(--text-secondary)",
+                  display: "flex", alignItems: "center", justifyContent: "center"
+                }}
+              >
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
             </div>
-            <div className="p-5 text-right space-y-3">
-              <div><strong>نام:</strong> {selectedReservation.name}</div>
-              <div><strong>نام خانوادگی:</strong> {selectedReservation.lastname}</div>
-              <div><strong>موبایل:</strong> <a className="text-blue-600" href={`tel:${selectedReservation.phone}`}>{selectedReservation.phone}</a></div>
-              <div><strong>سرویس‌های انتخاب شده:</strong></div>
-              {Array.isArray(selectedReservation.services) && selectedReservation.services.length > 0 ? (
-                <div className="mr-3">
-                  {selectedReservation.services.map((svc, idx) => (
-                    <div key={idx}>• {typeof svc === 'object' ? svc.name : svc}</div>
-                  ))}
+
+            {/* Modal Body */}
+            <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
+              {/* Name */}
+              <div style={{
+                background: "var(--bg-surface)", borderRadius: "var(--radius-md)",
+                padding: "14px 16px", display: "flex", alignItems: "center", gap: "12px"
+              }}>
+                <div style={{
+                  width: "40px", height: "40px", borderRadius: "50%",
+                  background: "linear-gradient(135deg, var(--accent), #d97706)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", flexShrink: 0
+                }}>
+                  {selectedReservation.name?.[0] || "?"}
                 </div>
-              ) : (
-                <div className="mr-3">هیچ سرویسی انتخاب نشده</div>
-              )}
-              <div>
-                <strong>توضیحات:</strong>
-                <div className="mt-1 p-2 bg-gray-100 rounded whitespace-pre-wrap">{selectedReservation.description}</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>
+                    {selectedReservation.name} {selectedReservation.lastname}
+                  </div>
+                  <a href={`tel:${selectedReservation.phone}`} style={{ fontSize: "14px", color: "var(--accent)", textDecoration: "none", fontFamily: "monospace" }}>
+                    {selectedReservation.phone}
+                  </a>
+                </div>
               </div>
-              <div className="text-sm text-gray-500"><strong>تاریخ:</strong> {new Date(selectedReservation.createdAt).toLocaleString("fa-IR")}</div>
+
+              {/* Services */}
+              <div>
+                <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", marginBottom: "8px", letterSpacing: "0.05em" }}>سرویس‌های انتخاب شده</div>
+                {Array.isArray(selectedReservation.services) && selectedReservation.services.length > 0 ? (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                    {selectedReservation.services.map((svc, idx) => (
+                      <span key={idx} className="badge badge-amber" style={{ fontSize: "13px" }}>
+                        {typeof svc === "object" ? svc.name : svc}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ color: "var(--text-muted)", fontSize: "13px" }}>هیچ سرویسی انتخاب نشده</div>
+                )}
+              </div>
+
+              {/* Description */}
+              {selectedReservation.description && (
+                <div>
+                  <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", marginBottom: "8px", letterSpacing: "0.05em" }}>توضیحات</div>
+                  <div style={{
+                    background: "var(--bg-input)", borderRadius: "var(--radius-md)",
+                    padding: "14px", fontSize: "14px", color: "var(--text-secondary)",
+                    lineHeight: "1.8", whiteSpace: "pre-wrap"
+                  }}>
+                    {selectedReservation.description}
+                  </div>
+                </div>
+              )}
+
+              {/* Date */}
+              <div style={{ fontSize: "12px", color: "var(--text-primary)", paddingTop: "4px" }}>
+                تاریخ ثبت: {new Date(selectedReservation.createdAt).toLocaleString("fa-IR")}
+              </div>
             </div>
-            <div className="px-5 py-3 border-t flex justify-end">
-              <button onClick={handleCloseDialog} className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded">بستن</button>
+
+            {/* Modal Footer */}
+            <div style={{ padding: "16px 24px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={() => setSelectedReservation(null)} className="btn-ghost">بستن</button>
             </div>
           </div>
         </div>

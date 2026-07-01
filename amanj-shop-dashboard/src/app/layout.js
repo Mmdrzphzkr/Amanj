@@ -18,6 +18,9 @@ import StoreProvider from "../redux/StoreProvider";
 export const metadata = {
   title: "Amanj coffee",
   description: "Amanj coffee shop",
+  verification: {
+    google: "CUv_t0Prybg6ip82Bk30MpTdhoOeCx0JHBZPOt_DtRY",
+  },
 };
 
 export default function RootLayout({ children }) {

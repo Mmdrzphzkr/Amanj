@@ -1,7 +1,9 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const STRAPI_URL = "http://localhost:8000"
+const STRAPI_URL = (
+    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
+  ).replace(/\/+$/, "");
 
 export async function POST(request) {
   const cookieStore = cookies();

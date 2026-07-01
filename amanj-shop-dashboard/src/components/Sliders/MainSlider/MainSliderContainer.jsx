@@ -33,6 +33,7 @@ const MainSliderContainer = () => {
       swiperOptions={options}
       modules={[Navigation, Pagination]}
       className="main-swiper"
+      placeholderClassName="min-h-[320px] md:min-h-[520px] bg-[#f5f5f5]"
     />
   );
 };

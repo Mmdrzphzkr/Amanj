@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import OrderDetailsView from "./OrderDetailsView"; // کامپوننتی که در مرحله بعد می‌سازیم
 
-const STRAPI_URL = "http://localhost:8000"
+const STRAPI_URL = (
+    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
+  ).replace(/\/+$/, "");
 
 async function getOrderDetails(orderId) {
   const cookieStore = cookies();

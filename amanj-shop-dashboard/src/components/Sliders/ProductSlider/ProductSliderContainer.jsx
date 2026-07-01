@@ -56,6 +56,7 @@ const ProductSliderContainer = () => {
         swiperOptions={options}
         modules={[Autoplay, Navigation]}
         className="product-swiper !p-5"
+        placeholderClassName="min-h-[320px] bg-[#f7f7f7]"
       />
     </div>
   );

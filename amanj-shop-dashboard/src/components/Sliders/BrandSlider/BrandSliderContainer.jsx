@@ -66,6 +66,7 @@ const BrandSliderContainer = () => {
         swiperOptions={options}
         modules={[Autoplay, Navigation]}
         className="brand-swiper"
+        placeholderClassName="min-h-[96px] bg-[#EDE9DE]"
       />
     </div>
   );

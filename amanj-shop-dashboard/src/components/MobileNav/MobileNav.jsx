@@ -15,12 +15,14 @@ const MobileNav = () => {
       <div className="p-1.5 flex justify-evenly align-middle md:hidden fixed bottom-0 left-0 w-full h-auto z-10 backdrop-blur-md bg-[#F9F8F580] shadow-sm">
         <Link
           href={"/"}
+          title="home button"
           className="bg-[#EDE9DE] rounded-full flex justify-center align-middle p-2.5 h-full"
         >
           <HomeIcon size={20} className="text-[#3f3f3f]" />
         </Link>
         <Link
           href={isAuthenticated ? "/profile" : loginUrl}
+          title="login button"
           className="p-2 bg-[#EDE9DE] rounded-full hover:bg-[#DED9CC] transition-all flex items-center gap-2"
         >
           <svg
@@ -53,6 +55,7 @@ const MobileNav = () => {
         </Link>
         <Link
           href="/cart"
+          title="cart trigger"
           className="relative p-2 bg-[#EDE9DE] rounded-full hover:bg-[#DED9CC] transition-all"
         >
           <svg
