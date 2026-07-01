@@ -1,6 +1,7 @@
 // export default Header;
 "use client";
 import { fetchHeaders } from "@/redux/slices/headerSlice";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "@/context/AuthContext";
@@ -20,6 +21,9 @@ const Header = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const pathname = usePathname();
+  const loginUrl = `/login?callbackurl=${pathname}`;
 
   useEffect(() => {
     dispatch(fetchHeaders());
@@ -53,17 +57,15 @@ const Header = () => {
     <>
       {/* --- سایدبار موبایل از سمت راست --- */}
       <div
-        className={`fixed inset-0 z-50 transition-all duration-500 ${
-          isMobileMenuOpen
+        className={`fixed inset-0 z-50 transition-all duration-500 ${isMobileMenuOpen
             ? "bg-black/50 visible opacity-100"
             : "opacity-0 invisible"
-        }`}
+          }`}
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <div
-          className={`bg-white w-3/4 h-full p-5 overflow-y-auto transform transition-transform duration-500 fixed right-0 top-0 ${
-            isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`bg-white w-3/4 h-full p-5 overflow-y-auto transform transition-transform duration-500 fixed right-0 top-0 ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+            }`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex justify-between items-center">
@@ -155,11 +157,10 @@ const Header = () => {
       {/* --- هدر دسکتاپ و موبایل --- */}
       <header
         className={`flex justify-between items-center px-[15px] py-[5px] md:py-[0px] md:px-[58px] fixed top-0 left-0 right-0 z-40 transition-all duration-500 
-        ${
-          isScrolled
+        ${isScrolled
             ? "backdrop-blur-md bg-[#F9F8F580] shadow-sm"
             : "bg-transparent"
-        }`}
+          }`}
       >
         <div className="flex justify-between md:justify-start items-center gap-6 w-full">
           {/* دکمه منوی موبایل */}
@@ -305,9 +306,8 @@ const Header = () => {
           </Link>
           {/* جستجو با افکت باز شدن نرم */}
           <div
-            className={`flex items-center border border-gray-300 rounded-full overflow-hidden transition-all duration-500 bg-[#EDE9DE] ${
-              isSearchOpen ? "w-64 px-2" : "w-full justify-center"
-            }`}
+            className={`flex items-center border border-gray-300 rounded-full overflow-hidden transition-all duration-500 bg-[#EDE9DE] ${isSearchOpen ? "w-64 px-2" : "w-full justify-center"
+              }`}
           >
             {isSearchOpen ? (
               <>
@@ -364,7 +364,7 @@ const Header = () => {
           {/* <button className="">👤 SVG آیکون کاربر</button> */}
 
           <Link
-            href={isAuthenticated ? "/profile" : "/login"}
+            href={isAuthenticated ? "/profile" : loginUrl}
             className="p-2 bg-[#EDE9DE] rounded-full hover:bg-[#DED9CC] transition-all flex items-center gap-2"
           >
             <svg

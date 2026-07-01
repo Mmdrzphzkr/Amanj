@@ -6,6 +6,8 @@ import Link from "next/link";
 import { addItem, removeItem, deleteItem } from "@/redux/slices/cartSlice";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import Header from "@/components/Header/Header";
+import MobileNav from "@/components/MobileNav/MobileNav";
+import Footer from "@/components/Footer/Footer";
 
 const CartPage = () => {
   const dispatch = useDispatch();
@@ -251,6 +253,8 @@ const CartPage = () => {
           </div>
         </div>
       </div>
+      <MobileNav />
+      <Footer />
     </>
   );
 };

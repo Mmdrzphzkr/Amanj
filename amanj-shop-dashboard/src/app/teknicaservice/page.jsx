@@ -17,6 +17,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { toast } from "react-hot-toast";
+import MobileNav from "@/components/MobileNav/MobileNav";
 
 export default function TechnicalServiceReservation() {
   const [form, setForm] = useState({
@@ -435,13 +436,12 @@ export default function TechnicalServiceReservation() {
                   "ارسال درخواست"
                 )}
               </Button>
-
               <Box sx={{ flex: 1 }} />
             </Box>
           </Box>
         </Paper>
       </Container>
-
+      <MobileNav />
       <Footer />
     </>
   );

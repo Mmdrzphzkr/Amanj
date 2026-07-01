@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { fetchStrapiData } from "@/lib/strapi-frontend";
 import { addItem } from "@/redux/slices/cartSlice";
 import { toast } from "react-hot-toast";
+import MobileNav from "@/components/MobileNav/MobileNav";
 
 // MUI Components
 import {
@@ -308,6 +309,7 @@ export default function ProductPage() {
           </TabPanel>
         </Box>
       </main>
+      <MobileNav />
       <Footer />
     </Suspense>
   );

@@ -77,6 +77,12 @@
       "relation": "oneToMany",
       "target": "api::order.order",
       "mappedBy": "users_permissions_user"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::guarantee.guarantee",
+      "mappedBy": "oprator"
     }
   }
 }

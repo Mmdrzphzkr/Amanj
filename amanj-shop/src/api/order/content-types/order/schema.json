@@ -21,10 +21,11 @@
       "default": "pending",
       "enum": [
         "shipped",
-        "processing",
+        "approved",
         "pending",
         "cancelled",
-        "delivered"
+        "delivered",
+        "processing"
       ]
     },
     "items": {

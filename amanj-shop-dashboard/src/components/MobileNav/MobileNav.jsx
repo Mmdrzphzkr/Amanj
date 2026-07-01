@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { HomeIcon } from "lucide-react";
@@ -6,6 +7,9 @@ import { HomeIcon } from "lucide-react";
 const MobileNav = () => {
   const totalCount = useSelector((state) => state.cart?.totalCount || 0);
   const { user, isAuthenticated } = useAuth();
+  const pathname = usePathname();
+  const loginUrl = `/login?callbackurl=${pathname}`;
+
   return (
     <>
       <div className="p-1.5 flex justify-evenly align-middle md:hidden fixed bottom-0 left-0 w-full h-auto z-10 backdrop-blur-md bg-[#F9F8F580] shadow-sm">
@@ -16,7 +20,7 @@ const MobileNav = () => {
           <HomeIcon size={20} className="text-[#3f3f3f]" />
         </Link>
         <Link
-          href={isAuthenticated ? "/profile" : "/login"}
+          href={isAuthenticated ? "/profile" : loginUrl}
           className="p-2 bg-[#EDE9DE] rounded-full hover:bg-[#DED9CC] transition-all flex items-center gap-2"
         >
           <svg

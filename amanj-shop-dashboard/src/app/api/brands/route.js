@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+const STRAPI_URL = "http://localhost:8000"
 
 // Handles POST requests to create a new brand
 export async function POST(request) {

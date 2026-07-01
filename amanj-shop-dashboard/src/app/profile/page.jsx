@@ -3,7 +3,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-
 // MUI Components - تمام قطعات مورد نیاز از اینجا فراخوانی شده‌اند
 import {
   Box,
@@ -40,7 +39,7 @@ export default function ProfilePage() {
   if (loading) return <Loading />;
 
   if (!isAuthenticated) {
-    redirect("/login?callbackUrl=/profile");
+    redirect("/login?callbackurl=/profile");
   }
 
   // پالت رنگی استخراج شده از تصویر برند آمانج

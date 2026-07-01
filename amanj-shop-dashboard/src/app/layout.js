@@ -1,5 +1,5 @@
 // src/app/layout.js
-import { Vazirmatn } from "next/font/google";
+//import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -9,11 +9,11 @@ import ClientProviders from "@/components/ClientProviders/clientProviders";
 import { Toaster } from "react-hot-toast";
 import StoreProvider from "../redux/StoreProvider";
 
-const vazirmatn = Vazirmatn({
-  subsets: ["arabic", "latin"], // Ensure necessary subsets are included
-  variable: "--font-vazirmatn",
-  display: "swap",
-});
+// const vazirmatn = Vazirmatn({
+//   subsets: ["arabic", "latin"], // Ensure necessary subsets are included
+//   variable: "--font-vazirmatn",
+//   display: "swap",
+// });
 
 export const metadata = {
   title: "Amanj coffee",
@@ -23,7 +23,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="fa" dir="rtl">
-      <body className={vazirmatn.className}>
+      <body>
         <Toaster
           position="top-center" // موقعیت نمایش توست‌ها
           reverseOrder={false} // ترتیب نمایش

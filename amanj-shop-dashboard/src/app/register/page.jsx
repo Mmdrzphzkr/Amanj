@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useSearchParams } from "next/navigation"; // اضافه شد برای خواندن آدرس بازگشت
+import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import {
@@ -13,6 +13,7 @@ import {
   Typography,
   Container,
   Paper,
+  CircularProgress, // اضافه شد
 } from "@mui/material";
 import MobileNav from "@/components/MobileNav/MobileNav";
 import Footer from "@/components/Footer/Footer";
@@ -27,7 +28,7 @@ export default function RegisterPage() {
 
   const auth = useAuth();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/"; // اگر از جایی نیامده بود، برود صفحه اصلی
+  const callbackUrl = searchParams.get("callbackurl") || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,13 +52,16 @@ export default function RegisterPage() {
 
       if (res.ok) {
         toast.success("ثبت‌نام موفق! در حال انتقال...");
-        // لاگین خودکار و هدایت به آدرسی که از آن آمده بود (مثلاً /checkout)
         await auth.login(data.jwt, data.user, callbackUrl);
       } else {
-        toast.error(data.error?.message || "خطا در ثبت‌نام");
+        // اگر خطای مشخصی از Strapi دریافت شد
+        const errorMessage = data.error?.message || "خطا در ثبت‌نام";
+        toast.error(errorMessage);
       }
     } catch (error) {
-      toast.error("خطای شبکه");
+      // خطاهای شبکه یا خطاهای غیرمنتظره
+      console.error("Registration error:", error);
+      toast.error("خطای شبکه یا خطای غیرمنتظره");
     } finally {
       setLoading(false);
     }
@@ -71,12 +75,14 @@ export default function RegisterPage() {
           <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
             ثبت‌نام در آمانج
           </Typography>
-          <form onSubmit={handleSubmit}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
             <TextField
               fullWidth
               label="نام کاربری"
               margin="normal"
               onChange={(e) => setUsername(e.target.value)}
+              disabled={loading} // غیرفعال کردن فیلدها در زمان لودینگ
+              dir="ltr" // برای ورودی‌های انگلیسی مثل نام کاربری
             />
             <TextField
               fullWidth
@@ -84,6 +90,8 @@ export default function RegisterPage() {
               type="email"
               margin="normal"
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              dir="ltr"
             />
             <TextField
               fullWidth
@@ -91,6 +99,8 @@ export default function RegisterPage() {
               type="password"
               margin="normal"
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              dir="ltr"
             />
             <TextField
               fullWidth
@@ -98,6 +108,8 @@ export default function RegisterPage() {
               type="password"
               margin="normal"
               onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={loading}
+              dir="ltr"
             />
             <Button
               fullWidth
@@ -105,15 +117,19 @@ export default function RegisterPage() {
               type="submit"
               disabled={loading}
               sx={{ mt: 3, py: 1.5, background: "#3F3F3F" }}
+              startIcon={
+                loading ? <CircularProgress size={18} color="inherit" /> : null
+              }
             >
               {loading ? "در حال ثبت‌نام..." : "تایید و عضویت"}
             </Button>
-          </form>
+          </Box>
           <Typography variant="body2" textAlign="center" mt={2}>
             حساب دارید؟{" "}
             <Link
-              href={`/login?callbackUrl=${callbackUrl}`}
-              className="text-[#C5A35C] font-bold"
+              href={`/login?callbackurl=${callbackUrl}`}
+              // className="text-[#C5A35C] font-bold" // این کلاس CSS را می توان به صورت inline style یا در sx button اضافه کرد
+              style={{ color: "#C5A35C", fontWeight: "bold" }}
             >
               وارد شوید
             </Link>

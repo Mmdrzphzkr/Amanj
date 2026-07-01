@@ -22,6 +22,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import MobileNav from "@/components/MobileNav/MobileNav";
 
 // --- واحد پول تومان (SVG) ---
 const PriceUnitIcon = () => (
@@ -60,6 +61,26 @@ const PriceUnitIcon = () => (
     </svg>
   </Box>
 );
+
+const getStatusBadge = (status) => {
+  const statusMap = {
+    pending: { label: "در انتظار پرداخت", color: "warning" },
+    approved: { label: "تایید شده", color: "info" },
+    processing: { label: "در حال آماده‌سازی", color: "primary" },
+    shipped: { label: "ارسال شده", color: "secondary" },
+    delivered: { label: "تحویل موفق", color: "success" },
+    cancelled: { label: "لغو شده", color: "error" },
+  };
+  const current = statusMap[status] || { label: status, color: "default" };
+  return (
+    <Chip
+      label={current.label}
+      color={current.color}
+      size="small"
+      variant="filled"
+    />
+  );
+};
 
 const PriceDisplay = ({ amount, bold }) => (
   <Typography
@@ -102,9 +123,7 @@ export default function OrderDetailsView({ order }) {
               <span style={{ color: "#C5A35C" }}>#{order.order_id}</span>
             </Typography>
             <Chip
-              label={
-                order.statuses === "pending" ? "در حال بررسی" : order.statuses
-              }
+              label={getStatusBadge(order.statuses)}
               color="warning"
               variant="outlined"
               sx={{ borderRadius: "8px", fontWeight: "bold" }}
@@ -203,7 +222,7 @@ export default function OrderDetailsView({ order }) {
                       amount={
                         order.items[0]?.quantity > 1
                           ? (order.shipping_cost + order.items[0]?.price) *
-                            order.items[0]?.quantity
+                          order.items[0]?.quantity
                           : order.shipping_cost + order.items[0]?.price
                       }
                       bold
@@ -239,6 +258,7 @@ export default function OrderDetailsView({ order }) {
           </Grid>
         </Container>
       </Box>
+      <MobileNav />
       <Footer />
     </>
   );

@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "guarantees",
+  "info": {
+    "singularName": "guarantee",
+    "pluralName": "guarantees",
+    "displayName": "Guarantee"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "serialNumber": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "deviceName": {
+      "type": "string",
+      "required": true
+    },
+    "deviceImage": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "customerPhoneNumber": {
+      "type": "string",
+      "maxLength": 11,
+      "required": true,
+      "regex": "^09\\d{9}$"
+    },
+    "warrantyDuration": {
+      "type": "integer",
+      "required": true
+    },
+    "warrantyType": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Normal",
+      "enum": [
+        "Normal",
+        "VIP"
+      ]
+    },
+    "startDate": {
+      "type": "date",
+      "required": true
+    },
+    "endDate": {
+      "type": "date",
+      "required": true
+    },
+    "oprator": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "user"
+    }
+  }
+}

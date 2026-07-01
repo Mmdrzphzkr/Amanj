@@ -747,6 +747,53 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiGuaranteeGuarantee extends Struct.CollectionTypeSchema {
+  collectionName: 'guarantees';
+  info: {
+    displayName: 'Guarantee';
+    pluralName: 'guarantees';
+    singularName: 'guarantee';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customerPhoneNumber: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 11;
+      }>;
+    deviceImage: Schema.Attribute.Media<'images', true>;
+    deviceName: Schema.Attribute.String & Schema.Attribute.Required;
+    endDate: Schema.Attribute.Date & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::guarantee.guarantee'
+    > &
+      Schema.Attribute.Private;
+    oprator: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    serialNumber: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    startDate: Schema.Attribute.Date & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    warrantyDuration: Schema.Attribute.Integer & Schema.Attribute.Required;
+    warrantyType: Schema.Attribute.Enumeration<['Normal', 'VIP']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Normal'>;
+  };
+}
+
 export interface ApiHeaderHeader extends Struct.CollectionTypeSchema {
   collectionName: 'headers';
   info: {
@@ -850,7 +897,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     shipping_cost: Schema.Attribute.Decimal & Schema.Attribute.Required;
     shipping_method_name: Schema.Attribute.String & Schema.Attribute.Required;
     statuses: Schema.Attribute.Enumeration<
-      ['shipped', 'processing', 'pending', 'cancelled', 'delivered']
+      ['shipped', 'approved', 'pending', 'cancelled', 'delivered', 'processing']
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'pending'>;
@@ -1674,6 +1721,7 @@ export interface PluginUsersPermissionsUser
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<'oneToMany', 'api::guarantee.guarantee'>;
     username: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
@@ -1704,6 +1752,7 @@ declare module '@strapi/strapi' {
       'api::faq-accordion.faq-accordion': ApiFaqAccordionFaqAccordion;
       'api::faq.faq': ApiFaqFaq;
       'api::global.global': ApiGlobalGlobal;
+      'api::guarantee.guarantee': ApiGuaranteeGuarantee;
       'api::header.header': ApiHeaderHeader;
       'api::main-slider.main-slider': ApiMainSliderMainSlider;
       'api::order.order': ApiOrderOrder;

@@ -13,6 +13,7 @@ import { Container, Box, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "@/components/Loading/Loading";
+import MobileNav from "@/components/MobileNav/MobileNav";
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -99,6 +100,7 @@ export default function CategoryPage() {
           </Grid>
         </Container>
       </Box>
+      <MobileNav />
       <Footer />
     </Suspense>
   );

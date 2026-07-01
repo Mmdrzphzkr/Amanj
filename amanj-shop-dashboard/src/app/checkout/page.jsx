@@ -13,7 +13,7 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-
+import { usePathname } from "next/navigation";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import Loading from "@/components/Loading/Loading";
@@ -23,7 +23,7 @@ import { clearCart } from "@/redux/slices/cartSlice";
 import { toast } from "react-hot-toast";
 import { useCheckoutData } from "./hooks/useCheckoutData";
 import { useCheckoutSteps } from "./hooks/useCheckoutSteps";
-
+import MobileNav from "@/components/MobileNav/MobileNav";
 import AddressStep from "@/components/AddressStep/AddressStep";
 import ShippingStep from "@/components/ShippingStep/ShippingStep";
 import PaymentStep from "@/components/PaymentStep/PaymentStep";
@@ -36,6 +36,8 @@ export default function CheckoutPage() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
   const router = require("next/navigation").useRouter();
   const dispatch = useDispatch();
+  const pathname = usePathname();
+  const loginUrl = `/login?callbackurl=${pathname}`
 
   const cartItems = useSelector((s) => s.cart.items);
   const totalAmount = useSelector((s) => s.cart.totalAmount);
@@ -171,16 +173,10 @@ export default function CheckoutPage() {
             >
               <Button
                 variant="contained"
-                onClick={() => router.push("/login?callbackUrl=/checkout")}
+                onClick={() => router.push(loginUrl)}
                 sx={{ bgcolor: "#3F3F3F" }}
               >
-                ورود
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => router.push("/register?callbackUrl=/checkout")}
-              >
-                ثبت نام
+                ورود یا ثبت نام
               </Button>
             </Box>
           </Paper>
@@ -393,6 +389,7 @@ export default function CheckoutPage() {
           </Box>
         </Box>
       </Container>
+      <MobileNav />
       <Footer />
     </>
   );

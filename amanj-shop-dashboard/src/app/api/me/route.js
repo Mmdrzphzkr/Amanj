@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+const STRAPI_URL ="http://127.0.0.1:8000"; //process.env.NEXT_PUBLIC_STRAPI_URL;
 
 export async function GET(request) {
   const cookieStore = cookies();

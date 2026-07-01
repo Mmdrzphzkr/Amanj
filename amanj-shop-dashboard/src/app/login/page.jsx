@@ -9,25 +9,29 @@ import {
   Typography,
   Container,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import Footer from "@/components/Footer/Footer";
 import Header from "@/components/Header/Header";
+import MobileNav from "@/components/MobileNav/MobileNav";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const auth = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-
+  const callbackUrl = searchParams.get("callbackurl") || "/";
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setLoading(true);
     try {
-      // Step 1: Get token from Strapi
       const strapiRes = await fetch(
         `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/local`,
         {
@@ -46,7 +50,13 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error("An unexpected error occurred during login.", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleRegister = () => {
+    router.push("/register?callbackurl=/checkout");
   };
 
   return (
@@ -67,7 +77,8 @@ export default function LoginPage() {
           <Typography component="h1" variant="h5">
             ورود به حساب کاربری
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: "100%" }}>
             <TextField
               margin="normal"
               required
@@ -81,6 +92,7 @@ export default function LoginPage() {
               onChange={(e) => setIdentifier(e.target.value)}
               className="bg-[#F9F8F5]"
               dir="ltr"
+              disabled={loading}
             />
             <TextField
               margin="normal"
@@ -95,25 +107,34 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="bg-[#F9F8F5]"
               dir="ltr"
+              disabled={loading}
             />
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
+              disabled={loading}
               sx={{ mt: 3, mb: 2, background: "#868686" }}
+              startIcon={
+                loading ? <CircularProgress size={18} color="inherit" /> : null
+              }
             >
-              ورود
+              {loading ? "در حال ورود..." : "ورود"}
             </Button>
           </Box>
+
           <Button
             variant="outlined"
-            onClick={() => router.push("/register?callbackUrl=/checkout")}
+            onClick={handleRegister}
+            disabled={loading}
             sx={{ color: "#3F3F3F", borderColor: "#3F3F3F" }}
           >
             ثبت نام
           </Button>
         </Paper>
       </Container>
+      <MobileNav />
       <Footer />
     </>
   );

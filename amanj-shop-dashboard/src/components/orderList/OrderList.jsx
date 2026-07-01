@@ -20,8 +20,8 @@ import { VisibilityOutlined, ShoppingBagOutlined } from "@mui/icons-material";
 // تابع کمکی برای نمایش وضعیت با رنگ‌های MUI
 const getStatusBadge = (status) => {
   const statusMap = {
-    pending_payment: { label: "در انتظار پرداخت", color: "warning" },
-    paid: { label: "پرداخت شده", color: "info" },
+    pending: { label: "در انتظار پرداخت", color: "warning" },
+    approved: { label: "تایید شده", color: "info" },
     processing: { label: "در حال آماده‌سازی", color: "primary" },
     shipped: { label: "ارسال شده", color: "secondary" },
     delivered: { label: "تحویل موفق", color: "success" },

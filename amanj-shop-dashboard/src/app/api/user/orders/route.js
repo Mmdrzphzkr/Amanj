@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 // استفاده از متغیر محیطی آدرس استرپی
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+const STRAPI_URL = "http://localhost:8000" //process.env.NEXT_PUBLIC_STRAPI_URL;
 
 export async function GET() {
   const cookieStore = cookies();
@@ -25,18 +25,18 @@ export async function GET() {
     }
     const user = await userRes.json();
     const userId = user.id;
-
+    
     // 2. فچ کردن سفارشات با نام صحیح رابطه: users_permissions_user
     // همچنین اضافه کردن populate=* برای گرفتن جزئیات آدرس و آیتم‌ها
     const url = `${STRAPI_URL}/api/orders?filters[users_permissions_user][id][$eq]=${userId}&sort=createdAt:desc&populate=*`;
-
+    
     const ordersRes = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });
 
     const ordersData = await ordersRes.json();
-
+    
     // استراپی دیتا را در فیلد data برمی‌گرداند. اگر خالی بود آرایه [] بدهید.
     return NextResponse.json(ordersData.data || []);
   } catch (error) {

@@ -16,7 +16,7 @@ export function middleware(request) {
   if (isProtected && !token) {
     url.pathname = "/login";
     // آدرس فعلی را هم نگه دار تا بعد از لاگین برگردد
-    url.searchParams.set("callbackUrl", request.nextUrl.pathname); 
+    url.searchParams.set("callbackurl", request.nextUrl.pathname); 
     return NextResponse.redirect(url);
   }
 

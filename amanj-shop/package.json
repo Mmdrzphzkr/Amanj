@@ -25,9 +25,10 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
+    "strapi-plugin-webp-converter": "^1.0.4",
+    "strapi-v5-image-optimizer": "^2.0.5",
     "styled-components": "^6.0.0"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0 <=22.x.x",
     "npm": ">=6.0.0"

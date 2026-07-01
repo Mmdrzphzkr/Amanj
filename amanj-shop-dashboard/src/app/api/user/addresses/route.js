@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+const STRAPI_URL = "http://localhost:8000"
 
 // --- تابع کمکی برای گرفتن آیدی کاربر لاگین شده ---
 async function getUserId(token) {
