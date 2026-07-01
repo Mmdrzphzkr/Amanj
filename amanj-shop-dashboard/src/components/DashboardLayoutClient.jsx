@@ -44,6 +44,12 @@ const Icons = {
       <path d="M16 2v4M8 2v4M3 10h18" />
     </svg>
   ),
+  Erp: () => (
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path d="M5 5h14v14H5z" />
+      <path d="M8 9h8M8 13h5" />
+    </svg>
+  ),
   Logout: () => (
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -63,6 +69,7 @@ const Icons = {
 
 const navLinks = [
   { href: "/dashboard", label: "داشبورد", icon: Icons.Dashboard },
+  { href: "/dashboard/erp", label: "ERP", icon: Icons.Erp },
   { href: "/dashboard/products", label: "محصولات", icon: Icons.Products },
   { href: "/dashboard/orders", label: "سفارشات", icon: Icons.Orders },
   { href: "/dashboard/categories", label: "دسته‌بندی‌ها", icon: Icons.Categories },

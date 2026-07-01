@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "employees",
+  "info": {
+    "singularName": "employee",
+    "pluralName": "employees",
+    "displayName": "Employee"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "full_name": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "position": {
+      "type": "string"
+    },
+    "base_salary": {
+      "type": "decimal",
+      "default": 0
+    },
+    "hire_date": {
+      "type": "date"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "payroll_records": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payroll-record.payroll-record",
+      "mappedBy": "employee"
+    }
+  }
+}

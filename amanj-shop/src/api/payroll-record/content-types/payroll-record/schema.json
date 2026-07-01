@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "payroll_records",
+  "info": {
+    "singularName": "payrollRecord",
+    "pluralName": "payrollRecords",
+    "displayName": "Payroll Record"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "employee": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::employee.employee",
+      "inversedBy": "payroll_records"
+    },
+    "period": {
+      "type": "string",
+      "required": true
+    },
+    "work_days": {
+      "type": "integer",
+      "required": true
+    },
+    "daily_salary": {
+      "type": "decimal",
+      "required": true
+    },
+    "bonus": {
+      "type": "decimal",
+      "default": 0
+    },
+    "total_salary": {
+      "type": "decimal",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "pending",
+      "enum": [
+        "draft",
+        "paid",
+        "pending"
+      ]
+    },
+    "note": {
+      "type": "text"
+    }
+  }
+}

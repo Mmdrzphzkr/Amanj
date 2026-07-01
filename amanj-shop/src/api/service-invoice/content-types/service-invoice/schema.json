@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "service_invoices",
+  "info": {
+    "singularName": "serviceInvoice",
+    "pluralName": "serviceInvoices",
+    "displayName": "Service Invoice"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "invoice_number": {
+      "type": "uid",
+      "required": true
+    },
+    "customer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::customer.customer",
+      "inversedBy": "service_invoices"
+    },
+    "service_title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "pending",
+      "enum": [
+        "draft",
+        "pending",
+        "completed",
+        "cancelled"
+      ]
+    },
+    "completed_at": {
+      "type": "date"
+    },
+    "note": {
+      "type": "text"
+    }
+  }
+}

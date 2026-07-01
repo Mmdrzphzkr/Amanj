@@ -1,0 +1,71 @@
+{
+  "kind": "collectionType",
+  "collectionName": "invoices",
+  "info": {
+    "singularName": "invoice",
+    "pluralName": "invoices",
+    "displayName": "Invoice"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "invoice_number": {
+      "type": "uid",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "draft",
+      "enum": [
+        "draft",
+        "pending",
+        "paid",
+        "cancelled"
+      ]
+    },
+    "issue_date": {
+      "type": "date",
+      "required": true
+    },
+    "due_date": {
+      "type": "date"
+    },
+    "customer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::customer.customer",
+      "inversedBy": "invoices"
+    },
+    "items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::invoice-item.invoice-item",
+      "mappedBy": "invoice"
+    },
+    "subtotal": {
+      "type": "decimal",
+      "required": true
+    },
+    "discount": {
+      "type": "decimal",
+      "default": 0
+    },
+    "total_amount": {
+      "type": "decimal",
+      "required": true
+    },
+    "payment_method": {
+      "type": "string"
+    },
+    "note": {
+      "type": "text"
+    },
+    "is_paid": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
