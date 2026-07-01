@@ -2,8 +2,8 @@
   "kind": "collectionType",
   "collectionName": "payroll_records",
   "info": {
-    "singularName": "payrollRecord",
-    "pluralName": "payrollRecords",
+    "singularName": "payroll-record",
+    "pluralName": "payroll-records",
     "displayName": "Payroll Record"
   },
   "options": {

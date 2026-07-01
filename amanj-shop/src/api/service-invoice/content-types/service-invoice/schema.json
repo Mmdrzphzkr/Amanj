@@ -2,8 +2,8 @@
   "kind": "collectionType",
   "collectionName": "service_invoices",
   "info": {
-    "singularName": "serviceInvoice",
-    "pluralName": "serviceInvoices",
+    "singularName": "service-invoice",
+    "pluralName": "service-invoices",
     "displayName": "Service Invoice"
   },
   "options": {
