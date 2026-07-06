@@ -1,4 +1,5 @@
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || "";
 
 async function strapiRequest(path, options = {}) {
   const response = await fetch(`${STRAPI_URL}/api${path}`, {
@@ -6,6 +7,7 @@ async function strapiRequest(path, options = {}) {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...(STRAPI_TOKEN ? { Authorization: `Bearer ${STRAPI_TOKEN}` } : {}),
       ...(options.headers || {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
