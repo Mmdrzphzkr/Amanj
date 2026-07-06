@@ -1,0 +1,84 @@
+{
+  "kind": "collectionType",
+  "collectionName": "repairs",
+  "info": {
+    "singularName": "repair",
+    "pluralName": "repairs",
+    "displayName": "Repair"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "repairNumber": {
+      "type": "uid",
+      "required": true
+    },
+    "customerName": {
+      "type": "string",
+      "required": true
+    },
+    "customerPhone": {
+      "type": "string",
+      "required": true
+    },
+    "brand": {
+      "type": "string",
+      "required": true
+    },
+    "model": {
+      "type": "string",
+      "required": true
+    },
+    "serialNumber": {
+      "type": "string",
+      "required": true
+    },
+    "problemDescription": {
+      "type": "text"
+    },
+    "receiveDate": {
+      "type": "datetime",
+      "required": true
+    },
+    "deliveryDate": {
+      "type": "datetime",
+      "required": false
+    },
+    "statuses": {
+      "type": "enumeration",
+      "required": true,
+      "default": "در انتظار بررسی",
+      "enum": [
+        "در انتظار بررسی",
+        "در حال عیب یابی",
+        "در حال تعمیر",
+        "آماده تحویل",
+        "تحویل داده شده"
+      ]
+    },
+    "totalCost": {
+      "type": "decimal",
+      "required": true
+    },
+    "technician": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::employee.employee",
+      "inversedBy": "repairs"
+    },
+    "items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::repair-item.repair-item",
+      "mappedBy": "repair"
+    },
+    "commissions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::commission.commission",
+      "mappedBy": "repair"
+    }
+  }
+}

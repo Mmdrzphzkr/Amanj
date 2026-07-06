@@ -649,6 +649,129 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCommissionCommission extends Struct.CollectionTypeSchema {
+  collectionName: 'commissions';
+  info: {
+    displayName: 'Commission';
+    pluralName: 'commissions';
+    singularName: 'commission';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    amount: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.DateTime;
+    description: Schema.Attribute.Text;
+    employee: Schema.Attribute.Relation<'manyToOne', 'api::employee.employee'>;
+    invoice: Schema.Attribute.Relation<'manyToOne', 'api::invoice.invoice'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::commission.commission'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    referenceNumber: Schema.Attribute.String & Schema.Attribute.Required;
+    repair: Schema.Attribute.Relation<'manyToOne', 'api::repair.repair'>;
+    type: Schema.Attribute.Enumeration<['invoice', 'repair']> &
+      Schema.Attribute.DefaultTo<'repair'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCustomerCustomer extends Struct.CollectionTypeSchema {
+  collectionName: 'customers';
+  info: {
+    displayName: 'Customer';
+    pluralName: 'customers';
+    singularName: 'customer';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    address: Schema.Attribute.String;
+    company_name: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email;
+    full_name: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::customer.customer'
+    > &
+      Schema.Attribute.Private;
+    notes: Schema.Attribute.Text;
+    phone: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    service_invoices: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::service-invoice.service-invoice'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEmployeeEmployee extends Struct.CollectionTypeSchema {
+  collectionName: 'employees';
+  info: {
+    displayName: 'Employee';
+    pluralName: 'employees';
+    singularName: 'employee';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    baseSalary: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    commissions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::commission.commission'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    hire_date: Schema.Attribute.Date;
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::employee.employee'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    phone: Schema.Attribute.String & Schema.Attribute.Required;
+    position: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    repairs: Schema.Attribute.Relation<'oneToMany', 'api::repair.repair'>;
+    salaryType: Schema.Attribute.Enumeration<
+      [
+        '\u0645\u0627\u0647\u0627\u0646\u0647',
+        '\u062F\u0631\u0635\u062F\u06CC',
+        '\u0628\u0647 \u0627\u0632\u0627\u06CC \u0647\u0631 \u062A\u0639\u0645\u06CC\u0631',
+        '\u0628\u0647 \u0627\u0632\u0627\u06CC \u0647\u0631 \u0641\u0627\u06A9\u062A\u0648\u0631',
+        '\u0633\u0627\u0639\u062A\u06CC',
+      ]
+    > &
+      Schema.Attribute.DefaultTo<'\u0628\u0647 \u0627\u0632\u0627\u06CC \u0647\u0631 \u062A\u0639\u0645\u06CC\u0631'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiFaqAccordionFaqAccordion
   extends Struct.CollectionTypeSchema {
   collectionName: 'faq_accordions';
@@ -825,6 +948,112 @@ export interface ApiHeaderHeader extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiInvoiceItemInvoiceItem extends Struct.CollectionTypeSchema {
+  collectionName: 'invoice_items';
+  info: {
+    displayName: 'InvoiceItem';
+    pluralName: 'invoice-items';
+    singularName: 'invoice-item';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    device: Schema.Attribute.String & Schema.Attribute.Required;
+    discount: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    invoice: Schema.Attribute.Relation<'manyToOne', 'api::invoice.invoice'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::invoice-item.invoice-item'
+    > &
+      Schema.Attribute.Private;
+    model: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    quantity: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
+    serialNumber: Schema.Attribute.String & Schema.Attribute.Required;
+    tax: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    total: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    unitPrice: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiInvoiceInvoice extends Struct.CollectionTypeSchema {
+  collectionName: 'invoices';
+  info: {
+    displayName: 'Invoice';
+    pluralName: 'invoices';
+    singularName: 'invoice';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    commissions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::commission.commission'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customerAddress: Schema.Attribute.String & Schema.Attribute.Required;
+    customerName: Schema.Attribute.String & Schema.Attribute.Required;
+    customerPhone: Schema.Attribute.String & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
+    finalAmount: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    invoice_number: Schema.Attribute.UID & Schema.Attribute.Required;
+    issueDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    items: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::invoice-item.invoice-item'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::invoice.invoice'
+    > &
+      Schema.Attribute.Private;
+    note: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    statuses: Schema.Attribute.Enumeration<
+      [
+        '\u0646\u0642\u062F\u06CC',
+        '\u06A9\u0627\u0631\u062A \u0628\u0647 \u06A9\u0627\u0631\u062A',
+        '\u0648\u0627\u0631\u06CC\u0632 \u0628\u0627\u0646\u06A9\u06CC',
+        '\u0686\u06A9',
+        '\u0627\u0642\u0633\u0627\u0637\u06CC',
+        '\u067E\u0631\u062F\u0627\u062E\u062A \u0622\u0646\u0644\u0627\u06CC\u0646',
+      ]
+    >;
+    subtotal: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    totalDiscount: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    totalTax: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiMainSliderMainSlider extends Struct.CollectionTypeSchema {
   collectionName: 'main_sliders';
   info: {
@@ -950,6 +1179,44 @@ export interface ApiPaymentSettingPaymentSetting
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPayrollPayroll extends Struct.CollectionTypeSchema {
+  collectionName: 'payrolls';
+  info: {
+    displayName: 'Payroll';
+    pluralName: 'payrolls';
+    singularName: 'payroll';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.DateTime;
+    items: Schema.Attribute.JSON;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::payroll.payroll'
+    > &
+      Schema.Attribute.Private;
+    month: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    statuses: Schema.Attribute.Enumeration<
+      [
+        '\u067E\u06CC\u0634 \u0646\u0648\u06CC\u0633',
+        '\u062A\u0627\u06CC\u06CC\u062F \u0634\u062F\u0647',
+        '\u067E\u0631\u062F\u0627\u062E\u062A \u0634\u062F\u0647',
+      ]
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    year: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -1102,6 +1369,108 @@ export interface ApiPublicGalleryPublicGallery
   };
 }
 
+export interface ApiRepairItemRepairItem extends Struct.CollectionTypeSchema {
+  collectionName: 'repair_items';
+  info: {
+    displayName: 'Repair Item';
+    pluralName: 'repair-items';
+    singularName: 'repair-item';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    laborCost: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::repair-item.repair-item'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    partsCost: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    quantity: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<1>;
+    repair: Schema.Attribute.Relation<'manyToOne', 'api::repair.repair'>;
+    total: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiRepairRepair extends Struct.CollectionTypeSchema {
+  collectionName: 'repairs';
+  info: {
+    displayName: 'Repair';
+    pluralName: 'repairs';
+    singularName: 'repair';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    brand: Schema.Attribute.String & Schema.Attribute.Required;
+    commissions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::commission.commission'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customerName: Schema.Attribute.String & Schema.Attribute.Required;
+    customerPhone: Schema.Attribute.String & Schema.Attribute.Required;
+    deliveryDate: Schema.Attribute.DateTime;
+    items: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::repair-item.repair-item'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::repair.repair'
+    > &
+      Schema.Attribute.Private;
+    model: Schema.Attribute.String & Schema.Attribute.Required;
+    problemDescription: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    receiveDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    repairNumber: Schema.Attribute.UID & Schema.Attribute.Required;
+    serialNumber: Schema.Attribute.String & Schema.Attribute.Required;
+    statuses: Schema.Attribute.Enumeration<
+      [
+        '\u062F\u0631 \u0627\u0646\u062A\u0638\u0627\u0631 \u0628\u0631\u0631\u0633\u06CC',
+        '\u062F\u0631 \u062D\u0627\u0644 \u0639\u06CC\u0628 \u06CC\u0627\u0628\u06CC',
+        '\u062F\u0631 \u062D\u0627\u0644 \u062A\u0639\u0645\u06CC\u0631',
+        '\u0622\u0645\u0627\u062F\u0647 \u062A\u062D\u0648\u06CC\u0644',
+        '\u062A\u062D\u0648\u06CC\u0644 \u062F\u0627\u062F\u0647 \u0634\u062F\u0647',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'\u062F\u0631 \u0627\u0646\u062A\u0638\u0627\u0631 \u0628\u0631\u0631\u0633\u06CC'>;
+    technician: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::employee.employee'
+    >;
+    totalCost: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiReviewReview extends Struct.CollectionTypeSchema {
   collectionName: 'reviews';
   info: {
@@ -1136,6 +1505,44 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiServiceInvoiceServiceInvoice
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'service_invoices';
+  info: {
+    displayName: 'ServiceInvoice';
+    pluralName: 'service-invoices';
+    singularName: 'service-invoice';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    amount: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    completed_at: Schema.Attribute.DateTime;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    customer: Schema.Attribute.Relation<'manyToOne', 'api::customer.customer'>;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    invoice_number: Schema.Attribute.UID & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::service-invoice.service-invoice'
+    > &
+      Schema.Attribute.Private;
+    note: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    service_title: Schema.Attribute.String & Schema.Attribute.Required;
+    statuses: Schema.Attribute.Enumeration<
+      ['draft', 'pending', 'completed', 'cancelled']
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiServiceService extends Struct.CollectionTypeSchema {
   collectionName: 'services';
   info: {
@@ -1160,6 +1567,47 @@ export interface ApiServiceService extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String & Schema.Attribute.Required;
     order: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSettingSetting extends Struct.SingleTypeSchema {
+  collectionName: 'settings';
+  info: {
+    displayName: 'Setting';
+    pluralName: 'settings';
+    singularName: 'setting';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    address: Schema.Attribute.Text;
+    companyLogo: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    companyName: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'\u062A\u0648\u0645\u0627\u0646'>;
+    economicCode: Schema.Attribute.String;
+    invoicePrefix: Schema.Attribute.String & Schema.Attribute.DefaultTo<'INV'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::setting.setting'
+    > &
+      Schema.Attribute.Private;
+    nationalId: Schema.Attribute.String;
+    phone: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    registrationNumber: Schema.Attribute.String;
+    repairPrefix: Schema.Attribute.String & Schema.Attribute.DefaultTo<'REP'>;
+    taxPercentage: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<10>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1488,6 +1936,7 @@ export interface PluginUploadFile extends Struct.CollectionTypeSchema {
   };
   attributes: {
     alternativeText: Schema.Attribute.String;
+    blurHash: Schema.Attribute.Text;
     caption: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1749,20 +2198,30 @@ declare module '@strapi/strapi' {
       'api::brand-slider.brand-slider': ApiBrandSliderBrandSlider;
       'api::brand.brand': ApiBrandBrand;
       'api::category.category': ApiCategoryCategory;
+      'api::commission.commission': ApiCommissionCommission;
+      'api::customer.customer': ApiCustomerCustomer;
+      'api::employee.employee': ApiEmployeeEmployee;
       'api::faq-accordion.faq-accordion': ApiFaqAccordionFaqAccordion;
       'api::faq.faq': ApiFaqFaq;
       'api::global.global': ApiGlobalGlobal;
       'api::guarantee.guarantee': ApiGuaranteeGuarantee;
       'api::header.header': ApiHeaderHeader;
+      'api::invoice-item.invoice-item': ApiInvoiceItemInvoiceItem;
+      'api::invoice.invoice': ApiInvoiceInvoice;
       'api::main-slider.main-slider': ApiMainSliderMainSlider;
       'api::order.order': ApiOrderOrder;
       'api::payment-setting.payment-setting': ApiPaymentSettingPaymentSetting;
+      'api::payroll.payroll': ApiPayrollPayroll;
       'api::place-order.place-order': ApiPlaceOrderPlaceOrder;
       'api::product-category.product-category': ApiProductCategoryProductCategory;
       'api::product.product': ApiProductProduct;
       'api::public-gallery.public-gallery': ApiPublicGalleryPublicGallery;
+      'api::repair-item.repair-item': ApiRepairItemRepairItem;
+      'api::repair.repair': ApiRepairRepair;
       'api::review.review': ApiReviewReview;
+      'api::service-invoice.service-invoice': ApiServiceInvoiceServiceInvoice;
       'api::service.service': ApiServiceService;
+      'api::setting.setting': ApiSettingSetting;
       'api::shipping.shipping': ApiShippingShipping;
       'api::technical-reservation.technical-reservation': ApiTechnicalReservationTechnicalReservation;
       'plugin::content-releases.release': PluginContentReleasesRelease;

@@ -26,16 +26,10 @@
       "type": "string"
     },
     "address": {
-      "type": "text"
+      "type": "string"
     },
     "notes": {
       "type": "text"
-    },
-    "invoices": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::invoice.invoice",
-      "mappedBy": "customer"
     },
     "service_invoices": {
       "type": "relation",

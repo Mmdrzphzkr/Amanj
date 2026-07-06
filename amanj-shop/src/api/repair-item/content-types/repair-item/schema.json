@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "repair_items",
+  "info": {
+    "singularName": "repair-item",
+    "pluralName": "repair-items",
+    "displayName": "Repair Item"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "partsCost": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "laborCost": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "quantity": {
+      "type": "integer",
+      "required": true,
+      "default": 1
+    },
+    "description": {
+      "type": "text"
+    },
+    "total": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "repair": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::repair.repair",
+      "inversedBy": "items"
+    }
+  }
+}

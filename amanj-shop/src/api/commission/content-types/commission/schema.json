@@ -1,0 +1,56 @@
+{
+  "kind": "collectionType",
+  "collectionName": "commissions",
+  "info": {
+    "singularName": "commission",
+    "pluralName": "commissions",
+    "displayName": "Commission"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "default": "repair",
+      "enum": [
+        "invoice",
+        "repair"
+      ]
+    },
+    "referenceNumber": {
+      "type": "string",
+      "required": true
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "date": {
+      "type": "datetime"
+    },
+    "description": {
+      "type": "text"
+    },
+    "employee": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::employee.employee",
+      "inversedBy": "commissions"
+    },
+    "invoice": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::invoice.invoice",
+      "inversedBy": "commissions"
+    },
+    "repair": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::repair.repair",
+      "inversedBy": "commissions"
+    }
+  }
+}

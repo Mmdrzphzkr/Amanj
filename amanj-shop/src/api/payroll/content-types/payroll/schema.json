@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "payrolls",
+  "info": {
+    "singularName": "payroll",
+    "pluralName": "payrolls",
+    "displayName": "Payroll"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "month": {
+      "type": "string",
+      "required": true
+    },
+    "year": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "datetime"
+    },
+    "statuses": {
+      "type": "enumeration",
+      "enum": [
+        "پیش نویس",
+        "تایید شده",
+        "پرداخت شده"
+      ]
+    },
+    "items": {
+      "type": "json"
+    }
+  }
+}

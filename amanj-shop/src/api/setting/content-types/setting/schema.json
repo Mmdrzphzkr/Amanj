@@ -1,0 +1,59 @@
+{
+  "kind": "singleType",
+  "collectionName": "settings",
+  "info": {
+    "singularName": "setting",
+    "pluralName": "settings",
+    "displayName": "Setting"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "companyName": {
+      "type": "string"
+    },
+    "companyLogo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "address": {
+      "type": "text"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "nationalId": {
+      "type": "string"
+    },
+    "economicCode": {
+      "type": "string"
+    },
+    "registrationNumber": {
+      "type": "string"
+    },
+    "taxPercentage": {
+      "type": "integer",
+      "default": 10
+    },
+    "currency": {
+      "type": "string",
+      "default": "تومان"
+    },
+    "invoicePrefix": {
+      "type": "string",
+      "default": "INV"
+    },
+    "repairPrefix": {
+      "type": "string",
+      "default": "REP"
+    }
+  }
+}

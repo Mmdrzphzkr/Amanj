@@ -15,29 +15,36 @@
       "type": "uid",
       "required": true
     },
-    "status": {
+    "statuses": {
       "type": "enumeration",
-      "required": true,
-      "default": "draft",
       "enum": [
-        "draft",
-        "pending",
-        "paid",
-        "cancelled"
+        "نقدی",
+        "کارت به کارت",
+        "واریز بانکی",
+        "چک",
+        "اقساطی",
+        "پرداخت آنلاین"
       ]
     },
-    "issue_date": {
-      "type": "date",
+    "issueDate": {
+      "type": "datetime",
       "required": true
     },
-    "due_date": {
-      "type": "date"
+    "subtotal": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
     },
-    "customer": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::customer.customer",
-      "inversedBy": "invoices"
+    "totalDiscount": {
+      "type": "decimal",
+      "default": 0
+    },
+    "finalAmount": {
+      "type": "decimal",
+      "required": true
+    },
+    "note": {
+      "type": "string"
     },
     "items": {
       "type": "relation",
@@ -45,27 +52,30 @@
       "target": "api::invoice-item.invoice-item",
       "mappedBy": "invoice"
     },
-    "subtotal": {
-      "type": "decimal",
+    "customerName": {
+      "type": "string",
       "required": true
     },
-    "discount": {
+    "customerPhone": {
+      "type": "string",
+      "required": true
+    },
+    "customerAddress": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "totalTax": {
       "type": "decimal",
       "default": 0
     },
-    "total_amount": {
-      "type": "decimal",
-      "required": true
-    },
-    "payment_method": {
-      "type": "string"
-    },
-    "note": {
-      "type": "text"
-    },
-    "is_paid": {
-      "type": "boolean",
-      "default": false
+    "commissions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::commission.commission",
+      "mappedBy": "invoice"
     }
   }
 }

@@ -4,7 +4,7 @@
   "info": {
     "singularName": "invoice-item",
     "pluralName": "invoice-items",
-    "displayName": "Invoice Item"
+    "displayName": "InvoiceItem"
   },
   "options": {
     "draftAndPublish": false
@@ -17,28 +17,39 @@
       "target": "api::invoice.invoice",
       "inversedBy": "items"
     },
-    "product": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::product.product"
+    "quantity": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "min": 1
     },
-    "description": {
+    "unitPrice": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "total": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "discount": {
+      "type": "decimal",
+      "default": 0
+    },
+    "device": {
       "type": "string",
       "required": true
     },
-    "quantity": {
-      "type": "integer",
+    "model": {
+      "type": "string",
       "required": true
     },
-    "unit_price": {
-      "type": "decimal",
+    "serialNumber": {
+      "type": "string",
       "required": true
     },
-    "total_price": {
-      "type": "decimal",
-      "required": true
-    },
-    "discount": {
+    "tax": {
       "type": "decimal",
       "default": 0
     }
