@@ -15,12 +15,12 @@
       "type": "string",
       "required": true
     },
-    "partsCost": {
+    "parts_cost": {
       "type": "decimal",
       "required": true,
       "default": 0
     },
-    "laborCost": {
+    "labor_cost": {
       "type": "decimal",
       "required": true,
       "default": 0

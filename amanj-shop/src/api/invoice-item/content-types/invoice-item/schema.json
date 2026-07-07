@@ -23,12 +23,12 @@
       "default": 1,
       "min": 1
     },
-    "unitPrice": {
+    "unit_price": {
       "type": "decimal",
       "required": true,
       "default": 0
     },
-    "total": {
+    "total_price": {
       "type": "decimal",
       "required": true,
       "default": 0
@@ -37,21 +37,9 @@
       "type": "decimal",
       "default": 0
     },
-    "device": {
-      "type": "string",
+    "description": {
+      "type": "text",
       "required": true
-    },
-    "model": {
-      "type": "string",
-      "required": true
-    },
-    "serialNumber": {
-      "type": "string",
-      "required": true
-    },
-    "tax": {
-      "type": "decimal",
-      "default": 0
     }
   }
 }

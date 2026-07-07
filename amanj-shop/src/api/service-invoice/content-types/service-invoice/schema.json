@@ -35,15 +35,13 @@
     },
     "statuses": {
       "type": "enumeration",
+      "default": "pending",
       "enum": [
         "draft",
         "pending",
         "completed",
         "cancelled"
       ]
-    },
-    "completed_at": {
-      "type": "datetime"
     },
     "note": {
       "type": "text"

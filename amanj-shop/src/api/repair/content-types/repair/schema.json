@@ -11,16 +11,8 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "repairNumber": {
+    "repair_number": {
       "type": "uid",
-      "required": true
-    },
-    "customerName": {
-      "type": "string",
-      "required": true
-    },
-    "customerPhone": {
-      "type": "string",
       "required": true
     },
     "brand": {
@@ -31,42 +23,37 @@
       "type": "string",
       "required": true
     },
-    "serialNumber": {
+    "serial_number": {
       "type": "string",
       "required": true
     },
-    "problemDescription": {
+    "problem": {
       "type": "text"
     },
-    "receiveDate": {
+    "received__date": {
       "type": "datetime",
-      "required": true
+      "required": false
     },
-    "deliveryDate": {
+    "delivery_date": {
       "type": "datetime",
       "required": false
     },
     "statuses": {
       "type": "enumeration",
-      "required": true,
-      "default": "در انتظار بررسی",
+      "required": false,
+      "default": "pending",
       "enum": [
-        "در انتظار بررسی",
-        "در حال عیب یابی",
-        "در حال تعمیر",
-        "آماده تحویل",
-        "تحویل داده شده"
+        "pending",
+        "in_progress",
+        "completed",
+        "delivered",
+        "canceled"
       ]
     },
-    "totalCost": {
+    "total_cost": {
       "type": "decimal",
-      "required": true
-    },
-    "technician": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::employee.employee",
-      "inversedBy": "repairs"
+      "required": true,
+      "default": 0
     },
     "items": {
       "type": "relation",
@@ -74,11 +61,20 @@
       "target": "api::repair-item.repair-item",
       "mappedBy": "repair"
     },
-    "commissions": {
+    "customer": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::commission.commission",
-      "mappedBy": "repair"
+      "relation": "manyToOne",
+      "target": "api::customer.customer",
+      "inversedBy": "repairs"
+    },
+    "technician": {
+      "type": "string"
+    },
+    "note": {
+      "type": "text"
+    },
+    "date": {
+      "type": "datetime"
     }
   }
 }

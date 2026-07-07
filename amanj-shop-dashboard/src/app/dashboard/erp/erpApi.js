@@ -293,7 +293,7 @@ export async function deleteInvoiceFromStrapi(id) {
 // ─── Repairs ──────────────────────────────────────────────
 
 export async function getRepairsFromStrapi() {
-  const payload = await strapiRequest("/repairs?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items]&sort=createdAt:desc");
+  const payload = await strapiRequest("/repairs?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items]=*&sort=createdAt:desc");
   return (payload?.data || []).map(normalizeRepairRecord);
 }
 

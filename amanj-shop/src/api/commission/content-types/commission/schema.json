@@ -13,13 +13,14 @@
   "attributes": {
     "type": {
       "type": "enumeration",
+      "required": true,
       "default": "repair",
       "enum": [
         "invoice",
         "repair"
       ]
     },
-    "referenceNumber": {
+    "reference": {
       "type": "string",
       "required": true
     },
@@ -38,18 +39,6 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::employee.employee",
-      "inversedBy": "commissions"
-    },
-    "invoice": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::invoice.invoice",
-      "inversedBy": "commissions"
-    },
-    "repair": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::repair.repair",
       "inversedBy": "commissions"
     }
   }

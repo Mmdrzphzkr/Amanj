@@ -36,6 +36,18 @@
       "relation": "oneToMany",
       "target": "api::service-invoice.service-invoice",
       "mappedBy": "customer"
+    },
+    "invoices": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::invoice.invoice",
+      "mappedBy": "customer"
+    },
+    "repairs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::repair.repair",
+      "mappedBy": "customer"
     }
   }
 }

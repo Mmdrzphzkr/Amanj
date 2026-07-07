@@ -669,7 +669,6 @@ export interface ApiCommissionCommission extends Struct.CollectionTypeSchema {
     date: Schema.Attribute.DateTime;
     description: Schema.Attribute.Text;
     employee: Schema.Attribute.Relation<'manyToOne', 'api::employee.employee'>;
-    invoice: Schema.Attribute.Relation<'manyToOne', 'api::invoice.invoice'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -677,9 +676,9 @@ export interface ApiCommissionCommission extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    referenceNumber: Schema.Attribute.String & Schema.Attribute.Required;
-    repair: Schema.Attribute.Relation<'manyToOne', 'api::repair.repair'>;
+    reference: Schema.Attribute.String & Schema.Attribute.Required;
     type: Schema.Attribute.Enumeration<['invoice', 'repair']> &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'repair'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -705,6 +704,7 @@ export interface ApiCustomerCustomer extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     email: Schema.Attribute.Email;
     full_name: Schema.Attribute.String & Schema.Attribute.Required;
+    invoices: Schema.Attribute.Relation<'oneToMany', 'api::invoice.invoice'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -714,6 +714,7 @@ export interface ApiCustomerCustomer extends Struct.CollectionTypeSchema {
     notes: Schema.Attribute.Text;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    repairs: Schema.Attribute.Relation<'oneToMany', 'api::repair.repair'>;
     service_invoices: Schema.Attribute.Relation<
       'oneToMany',
       'api::service-invoice.service-invoice'
@@ -735,7 +736,8 @@ export interface ApiEmployeeEmployee extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    baseSalary: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    base_salary: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
     commissions: Schema.Attribute.Relation<
       'oneToMany',
       'api::commission.commission'
@@ -743,29 +745,23 @@ export interface ApiEmployeeEmployee extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    full_name: Schema.Attribute.String & Schema.Attribute.Required;
     hire_date: Schema.Attribute.Date;
-    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::employee.employee'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    payroll_records: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::payroll-record.payroll-record'
+    >;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     position: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    repairs: Schema.Attribute.Relation<'oneToMany', 'api::repair.repair'>;
-    salaryType: Schema.Attribute.Enumeration<
-      [
-        '\u0645\u0627\u0647\u0627\u0646\u0647',
-        '\u062F\u0631\u0635\u062F\u06CC',
-        '\u0628\u0647 \u0627\u0632\u0627\u06CC \u0647\u0631 \u062A\u0639\u0645\u06CC\u0631',
-        '\u0628\u0647 \u0627\u0632\u0627\u06CC \u0647\u0631 \u0641\u0627\u06A9\u062A\u0648\u0631',
-        '\u0633\u0627\u0639\u062A\u06CC',
-      ]
-    > &
-      Schema.Attribute.DefaultTo<'\u0628\u0647 \u0627\u0632\u0627\u06CC \u0647\u0631 \u062A\u0639\u0645\u06CC\u0631'>;
+    salaryType: Schema.Attribute.Enumeration<['daily', 'monthly', 'contract']> &
+      Schema.Attribute.DefaultTo<'monthly'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -962,7 +958,7 @@ export interface ApiInvoiceItemInvoiceItem extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    device: Schema.Attribute.String & Schema.Attribute.Required;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
     discount: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
     invoice: Schema.Attribute.Relation<'manyToOne', 'api::invoice.invoice'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -971,7 +967,6 @@ export interface ApiInvoiceItemInvoiceItem extends Struct.CollectionTypeSchema {
       'api::invoice-item.invoice-item'
     > &
       Schema.Attribute.Private;
-    model: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     quantity: Schema.Attribute.Integer &
       Schema.Attribute.Required &
@@ -982,12 +977,10 @@ export interface ApiInvoiceItemInvoiceItem extends Struct.CollectionTypeSchema {
         number
       > &
       Schema.Attribute.DefaultTo<1>;
-    serialNumber: Schema.Attribute.String & Schema.Attribute.Required;
-    tax: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
-    total: Schema.Attribute.Decimal &
+    total_price: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
-    unitPrice: Schema.Attribute.Decimal &
+    unit_price: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
     updatedAt: Schema.Attribute.DateTime;
@@ -1007,20 +1000,13 @@ export interface ApiInvoiceInvoice extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    commissions: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::commission.commission'
-    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    customerAddress: Schema.Attribute.String & Schema.Attribute.Required;
-    customerName: Schema.Attribute.String & Schema.Attribute.Required;
-    customerPhone: Schema.Attribute.String & Schema.Attribute.Required;
-    description: Schema.Attribute.Text;
-    finalAmount: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    customer: Schema.Attribute.Relation<'manyToOne', 'api::customer.customer'>;
+    discount: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
     invoice_number: Schema.Attribute.UID & Schema.Attribute.Required;
-    issueDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    issue_date: Schema.Attribute.DateTime & Schema.Attribute.Required;
     items: Schema.Attribute.Relation<
       'oneToMany',
       'api::invoice-item.invoice-item'
@@ -1032,6 +1018,7 @@ export interface ApiInvoiceInvoice extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     note: Schema.Attribute.String;
+    payment_method: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     statuses: Schema.Attribute.Enumeration<
       [
@@ -1046,8 +1033,7 @@ export interface ApiInvoiceInvoice extends Struct.CollectionTypeSchema {
     subtotal: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
-    totalDiscount: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
-    totalTax: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    total_amount: Schema.Attribute.Decimal & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1182,41 +1168,42 @@ export interface ApiPaymentSettingPaymentSetting
   };
 }
 
-export interface ApiPayrollPayroll extends Struct.CollectionTypeSchema {
-  collectionName: 'payrolls';
+export interface ApiPayrollRecordPayrollRecord
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'payroll_records';
   info: {
-    displayName: 'Payroll';
-    pluralName: 'payrolls';
-    singularName: 'payroll';
+    displayName: 'PayrollRecord';
+    pluralName: 'payroll-records';
+    singularName: 'payroll-record';
   };
   options: {
     draftAndPublish: false;
   };
   attributes: {
+    base_salary: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    bonus: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    commission_total: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     date: Schema.Attribute.DateTime;
-    items: Schema.Attribute.JSON;
+    deduction: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    employee: Schema.Attribute.Relation<'manyToOne', 'api::employee.employee'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::payroll.payroll'
+      'api::payroll-record.payroll-record'
     > &
       Schema.Attribute.Private;
-    month: Schema.Attribute.String & Schema.Attribute.Required;
+    note: Schema.Attribute.String;
+    period: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    statuses: Schema.Attribute.Enumeration<
-      [
-        '\u067E\u06CC\u0634 \u0646\u0648\u06CC\u0633',
-        '\u062A\u0627\u06CC\u06CC\u062F \u0634\u062F\u0647',
-        '\u067E\u0631\u062F\u0627\u062E\u062A \u0634\u062F\u0647',
-      ]
-    >;
+    statuses: Schema.Attribute.Enumeration<['draft', 'paid', 'pending']> &
+      Schema.Attribute.DefaultTo<'pending'>;
+    total_salary: Schema.Attribute.Decimal & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    year: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -1384,7 +1371,7 @@ export interface ApiRepairItemRepairItem extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
-    laborCost: Schema.Attribute.Decimal &
+    labor_cost: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -1394,7 +1381,7 @@ export interface ApiRepairItemRepairItem extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String & Schema.Attribute.Required;
-    partsCost: Schema.Attribute.Decimal &
+    parts_cost: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
@@ -1423,16 +1410,12 @@ export interface ApiRepairRepair extends Struct.CollectionTypeSchema {
   };
   attributes: {
     brand: Schema.Attribute.String & Schema.Attribute.Required;
-    commissions: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::commission.commission'
-    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    customerName: Schema.Attribute.String & Schema.Attribute.Required;
-    customerPhone: Schema.Attribute.String & Schema.Attribute.Required;
-    deliveryDate: Schema.Attribute.DateTime;
+    customer: Schema.Attribute.Relation<'manyToOne', 'api::customer.customer'>;
+    date: Schema.Attribute.DateTime;
+    delivery_date: Schema.Attribute.DateTime;
     items: Schema.Attribute.Relation<
       'oneToMany',
       'api::repair-item.repair-item'
@@ -1444,27 +1427,20 @@ export interface ApiRepairRepair extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     model: Schema.Attribute.String & Schema.Attribute.Required;
-    problemDescription: Schema.Attribute.Text;
+    note: Schema.Attribute.Text;
+    problem: Schema.Attribute.Text;
     publishedAt: Schema.Attribute.DateTime;
-    receiveDate: Schema.Attribute.DateTime & Schema.Attribute.Required;
-    repairNumber: Schema.Attribute.UID & Schema.Attribute.Required;
-    serialNumber: Schema.Attribute.String & Schema.Attribute.Required;
+    received__date: Schema.Attribute.DateTime;
+    repair_number: Schema.Attribute.UID & Schema.Attribute.Required;
+    serial_number: Schema.Attribute.String & Schema.Attribute.Required;
     statuses: Schema.Attribute.Enumeration<
-      [
-        '\u062F\u0631 \u0627\u0646\u062A\u0638\u0627\u0631 \u0628\u0631\u0631\u0633\u06CC',
-        '\u062F\u0631 \u062D\u0627\u0644 \u0639\u06CC\u0628 \u06CC\u0627\u0628\u06CC',
-        '\u062F\u0631 \u062D\u0627\u0644 \u062A\u0639\u0645\u06CC\u0631',
-        '\u0622\u0645\u0627\u062F\u0647 \u062A\u062D\u0648\u06CC\u0644',
-        '\u062A\u062D\u0648\u06CC\u0644 \u062F\u0627\u062F\u0647 \u0634\u062F\u0647',
-      ]
+      ['pending', 'in_progress', 'completed', 'delivered', 'canceled']
     > &
+      Schema.Attribute.DefaultTo<'pending'>;
+    technician: Schema.Attribute.String;
+    total_cost: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'\u062F\u0631 \u0627\u0646\u062A\u0638\u0627\u0631 \u0628\u0631\u0631\u0633\u06CC'>;
-    technician: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::employee.employee'
-    >;
-    totalCost: Schema.Attribute.Decimal & Schema.Attribute.Required;
+      Schema.Attribute.DefaultTo<0>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1518,7 +1494,6 @@ export interface ApiServiceInvoiceServiceInvoice
   };
   attributes: {
     amount: Schema.Attribute.Decimal & Schema.Attribute.Required;
-    completed_at: Schema.Attribute.DateTime;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1536,7 +1511,8 @@ export interface ApiServiceInvoiceServiceInvoice
     service_title: Schema.Attribute.String & Schema.Attribute.Required;
     statuses: Schema.Attribute.Enumeration<
       ['draft', 'pending', 'completed', 'cancelled']
-    >;
+    > &
+      Schema.Attribute.DefaultTo<'pending'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -2211,7 +2187,7 @@ declare module '@strapi/strapi' {
       'api::main-slider.main-slider': ApiMainSliderMainSlider;
       'api::order.order': ApiOrderOrder;
       'api::payment-setting.payment-setting': ApiPaymentSettingPaymentSetting;
-      'api::payroll.payroll': ApiPayrollPayroll;
+      'api::payroll-record.payroll-record': ApiPayrollRecordPayrollRecord;
       'api::place-order.place-order': ApiPlaceOrderPlaceOrder;
       'api::product-category.product-category': ApiProductCategoryProductCategory;
       'api::product.product': ApiProductProduct;

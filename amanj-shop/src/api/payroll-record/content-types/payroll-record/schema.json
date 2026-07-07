@@ -1,0 +1,60 @@
+{
+  "kind": "collectionType",
+  "collectionName": "payroll_records",
+  "info": {
+    "singularName": "payroll-record",
+    "pluralName": "payroll-records",
+    "displayName": "PayrollRecord"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "employee": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::employee.employee",
+      "inversedBy": "payroll_records"
+    },
+    "period": {
+      "type": "string",
+      "required": true
+    },
+    "base_salary": {
+      "type": "decimal",
+      "default": 0
+    },
+    "commission_total": {
+      "type": "decimal",
+      "default": 0
+    },
+    "bonus": {
+      "type": "decimal",
+      "default": 0
+    },
+    "deduction": {
+      "type": "decimal",
+      "default": 0
+    },
+    "total_salary": {
+      "type": "decimal",
+      "required": true
+    },
+    "date": {
+      "type": "datetime"
+    },
+    "statuses": {
+      "type": "enumeration",
+      "default": "pending",
+      "enum": [
+        "draft",
+        "paid",
+        "pending"
+      ]
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}

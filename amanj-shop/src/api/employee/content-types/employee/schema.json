@@ -11,7 +11,7 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "name": {
+    "full_name": {
       "type": "string",
       "required": true
     },
@@ -22,7 +22,7 @@
     "position": {
       "type": "string"
     },
-    "baseSalary": {
+    "base_salary": {
       "type": "decimal",
       "required": false,
       "default": 0
@@ -30,32 +30,30 @@
     "hire_date": {
       "type": "date"
     },
-    "isActive": {
+    "active": {
       "type": "boolean",
       "default": true
-    },
-    "repairs": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::repair.repair",
-      "mappedBy": "technician"
     },
     "salaryType": {
       "type": "enumeration",
       "required": false,
-      "default": "به ازای هر تعمیر",
+      "default": "monthly",
       "enum": [
-        "ماهانه",
-        "درصدی",
-        "به ازای هر تعمیر",
-        "به ازای هر فاکتور",
-        "ساعتی"
+        "daily",
+        "monthly",
+        "contract"
       ]
     },
     "commissions": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::commission.commission",
+      "mappedBy": "employee"
+    },
+    "payroll_records": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payroll-record.payroll-record",
       "mappedBy": "employee"
     }
   }

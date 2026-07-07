@@ -26,7 +26,7 @@
         "پرداخت آنلاین"
       ]
     },
-    "issueDate": {
+    "issue_date": {
       "type": "datetime",
       "required": true
     },
@@ -35,11 +35,11 @@
       "required": true,
       "default": 0
     },
-    "totalDiscount": {
+    "discount": {
       "type": "decimal",
       "default": 0
     },
-    "finalAmount": {
+    "total_amount": {
       "type": "decimal",
       "required": true
     },
@@ -52,30 +52,14 @@
       "target": "api::invoice-item.invoice-item",
       "mappedBy": "invoice"
     },
-    "customerName": {
-      "type": "string",
-      "required": true
-    },
-    "customerPhone": {
-      "type": "string",
-      "required": true
-    },
-    "customerAddress": {
-      "type": "string",
-      "required": true
-    },
-    "description": {
-      "type": "text"
-    },
-    "totalTax": {
-      "type": "decimal",
-      "default": 0
-    },
-    "commissions": {
+    "customer": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::commission.commission",
-      "mappedBy": "invoice"
+      "relation": "manyToOne",
+      "target": "api::customer.customer",
+      "inversedBy": "invoices"
+    },
+    "payment_method": {
+      "type": "string"
     }
   }
 }
