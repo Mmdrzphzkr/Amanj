@@ -1,4 +1,5 @@
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const STRAPI_URL =
+  process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || "";
 
 async function strapiRequest(path, options = {}) {
@@ -16,7 +17,9 @@ async function strapiRequest(path, options = {}) {
   const payload = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(payload?.error?.message || "درخواست به استرپی با خطا مواجه شد");
+    throw new Error(
+      payload?.error?.message || "درخواست به استرپی با خطا مواجه شد",
+    );
   }
 
   return payload;
@@ -34,22 +37,21 @@ function toPersianDate(value) {
 // ─── Normalizers ──────────────────────────────────────────
 
 function normalizeInvoiceRecord(item) {
-  const attrs = item?.attributes || {};
-  const firstItem = attrs.items?.data?.[0]?.attributes;
+  const attrs = item || {};
   return {
     id: item?.id,
     invoiceNumber: attrs.invoice_number || "",
     date: attrs.issue_date || attrs.createdAt?.slice(0, 10) || "",
-    customerName: attrs.customer?.data?.attributes?.full_name || "—",
-    customerPhone: attrs.customer?.data?.attributes?.phone || "",
-    items: (attrs.items?.data || []).map((it) => ({
+    customerName: attrs.customer?.full_name || "—",
+    customerPhone: attrs.customer?.phone || "",
+    items: (attrs.items || []).map((it) => ({
       id: it.id,
-      description: it.attributes?.description || "",
-      quantity: Number(it.attributes?.quantity || 1),
-      unitPrice: Number(it.attributes?.unit_price || 0),
-      discount: Number(it.attributes?.discount || 0),
-      tax: Number(it.attributes?.tax || 0),
-      total: Number(it.attributes?.total_price || 0),
+      description: it.description || "",
+      quantity: Number(it.quantity || 1),
+      unitPrice: Number(it.unit_price || 0),
+      discount: Number(it.discount || 0),
+      tax: Number(it.tax || 0),
+      total: Number(it.total_price || 0),
     })),
     subtotal: Number(attrs.subtotal || 0),
     discount: Number(attrs.discount || 0),
@@ -96,8 +98,8 @@ function normalizeRepairRecord(item) {
     id: item?.id,
     repairNumber: attrs.repair_number || "",
     date: attrs.date || attrs.createdAt?.slice(0, 10) || "",
-    customerName: attrs.customer?.data?.attributes?.full_name || "—",
-    customerPhone: attrs.customer?.data?.attributes?.phone || "",
+    customerName: attrs.customer?.full_name || "—",
+    customerPhone: attrs.customer?.phone || "",
     brand: attrs.brand || "",
     model: attrs.model || "",
     serialNumber: attrs.serial_number || "",
@@ -105,14 +107,14 @@ function normalizeRepairRecord(item) {
     technician: attrs.technician || "",
     receivedDate: attrs.received_date || "",
     deliveryDate: attrs.delivery_date || "",
-    items: (attrs.items?.data || []).map((it) => ({
+    items: (attrs.items || []).map((it) => ({
       id: it.id,
-      name: it.attributes?.name || "",
-      partsCost: Number(it.attributes?.parts_cost || 0),
-      laborCost: Number(it.attributes?.labor_cost || 0),
-      quantity: Number(it.attributes?.quantity || 1),
-      description: it.attributes?.description || "",
-      total: Number(it.attributes?.total || 0),
+      name: it.name || "",
+      partsCost: Number(it.parts_cost || 0),
+      laborCost: Number(it.labor_cost || 0),
+      quantity: Number(it.quantity || 1),
+      description: it.description || "",
+      total: Number(it.total || 0),
     })),
     totalCost: Number(attrs.total_cost || 0),
     statuses: attrs.statuses || "pending",
@@ -122,11 +124,11 @@ function normalizeRepairRecord(item) {
 }
 
 function normalizeCommissionRecord(item) {
-  const attrs = item?.attributes || {};
+  const attrs = item || {};
   return {
     id: item?.id,
-    employeeId: attrs.employee?.data?.id || "",
-    employeeName: attrs.employee?.data?.attributes?.full_name || "",
+    employeeId: attrs.employee?.id || "",
+    employeeName: attrs.employee?.full_name || "",
     type: attrs.type || "invoice",
     reference: attrs.reference || "",
     amount: Number(attrs.amount || 0),
@@ -136,11 +138,11 @@ function normalizeCommissionRecord(item) {
 }
 
 function normalizePayrollRecord(item) {
-  const attrs = item?.attributes || {};
+  const attrs = item || {};
   return {
     id: item?.id,
-    employeeId: attrs.employee?.data?.id || "",
-    employeeName: attrs.employee?.data?.attributes?.full_name || "—",
+    employeeId: attrs.employee?.id || "",
+    employeeName: attrs.employee?.full_name || "—",
     period: attrs.period || "",
     baseSalary: Number(attrs.base_salary || 0),
     commissionTotal: Number(attrs.commission_total || 0),
@@ -155,10 +157,10 @@ function normalizePayrollRecord(item) {
 }
 
 function normalizeServiceRecord(item) {
-  const attrs = item?.attributes || {};
+  const attrs = item || {};
   return {
     id: item?.id,
-    customerName: attrs.customer?.data?.attributes?.full_name || "—",
+    customerName: attrs.customer?.full_name || "—",
     serviceName: attrs.service_title || "—",
     amount: Number(attrs.amount || 0),
     note: attrs.description || "",
@@ -169,19 +171,42 @@ function normalizeServiceRecord(item) {
 // ─── Invoices ─────────────────────────────────────────────
 
 export async function getInvoicesFromStrapi() {
-  const payload = await strapiRequest("/invoices?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items][fields][0]=description&populate[items][fields][1]=quantity&populate[items][fields][2]=unit_price&populate[items][fields][3]=discount&populate[items][fields][4]=total_price&sort=createdAt:desc");
+  const payload = await strapiRequest(
+    "/invoices?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items][fields][0]=description&populate[items][fields][1]=quantity&populate[items][fields][2]=unit_price&populate[items][fields][3]=discount&populate[items][fields][4]=total_price&sort=createdAt:desc",
+  );
   return (payload?.data || []).map(normalizeInvoiceRecord);
 }
 
-export async function createInvoiceInStrapi({ customerName, customerPhone, invoiceNumber, date, items, subtotal, discount, taxAmount, totalAmount, paymentMethod, statuses, note }) {
+export async function createInvoiceInStrapi({
+  customerName,
+  customerPhone,
+  invoiceNumber,
+  date,
+  items,
+  subtotal,
+  discount,
+  taxAmount,
+  totalAmount,
+  paymentMethod,
+  statuses,
+  note,
+}) {
   let customerId = null;
-  const existingCustomers = await strapiRequest(`/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`);
+  const existingCustomers = await strapiRequest(
+    `/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`,
+  );
   if (existingCustomers?.data?.length > 0) {
     customerId = existingCustomers.data[0].id;
   } else {
     const custRes = await strapiRequest("/customers", {
       method: "POST",
-      body: { data: { full_name: customerName, phone: customerPhone || "-", notes: note || "" } },
+      body: {
+        data: {
+          full_name: customerName,
+          phone: customerPhone || "-",
+          notes: note || "",
+        },
+      },
     });
     customerId = custRes?.data?.id;
   }
@@ -202,7 +227,7 @@ export async function createInvoiceInStrapi({ customerName, customerPhone, invoi
       },
     },
   });
-  const invoiceId = invoiceRes?.data?.id;
+  const invoiceId = invoiceRes?.documentId;
 
   if (invoiceId && items?.length) {
     for (const item of items) {
@@ -224,22 +249,46 @@ export async function createInvoiceInStrapi({ customerName, customerPhone, invoi
   return invoiceRes;
 }
 
-export async function updateInvoiceInStrapi(id, { customerName, customerPhone, invoiceNumber, date, items, subtotal, discount, taxAmount, totalAmount, paymentMethod, statuses, note }) {
+export async function updateInvoiceInStrapi(
+  id,
+  {
+    customerName,
+    customerPhone,
+    invoiceNumber,
+    date,
+    items,
+    subtotal,
+    discount,
+    taxAmount,
+    totalAmount,
+    paymentMethod,
+    statuses,
+    note,
+  },
+) {
   let customerId = null;
   if (customerName) {
-    const existingCustomers = await strapiRequest(`/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`);
+    const existingCustomers = await strapiRequest(
+      `/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`,
+    );
     if (existingCustomers?.data?.length > 0) {
       customerId = existingCustomers.data[0].id;
     } else {
       const custRes = await strapiRequest("/customers", {
         method: "POST",
-        body: { data: { full_name: customerName, phone: customerPhone || "-", notes: note || "" } },
+        body: {
+          data: {
+            full_name: customerName,
+            phone: customerPhone || "-",
+            notes: note || "",
+          },
+        },
       });
       customerId = custRes?.data?.id;
     }
   }
 
-  const invoiceRes = await strapiRequest(`/invoices/${id}`, {
+  const invoiceRes = await strapiRequest(`/invoices/${documentId}`, {
     method: "PUT",
     body: {
       data: {
@@ -257,7 +306,9 @@ export async function updateInvoiceInStrapi(id, { customerName, customerPhone, i
   });
 
   if (items?.length) {
-    const existing = await strapiRequest(`/invoice-items?filters[invoice][id][$eq]=${id}&fields[0]=id`);
+    const existing = await strapiRequest(
+      `/invoice-items?filters[invoice][id][$eq]=${id}&fields[0]=id`,
+    );
     for (const old of existing?.data || []) {
       await strapiRequest(`/invoice-items/${old.id}`, { method: "DELETE" });
     }
@@ -283,7 +334,9 @@ export async function updateInvoiceInStrapi(id, { customerName, customerPhone, i
 }
 
 export async function deleteInvoiceFromStrapi(id) {
-  const existing = await strapiRequest(`/invoice-items?filters[invoice][id][$eq]=${id}&fields[0]=id`);
+  const existing = await strapiRequest(
+    `/invoice-items?filters[invoice][id][$eq]=${id}&fields[0]=id`,
+  );
   for (const old of existing?.data || []) {
     await strapiRequest(`/invoice-items/${old.id}`, { method: "DELETE" });
   }
@@ -293,20 +346,30 @@ export async function deleteInvoiceFromStrapi(id) {
 // ─── Repairs ──────────────────────────────────────────────
 
 export async function getRepairsFromStrapi() {
-  const payload = await strapiRequest("/repairs?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items][populate]=*&sort=createdAt:desc");
+  const payload = await strapiRequest(
+    "/repairs?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items][populate]=*&sort=createdAt:desc",
+  );
   return (payload?.data || []).map(normalizeRepairRecord);
 }
 
 export async function createRepairInStrapi(data) {
   let customerId = null;
   if (data.customerName) {
-    const existing = await strapiRequest(`/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=id`);
+    const existing = await strapiRequest(
+      `/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=id`,
+    );
     if (existing?.data?.length > 0) {
       customerId = existing.data[0].id;
     } else {
       const custRes = await strapiRequest("/customers", {
         method: "POST",
-        body: { data: { full_name: data.customerName, phone: data.customerPhone || "-", notes: data.note || "" } },
+        body: {
+          data: {
+            full_name: data.customerName,
+            phone: data.customerPhone || "-",
+            notes: data.note || "",
+          },
+        },
       });
       customerId = custRes?.data?.id;
     }
@@ -347,7 +410,10 @@ export async function createRepairInStrapi(data) {
               labor_cost: Number(item.laborCost || 0),
               quantity: Number(item.quantity || 1),
               description: item.description || "",
-              total: Number((Number(item.partsCost || 0) + Number(item.laborCost || 0)) * Number(item.quantity || 1)),
+              total: Number(
+                (Number(item.partsCost || 0) + Number(item.laborCost || 0)) *
+                  Number(item.quantity || 1),
+              ),
             },
           },
         });
@@ -360,19 +426,26 @@ export async function createRepairInStrapi(data) {
 export async function updateRepairInStrapi(id, data) {
   let customerId = null;
   if (data.customerName) {
-    const existing = await strapiRequest(`/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=id`);
+    const existing = await strapiRequest(
+      `/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=id`,
+    );
     if (existing?.data?.length > 0) {
       customerId = existing.data[0].id;
     } else {
       const custRes = await strapiRequest("/customers", {
         method: "POST",
-        body: { data: { full_name: data.customerName, phone: data.customerPhone || "-" } },
+        body: {
+          data: {
+            full_name: data.customerName,
+            phone: data.customerPhone || "-",
+          },
+        },
       });
       customerId = custRes?.data?.id;
     }
   }
 
-  const repairRes = await strapiRequest(`/repairs/${id}`, {
+  const repairRes = await strapiRequest(`/repairs/${documentId}`, {
     method: "PUT",
     body: {
       data: {
@@ -393,7 +466,9 @@ export async function updateRepairInStrapi(id, data) {
     },
   });
 
-  const existing = await strapiRequest(`/repair-items?filters[repair][id][$eq]=${id}&fields[0]=id`);
+  const existing = await strapiRequest(
+    `/repair-items?filters[repair][id][$eq]=${id}&fields[0]=id`,
+  );
   for (const old of existing?.data || []) {
     await strapiRequest(`/repair-items/${old.id}`, { method: "DELETE" });
   }
@@ -410,7 +485,10 @@ export async function updateRepairInStrapi(id, data) {
               labor_cost: Number(item.laborCost || 0),
               quantity: Number(item.quantity || 1),
               description: item.description || "",
-              total: Number((Number(item.partsCost || 0) + Number(item.laborCost || 0)) * Number(item.quantity || 1)),
+              total: Number(
+                (Number(item.partsCost || 0) + Number(item.laborCost || 0)) *
+                  Number(item.quantity || 1),
+              ),
             },
           },
         });
@@ -421,7 +499,9 @@ export async function updateRepairInStrapi(id, data) {
 }
 
 export async function deleteRepairFromStrapi(id) {
-  const existing = await strapiRequest(`/repair-items?filters[repair][id][$eq]=${id}&fields[0]=id`);
+  const existing = await strapiRequest(
+    `/repair-items?filters[repair][id][$eq]=${id}&fields[0]=id`,
+  );
   for (const old of existing?.data || []) {
     await strapiRequest(`/repair-items/${old.id}`, { method: "DELETE" });
   }
@@ -431,7 +511,9 @@ export async function deleteRepairFromStrapi(id) {
 // ─── Products (uses existing Strapi product content type) ──
 
 export async function getProductsFromStrapi() {
-  const payload = await strapiRequest("/products?fields[0]=name&fields[1]=sku&fields[2]=price&fields[3]=stock&fields[4]=category&fields[5]=purchase_price&fields[6]=min_stock&fields[7]=supplier&sort=createdAt:desc");
+  const payload = await strapiRequest(
+    "/products?fields[0]=name&fields[1]=sku&fields[2]=price&fields[3]=stock&fields[4]=category&fields[5]=purchase_price&fields[6]=min_stock&fields[7]=supplier&sort=createdAt:desc",
+  );
   return (payload?.data || []).map(normalizeProductRecord);
 }
 
@@ -454,7 +536,7 @@ export async function createProductInStrapi(data) {
 }
 
 export async function updateProductInStrapi(id, data) {
-  return strapiRequest(`/products/${id}`, {
+  return strapiRequest(`/products/${documentId}`, {
     method: "PUT",
     body: {
       data: {
@@ -499,7 +581,7 @@ export async function createEmployeeInStrapi(data) {
 }
 
 export async function updateEmployeeInStrapi(id, data) {
-  return strapiRequest(`/employees/${id}`, {
+  return strapiRequest(`/employees/${documentId}`, {
     method: "PUT",
     body: {
       data: {
@@ -521,7 +603,9 @@ export async function deleteEmployeeFromStrapi(id) {
 // ─── Commissions ──────────────────────────────────────────
 
 export async function getCommissionsFromStrapi() {
-  const payload = await strapiRequest("/commissions?populate[employee][fields][0]=full_name&sort=createdAt:desc");
+  const payload = await strapiRequest(
+    "/commissions?populate[employee][fields][0]=full_name&sort=createdAt:desc",
+  );
   return (payload?.data || []).map(normalizeCommissionRecord);
 }
 
@@ -548,7 +632,9 @@ export async function deleteCommissionFromStrapi(id) {
 // ─── Payroll ──────────────────────────────────────────────
 
 export async function getPayrollsFromStrapi() {
-  const payload = await strapiRequest("/payroll-records?populate[employee][fields][0]=full_name&sort=createdAt:desc");
+  const payload = await strapiRequest(
+    "/payroll-records?populate[employee][fields][0]=full_name&sort=createdAt:desc",
+  );
   return (payload?.data || []).map(normalizePayrollRecord);
 }
 
@@ -579,11 +665,18 @@ export async function deletePayrollFromStrapi(id) {
 // ─── Services ─────────────────────────────────────────────
 
 export async function getServicesFromStrapi() {
-  const payload = await strapiRequest("/service-invoices?populate[customer][fields][0]=full_name&sort=createdAt:desc");
+  const payload = await strapiRequest(
+    "/service-invoices?populate[customer][fields][0]=full_name&sort=createdAt:desc",
+  );
   return (payload?.data || []).map(normalizeServiceRecord);
 }
 
-export async function createServiceInStrapi({ customerName, serviceName, amount, note }) {
+export async function createServiceInStrapi({
+  customerName,
+  serviceName,
+  amount,
+  note,
+}) {
   const customerPayload = await strapiRequest("/customers", {
     method: "POST",
     body: { data: { full_name: customerName, phone: "-", notes: note || "" } },
