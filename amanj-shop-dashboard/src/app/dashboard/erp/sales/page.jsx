@@ -36,6 +36,7 @@ const emptyItem = {
 };
 
 const emptyForm = {
+  documentId: '',
   invoiceNumber: `INV-${Date.now().toString(36).toUpperCase()}`,
   date: new Date().toISOString().slice(0, 10),
   customerName: "",
@@ -125,6 +126,7 @@ export default function SalesPage() {
 
   const openEdit = (invoice) => {
     setForm({
+      documentId: invoice.documentId,
       invoiceNumber: invoice.invoiceNumber,
       date: invoice.date,
       customerName: invoice.customerName,
@@ -156,7 +158,7 @@ export default function SalesPage() {
     try {
       setSaving(true);
       if (editing) {
-        await updateInvoiceInStrapi(editing, { ...form, ...calc });
+        await updateInvoiceInStrapi({ ...form, ...calc });
         toast.success("فاکتور به‌روزرسانی شد");
       } else {
         await createInvoiceInStrapi({ ...form, ...calc });

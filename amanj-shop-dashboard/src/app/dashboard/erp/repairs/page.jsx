@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 const emptyItem = { id: '', name: '', partsCost: 0, laborCost: 0, quantity: 1, description: '', total: 0 };
 
 const emptyForm = {
+  documentId: '',
   repairNumber: `SRV-${Date.now().toString(36).toUpperCase()}`,
   date: new Date().toISOString().slice(0, 10),
   customerName: '', customerPhone: '', brand: '', model: '', serialNumber: '',
@@ -57,14 +58,14 @@ export default function RepairsPage() {
 
   const openEdit = (repair) => {
     setForm({
-      repairNumber: repair.repairNumber, date: repair.date, customerName: repair.customerName,
-      customerPhone: repair.customerPhone || '', brand: repair.brand || '', model: repair.model || '',
-      serialNumber: repair.serialNumber || '', problem: repair.problem || '', technician: repair.technician || '',
-      receivedDate: repair.receivedDate || repair.date, deliveryDate: repair.deliveryDate || '',
+      documnetId: repair.documentId, repairNumber: repair.repairNumber, date: repair.date, customerName: repair.customer?.full_name,
+      customerPhone: repair.customer?.phone || '', brand: repair.brand || '', model: repair.model || '',
+      serialNumber: repair.serial_number || '', problem: repair.problem || '', technician: repair.technician || '',
+      receivedDate: repair.received_date || repair.date, delivery_date: repair.delivery_date || '',
       items: repair.items?.length ? repair.items : [{ ...emptyItem, id: Date.now().toString() }],
-      totalCost: repair.totalCost, statuses: repair.statuses, note: repair.note || '',
+      totalCost: repair.total_cost, statuses: repair.statuses, note: repair.note || '',
     });
-    setEditing(repair.id); setShowForm(true);
+    setEditing(repair.documnetId); setShowForm(true);
   };
 
   const handleSave = async () => {

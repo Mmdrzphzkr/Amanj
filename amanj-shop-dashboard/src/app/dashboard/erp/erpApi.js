@@ -250,8 +250,8 @@ export async function createInvoiceInStrapi({
 }
 
 export async function updateInvoiceInStrapi(
-  id,
   {
+    documentId,
     customerName,
     customerPhone,
     invoiceNumber,
@@ -412,7 +412,7 @@ export async function createRepairInStrapi(data) {
               description: item.description || "",
               total: Number(
                 (Number(item.partsCost || 0) + Number(item.laborCost || 0)) *
-                  Number(item.quantity || 1),
+                Number(item.quantity || 1),
               ),
             },
           },
@@ -423,7 +423,7 @@ export async function createRepairInStrapi(data) {
   return repairRes;
 }
 
-export async function updateRepairInStrapi(id, data) {
+export async function updateRepairInStrapi(documentId, data) {
   let customerId = null;
   if (data.customerName) {
     const existing = await strapiRequest(
@@ -487,7 +487,7 @@ export async function updateRepairInStrapi(id, data) {
               description: item.description || "",
               total: Number(
                 (Number(item.partsCost || 0) + Number(item.laborCost || 0)) *
-                  Number(item.quantity || 1),
+                Number(item.quantity || 1),
               ),
             },
           },
