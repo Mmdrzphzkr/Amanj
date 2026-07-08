@@ -23,7 +23,7 @@ const emptyForm = {
   customerName: '', customerPhone: '',
   items: [],
   subtotal: 0, discount: 0, taxAmount: 0, totalAmount: 0,
-  paymentMethod: 'cash', status: 'draft', note: '',
+  paymentMethod: 'cash', statuses: 'draft', note: '',
 };
 
 export default function SalesPage() {
@@ -46,9 +46,9 @@ export default function SalesPage() {
     finally { setLoading(false); }
   };
 
-  const filtered = filter === 'all' ? invoices : invoices.filter((i) => i.status === filter);
-  const paidTotal = invoices.filter((i) => i.status === 'paid').reduce((s, i) => s + Number(i.totalAmount || 0), 0);
-  const pendingTotal = invoices.filter((i) => i.status === 'pending').reduce((s, i) => s + Number(i.totalAmount || 0), 0);
+  const filtered = filter === 'all' ? invoices : invoices.filter((i) => i.statuses === filter);
+  const paidTotal = invoices.filter((i) => i.statuses === 'paid').reduce((s, i) => s + Number(i.totalAmount || 0), 0);
+  const pendingTotal = invoices.filter((i) => i.statuses === 'pending').reduce((s, i) => s + Number(i.totalAmount || 0), 0);
   const grandTotal = invoices.reduce((s, i) => s + Number(i.totalAmount || 0), 0);
 
   const recalculate = (items, taxRate) => {
@@ -79,7 +79,7 @@ export default function SalesPage() {
       items: invoice.items?.length ? invoice.items : [{ ...emptyItem, id: Date.now().toString() }],
       subtotal: invoice.subtotal, discount: invoice.discount, taxAmount: invoice.taxAmount,
       totalAmount: invoice.totalAmount, paymentMethod: invoice.paymentMethod || 'cash',
-      status: invoice.status, note: invoice.note || '',
+      statuses: invoice.statuses, note: invoice.note || '',
     });
     setEditing(invoice.id); setShowForm(true);
   };
@@ -122,7 +122,7 @@ export default function SalesPage() {
     { header: 'مشتری', accessor: 'customerName' },
     { header: 'تاریخ', render: (row) => formatJalaliDate(row.date) },
     { header: 'مبلغ', render: (row) => formatCurrency(row.totalAmount || 0) },
-    { header: 'وضعیت', render: (row) => <Badge status={row.status}>{row.status === 'draft' ? 'پیش‌نویس' : row.status === 'pending' ? 'در انتظار' : row.status === 'paid' ? 'پرداخت شده' : 'لغو شده'}</Badge> },
+    { header: 'وضعیت', render: (row) => <Badge statuses={row.statuses}>{row.statuses === 'draft' ? 'پیش‌نویس' : row.statuses === 'pending' ? 'در انتظار' : row.statuses === 'paid' ? 'پرداخت شده' : 'لغو شده'}</Badge> },
     {
       header: 'عملیات', render: (row) => (
         <div style={{ display: 'flex', gap: 4 }}>
@@ -171,7 +171,7 @@ export default function SalesPage() {
           <Input label="نام مشتری" value={form.customerName} onChange={(e) => setForm({ ...form, customerName: e.target.value })} />
           <Input label="تلفن مشتری" value={form.customerPhone} onChange={(e) => setForm({ ...form, customerPhone: e.target.value })} />
           <Select label="روش پرداخت" options={paymentMethods} value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })} />
-          <Select label="وضعیت" options={invoiceStatuses} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} />
+          <Select label="وضعیت" options={invoiceStatuses} value={form.statuses} onChange={(e) => setForm({ ...form, statuses: e.target.value })} />
         </div>
         <div style={{ marginTop: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>

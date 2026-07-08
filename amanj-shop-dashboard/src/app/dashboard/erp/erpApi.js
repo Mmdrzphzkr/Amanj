@@ -56,7 +56,7 @@ function normalizeInvoiceRecord(item) {
     taxAmount: Number(attrs.tax_amount || 0),
     totalAmount: Number(attrs.total_amount || 0),
     paymentMethod: attrs.payment_method || "",
-    status: attrs.status || "draft",
+    statuses: attrs.statuses || "draft",
     note: attrs.note || "",
     createdAt: toPersianDate(attrs.createdAt),
   };
@@ -115,7 +115,7 @@ function normalizeRepairRecord(item) {
       total: Number(it.attributes?.total || 0),
     })),
     totalCost: Number(attrs.total_cost || 0),
-    status: attrs.status || "pending",
+    statuses: attrs.statuses || "pending",
     note: attrs.note || "",
     createdAt: toPersianDate(attrs.createdAt),
   };
@@ -148,7 +148,7 @@ function normalizePayrollRecord(item) {
     deduction: Number(attrs.deduction || 0),
     totalSalary: Number(attrs.total_salary || 0),
     date: attrs.date || attrs.createdAt?.slice(0, 10) || "",
-    status: attrs.status || "paid",
+    statuses: attrs.statuses || "paid",
     note: attrs.note || "",
     createdAt: toPersianDate(attrs.createdAt),
   };
@@ -173,7 +173,7 @@ export async function getInvoicesFromStrapi() {
   return (payload?.data || []).map(normalizeInvoiceRecord);
 }
 
-export async function createInvoiceInStrapi({ customerName, customerPhone, invoiceNumber, date, items, subtotal, discount, taxAmount, totalAmount, paymentMethod, status, note }) {
+export async function createInvoiceInStrapi({ customerName, customerPhone, invoiceNumber, date, items, subtotal, discount, taxAmount, totalAmount, paymentMethod, statuses, note }) {
   let customerId = null;
   const existingCustomers = await strapiRequest(`/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`);
   if (existingCustomers?.data?.length > 0) {
@@ -192,7 +192,7 @@ export async function createInvoiceInStrapi({ customerName, customerPhone, invoi
       data: {
         invoice_number: invoiceNumber || `INV-${Date.now()}`,
         issue_date: date || new Date().toISOString().slice(0, 10),
-        status: status || "draft",
+        statuses: statuses || "draft",
         customer: customerId,
         subtotal: Number(subtotal || 0),
         discount: Number(discount || 0),
@@ -224,7 +224,7 @@ export async function createInvoiceInStrapi({ customerName, customerPhone, invoi
   return invoiceRes;
 }
 
-export async function updateInvoiceInStrapi(id, { customerName, customerPhone, invoiceNumber, date, items, subtotal, discount, taxAmount, totalAmount, paymentMethod, status, note }) {
+export async function updateInvoiceInStrapi(id, { customerName, customerPhone, invoiceNumber, date, items, subtotal, discount, taxAmount, totalAmount, paymentMethod, statuses, note }) {
   let customerId = null;
   if (customerName) {
     const existingCustomers = await strapiRequest(`/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`);
@@ -245,7 +245,7 @@ export async function updateInvoiceInStrapi(id, { customerName, customerPhone, i
       data: {
         invoice_number: invoiceNumber,
         issue_date: date,
-        status,
+        statuses,
         customer: customerId,
         subtotal: Number(subtotal || 0),
         discount: Number(discount || 0),
@@ -293,7 +293,7 @@ export async function deleteInvoiceFromStrapi(id) {
 // ─── Repairs ──────────────────────────────────────────────
 
 export async function getRepairsFromStrapi() {
-  const payload = await strapiRequest("/repairs?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items]=*&sort=createdAt:desc");
+  const payload = await strapiRequest("/repairs?populate[customer][fields][0]=full_name&populate[customer][fields][1]=phone&populate[items][populate]=*&sort=createdAt:desc");
   return (payload?.data || []).map(normalizeRepairRecord);
 }
 
@@ -327,7 +327,7 @@ export async function createRepairInStrapi(data) {
         received_date: data.receivedDate || data.date,
         delivery_date: data.deliveryDate || null,
         total_cost: Number(data.totalCost || 0),
-        status: data.status || "pending",
+        statuses: data.statuses || "pending",
         note: data.note || "",
       },
     },
@@ -387,7 +387,7 @@ export async function updateRepairInStrapi(id, data) {
         received_date: data.receivedDate,
         delivery_date: data.deliveryDate || null,
         total_cost: Number(data.totalCost || 0),
-        status: data.status || "pending",
+        statuses: data.statuses || "pending",
         note: data.note || "",
       },
     },
@@ -565,7 +565,7 @@ export async function createPayrollInStrapi(data) {
         deduction: Number(data.deduction || 0),
         total_salary: Number(data.totalSalary || 0),
         date: data.date || new Date().toISOString().slice(0, 10),
-        status: data.status || "paid",
+        statuses: data.statuses || "paid",
         note: data.note || "",
       },
     },
@@ -597,7 +597,7 @@ export async function createServiceInStrapi({ customerName, serviceName, amount,
         service_title: serviceName,
         description: note || "",
         amount: Number(amount),
-        status: "pending",
+        statuses: "pending",
       },
     },
   });

@@ -17,13 +17,12 @@
     },
     "statuses": {
       "type": "enumeration",
+      "default": "draft",
       "enum": [
-        "نقدی",
-        "کارت به کارت",
-        "واریز بانکی",
-        "چک",
-        "اقساطی",
-        "پرداخت آنلاین"
+        "draft",
+        "pending",
+        "paid",
+        "canceled"
       ]
     },
     "issue_date": {

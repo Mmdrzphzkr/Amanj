@@ -1021,15 +1021,9 @@ export interface ApiInvoiceInvoice extends Struct.CollectionTypeSchema {
     payment_method: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     statuses: Schema.Attribute.Enumeration<
-      [
-        '\u0646\u0642\u062F\u06CC',
-        '\u06A9\u0627\u0631\u062A \u0628\u0647 \u06A9\u0627\u0631\u062A',
-        '\u0648\u0627\u0631\u06CC\u0632 \u0628\u0627\u0646\u06A9\u06CC',
-        '\u0686\u06A9',
-        '\u0627\u0642\u0633\u0627\u0637\u06CC',
-        '\u067E\u0631\u062F\u0627\u062E\u062A \u0622\u0646\u0644\u0627\u06CC\u0646',
-      ]
-    >;
+      ['draft', 'pending', 'paid', 'canceled']
+    > &
+      Schema.Attribute.DefaultTo<'draft'>;
     subtotal: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;

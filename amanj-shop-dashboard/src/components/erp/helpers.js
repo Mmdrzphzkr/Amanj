@@ -71,7 +71,7 @@ export function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-export function getStatusColor(status) {
+export function getStatusColor(statuses) {
   const colors = {
     draft: 'badge-amber',
     pending: 'badge-blue',
@@ -81,7 +81,7 @@ export function getStatusColor(status) {
     active: 'badge-green',
     inactive: 'badge-red',
   };
-  return colors[status] || 'badge-amber';
+  return colors[statuses] || 'badge-amber';
 }
 
 export const invoiceStatuses = [

@@ -22,7 +22,7 @@ const emptyForm = {
   date: new Date().toISOString().slice(0, 10),
   customerName: '', customerPhone: '', brand: '', model: '', serialNumber: '',
   problem: '', technician: '', receivedDate: new Date().toISOString().slice(0, 10),
-  deliveryDate: '', items: [], totalCost: 0, status: 'pending', note: '',
+  deliveryDate: '', items: [], totalCost: 0, statuses: 'pending', note: '',
 };
 
 export default function RepairsPage() {
@@ -46,9 +46,9 @@ export default function RepairsPage() {
   };
 
   const employees = state.employees || [];
-  const filtered = filter === 'all' ? repairs : repairs.filter((r) => r.status === filter);
+  const filtered = filter === 'all' ? repairs : repairs.filter((r) => r.statuses === filter);
   const totalRevenue = repairs.reduce((s, r) => s + Number(r.totalCost || 0), 0);
-  const pendingCount = repairs.filter((r) => r.status === 'pending' || r.status === 'in_progress').length;
+  const pendingCount = repairs.filter((r) => r.statuses === 'pending' || r.statuses === 'in_progress').length;
 
   const openNew = () => {
     setForm({ ...emptyForm, repairNumber: `SRV-${Date.now().toString(36).toUpperCase()}` });
@@ -62,7 +62,7 @@ export default function RepairsPage() {
       serialNumber: repair.serialNumber || '', problem: repair.problem || '', technician: repair.technician || '',
       receivedDate: repair.receivedDate || repair.date, deliveryDate: repair.deliveryDate || '',
       items: repair.items?.length ? repair.items : [{ ...emptyItem, id: Date.now().toString() }],
-      totalCost: repair.totalCost, status: repair.status, note: repair.note || '',
+      totalCost: repair.totalCost, statuses: repair.statuses, note: repair.note || '',
     });
     setEditing(repair.id); setShowForm(true);
   };
@@ -106,7 +106,7 @@ export default function RepairsPage() {
     { header: 'تکنسین', accessor: 'technician' },
     { header: 'تاریخ دریافت', render: (row) => formatJalaliDate(row.receivedDate || row.date) },
     { header: 'هزینه', render: (row) => formatCurrency(row.totalCost || 0) },
-    { header: 'وضعیت', render: (row) => <Badge status={row.status}>{statusLabels[row.status] || row.status}</Badge> },
+    { header: 'وضعیت', render: (row) => <Badge statuses={row.statuses}>{statusLabels[row.statuses] || row.statuses}</Badge> },
     {
       header: 'عملیات', render: (row) => (
         <div style={{ display: 'flex', gap: 4 }}>
@@ -137,7 +137,7 @@ export default function RepairsPage() {
         <StatCard value={repairs.length} label="کل تعمیرات" color="amber" icon="🔧" loading={loading} />
         <StatCard value={formatCurrency(totalRevenue)} label="درآمد تعمیرات" color="green" icon="💰" loading={loading} />
         <StatCard value={pendingCount} label="در انتظار / در حال کار" color="blue" icon="⏳" loading={loading} />
-        <StatCard value={repairs.filter((r) => r.status === 'delivered').length} label="تحویل شده" color="purple" icon="✅" loading={loading} />
+        <StatCard value={repairs.filter((r) => r.statuses === 'delivered').length} label="تحویل شده" color="purple" icon="✅" loading={loading} />
       </div>
 
       <Table columns={columns} data={filtered} onRowClick={openEdit} loading={loading} emptyMessage="هیچ تعمیری یافت نشد" />
@@ -156,7 +156,7 @@ export default function RepairsPage() {
           <Input label="تاریخ دریافت" type="date" value={form.receivedDate} onChange={(e) => setForm({ ...form, receivedDate: e.target.value })} />
           <Input label="تاریخ تحویل" type="date" value={form.deliveryDate} onChange={(e) => setForm({ ...form, deliveryDate: e.target.value })} />
           <Select label="تکنسین" options={employees.filter((e) => e.active !== false).map((e) => ({ value: e.name, label: e.name }))} value={form.technician} onChange={(e) => setForm({ ...form, technician: e.target.value })} />
-          <Select label="وضعیت" options={repairStatuses} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} />
+          <Select label="وضعیت" options={repairStatuses} value={form.statuses} onChange={(e) => setForm({ ...form, statuses: e.target.value })} />
         </div>
         <Textarea label="شرح مشکل" value={form.problem} onChange={(e) => setForm({ ...form, problem: e.target.value })} style={{ marginTop: 12 }} />
         <div style={{ marginTop: 20 }}>

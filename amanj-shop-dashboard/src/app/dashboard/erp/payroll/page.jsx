@@ -64,7 +64,7 @@ export default function PayrollPage() {
           deduction: Number(deductionMap[emp.id]?.deduction || 0),
           totalSalary: finalSalary,
           date: new Date().toISOString().slice(0, 10),
-          status: 'paid',
+          statuses: 'paid',
         });
       }
       toast.success(`حقوق ${employees.length} نفر ثبت شد`);

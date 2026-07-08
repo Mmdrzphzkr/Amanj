@@ -32,9 +32,9 @@ export default function ErpDashboard() {
     })();
   }, []);
 
-  const paidSales = invoices.filter((i) => i.status === 'paid').reduce((s, i) => s + Number(i.totalAmount || 0), 0);
-  const repairRevenue = repairs.filter((r) => r.status === 'delivered' || r.status === 'completed').reduce((s, r) => s + Number(r.totalCost || 0), 0);
-  const pendingRepairs = repairs.filter((r) => r.status === 'pending' || r.status === 'in_progress').length;
+  const paidSales = invoices.filter((i) => i.statuses === 'paid').reduce((s, i) => s + Number(i.totalAmount || 0), 0);
+  const repairRevenue = repairs.filter((r) => r.statuses === 'delivered' || r.statuses === 'completed').reduce((s, r) => s + Number(r.totalCost || 0), 0);
+  const pendingRepairs = repairs.filter((r) => r.statuses === 'pending' || r.statuses === 'in_progress').length;
   const lowStockItems = products.filter((p) => Number(p.stock) <= Number(p.minStock)).length;
 
   // Monthly chart data (last 6 months)
@@ -54,7 +54,7 @@ export default function ErpDashboard() {
   }
 
   const statusCounts = {};
-  repairs.forEach((r) => { statusCounts[r.status] = (statusCounts[r.status] || 0) + 1; });
+  repairs.forEach((r) => { statusCounts[r.statuses] = (statusCounts[r.statuses] || 0) + 1; });
   const pieData = Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
   const PIE_COLORS = ['#f59e0b', '#3b82f6', '#22c55e', '#8b5cf6', '#ef4444'];
 
@@ -79,8 +79,8 @@ export default function ErpDashboard() {
           </div>
         </div>
         <div className="dashboard-hero__status">
-          <div className="dashboard-status-pill">● سیستم آنلاین</div>
-          <div className="dashboard-status-card">
+          <div className="dashboard-statuses-pill">● سیستم آنلاین</div>
+          <div className="dashboard-statuses-card">
             <span>تاریخ امروز</span>
             <strong>{new Date().toLocaleDateString('fa-IR')}</strong>
           </div>
@@ -142,7 +142,7 @@ export default function ErpDashboard() {
               <div key={inv.id} className="module-item" style={{ padding: '10px 12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <strong style={{ fontSize: 13 }}>{inv.customerName}</strong>
-                  <span className={`badge ${getStatusColor(inv.status)}`} style={{ fontSize: 11 }}>{statusLabels[inv.status] || inv.status}</span>
+                  <span className={`badge ${getStatusColor(inv.statuses)}`} style={{ fontSize: 11 }}>{statusLabels[inv.statuses] || inv.statuses}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-muted)' }}>
                   <span>{inv.invoiceNumber}</span>
@@ -161,7 +161,7 @@ export default function ErpDashboard() {
               <div key={r.id} className="module-item" style={{ padding: '10px 12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <strong style={{ fontSize: 13 }}>{r.customerName}</strong>
-                  <span className={`badge ${getStatusColor(r.status)}`} style={{ fontSize: 11 }}>{statusLabels[r.status] || r.status}</span>
+                  <span className={`badge ${getStatusColor(r.statuses)}`} style={{ fontSize: 11 }}>{statusLabels[r.statuses] || r.statuses}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-muted)' }}>
                   <span>{r.repairNumber} - {r.brand || ''} {r.model || ''}</span>
