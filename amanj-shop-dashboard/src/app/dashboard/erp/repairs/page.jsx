@@ -58,14 +58,14 @@ export default function RepairsPage() {
 
   const openEdit = (repair) => {
     setForm({
-      documnetId: repair.documentId, repairNumber: repair.repairNumber, date: repair.date, customerName: repair.customer?.full_name,
-      customerPhone: repair.customer?.phone || '', brand: repair.brand || '', model: repair.model || '',
-      serialNumber: repair.serial_number || '', problem: repair.problem || '', technician: repair.technician || '',
-      receivedDate: repair.received_date || repair.date, delivery_date: repair.delivery_date || '',
+      documentId: repair.documentId, repairNumber: repair.repairNumber, date: repair.date, customerName: repair.customerName,
+      customerPhone: repair.customerPhone || '', brand: repair.brand || '', model: repair.model || '',
+      serialNumber: repair.serialNumber || '', problem: repair.problem || '', technician: repair.technician || '',
+      receivedDate: repair.receivedDate || repair.date, deliveryDate: repair.deliveryDate || '',
       items: repair.items?.length ? repair.items : [{ ...emptyItem, id: Date.now().toString() }],
-      totalCost: repair.total_cost, statuses: repair.statuses, note: repair.note || '',
+      totalCost: repair.totalCost, statuses: repair.statuses, note: repair.note || '',
     });
-    setEditing(repair.documnetId); setShowForm(true);
+    setEditing(repair.documentId); setShowForm(true);
   };
 
   const handleSave = async () => {
@@ -90,7 +90,7 @@ export default function RepairsPage() {
   };
 
   const handleDelete = async () => {
-    try { await deleteRepairFromStrapi(deleteTarget.id); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
+    try { await deleteRepairFromStrapi(deleteTarget.documentId); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
     catch (e) { toast.error('خطا: ' + e.message); }
   };
 

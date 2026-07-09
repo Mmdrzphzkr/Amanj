@@ -52,7 +52,7 @@ export default function CommissionsPage() {
   };
 
   const handleDelete = async () => {
-    try { await deleteCommissionFromStrapi(deleteTarget.id); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
+    try { await deleteCommissionFromStrapi(deleteTarget.documentId); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
     catch (e) { toast.error('خطا: ' + e.message); }
   };
 

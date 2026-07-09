@@ -39,13 +39,14 @@ function toPersianDate(value) {
 function normalizeInvoiceRecord(item) {
   const attrs = item || {};
   return {
-    id: item?.id,
+    id: item?.documentId || item?.id,
+    documentId: item?.documentId || item?.id,
     invoiceNumber: attrs.invoice_number || "",
     date: attrs.issue_date || attrs.createdAt?.slice(0, 10) || "",
     customerName: attrs.customer?.full_name || "—",
     customerPhone: attrs.customer?.phone || "",
     items: (attrs.items || []).map((it) => ({
-      id: it.id,
+      id: it.documentId || it.id,
       description: it.description || "",
       quantity: Number(it.quantity || 1),
       unitPrice: Number(it.unit_price || 0),
@@ -65,50 +66,50 @@ function normalizeInvoiceRecord(item) {
 }
 
 function normalizeProductRecord(item) {
-  const attrs = item?.attributes || {};
   return {
-    id: item?.id,
-    name: attrs.name || "",
-    category: attrs.category || "coffee_machine",
-    sku: attrs.sku || "",
-    purchasePrice: Number(attrs.purchase_price || 0),
-    sellingPrice: Number(attrs.price || attrs.selling_price || 0),
-    stock: Number(attrs.stock || 0),
-    minStock: Number(attrs.min_stock || 0),
-    supplier: attrs.supplier || "",
+    id: item?.documentId || item?.id,
+    documentId: item?.documentId || item?.id,
+    name: item?.name || "",
+    category: item?.category || "coffee_machine",
+    sku: item?.sku || "",
+    purchasePrice: Number(item?.purchase_price || 0),
+    sellingPrice: Number(item?.price || item?.selling_price || 0),
+    stock: Number(item?.stock || 0),
+    minStock: Number(item?.min_stock || 0),
+    supplier: item?.supplier || "",
   };
 }
 
 function normalizeEmployeeRecord(item) {
-  const attrs = item?.attributes || {};
   return {
-    id: item?.id,
-    name: attrs.full_name || "",
-    phone: attrs.phone || "",
-    position: attrs.position || "",
-    salaryType: attrs.salary_type || "monthly",
-    baseSalary: Number(attrs.base_salary || 0),
-    active: attrs.active !== false,
+    id: item?.documentId || item?.id,
+    documentId: item?.documentId || item?.id,
+    name: item?.full_name || "",
+    phone: item?.phone || "",
+    position: item?.position || "",
+    salaryType: item?.salary_type || "monthly",
+    baseSalary: Number(item?.base_salary || 0),
+    active: item?.active !== false,
   };
 }
 
 function normalizeRepairRecord(item) {
-  const attrs = item?.attributes || {};
   return {
-    id: item?.id,
-    repairNumber: attrs.repair_number || "",
-    date: attrs.date || attrs.createdAt?.slice(0, 10) || "",
-    customerName: attrs.customer?.full_name || "—",
-    customerPhone: attrs.customer?.phone || "",
-    brand: attrs.brand || "",
-    model: attrs.model || "",
-    serialNumber: attrs.serial_number || "",
-    problem: attrs.problem || "",
-    technician: attrs.technician || "",
-    receivedDate: attrs.received_date || "",
-    deliveryDate: attrs.delivery_date || "",
-    items: (attrs.items || []).map((it) => ({
-      id: it.id,
+    id: item?.documentId || item?.id,
+    documentId: item?.documentId || item?.id,
+    repairNumber: item?.repair_number || "",
+    date: item?.date || item?.createdAt?.slice(0, 10) || "",
+    customerName: item?.customer?.full_name || "—",
+    customerPhone: item?.customer?.phone || "",
+    brand: item?.brand || "",
+    model: item?.model || "",
+    serialNumber: item?.serial_number || "",
+    problem: item?.problem || "",
+    technician: item?.technician || "",
+    receivedDate: item?.received_date || "",
+    deliveryDate: item?.delivery_date || "",
+    items: (item?.items || []).map((it) => ({
+      id: it.documentId || it.id,
       name: it.name || "",
       partsCost: Number(it.parts_cost || 0),
       laborCost: Number(it.labor_cost || 0),
@@ -116,55 +117,55 @@ function normalizeRepairRecord(item) {
       description: it.description || "",
       total: Number(it.total || 0),
     })),
-    totalCost: Number(attrs.total_cost || 0),
-    statuses: attrs.statuses || "pending",
-    note: attrs.note || "",
-    createdAt: toPersianDate(attrs.createdAt),
+    totalCost: Number(item?.total_cost || 0),
+    statuses: item?.statuses || "pending",
+    note: item?.note || "",
+    createdAt: toPersianDate(item?.createdAt),
   };
 }
 
 function normalizeCommissionRecord(item) {
-  const attrs = item || {};
   return {
-    id: item?.id,
-    employeeId: attrs.employee?.id || "",
-    employeeName: attrs.employee?.full_name || "",
-    type: attrs.type || "invoice",
-    reference: attrs.reference || "",
-    amount: Number(attrs.amount || 0),
-    date: attrs.date || attrs.createdAt?.slice(0, 10) || "",
-    description: attrs.description || "",
+    id: item?.documentId || item?.id,
+    documentId: item?.documentId || item?.id,
+    employeeId: item?.employee?.documentId || item?.employee?.id || "",
+    employeeName: item?.employee?.full_name || "",
+    type: item?.type || "invoice",
+    reference: item?.reference || "",
+    amount: Number(item?.amount || 0),
+    date: item?.date || item?.createdAt?.slice(0, 10) || "",
+    description: item?.description || "",
   };
 }
 
 function normalizePayrollRecord(item) {
-  const attrs = item || {};
   return {
-    id: item?.id,
-    employeeId: attrs.employee?.id || "",
-    employeeName: attrs.employee?.full_name || "—",
-    period: attrs.period || "",
-    baseSalary: Number(attrs.base_salary || 0),
-    commissionTotal: Number(attrs.commission_total || 0),
-    bonus: Number(attrs.bonus || 0),
-    deduction: Number(attrs.deduction || 0),
-    totalSalary: Number(attrs.total_salary || 0),
-    date: attrs.date || attrs.createdAt?.slice(0, 10) || "",
-    statuses: attrs.statuses || "paid",
-    note: attrs.note || "",
-    createdAt: toPersianDate(attrs.createdAt),
+    id: item?.documentId || item?.id,
+    documentId: item?.documentId || item?.id,
+    employeeId: item?.employee?.documentId || item?.employee?.id || "",
+    employeeName: item?.employee?.full_name || "—",
+    period: item?.period || "",
+    baseSalary: Number(item?.base_salary || 0),
+    commissionTotal: Number(item?.commission_total || 0),
+    bonus: Number(item?.bonus || 0),
+    deduction: Number(item?.deduction || 0),
+    totalSalary: Number(item?.total_salary || 0),
+    date: item?.date || item?.createdAt?.slice(0, 10) || "",
+    statuses: item?.statuses || "paid",
+    note: item?.note || "",
+    createdAt: toPersianDate(item?.createdAt),
   };
 }
 
 function normalizeServiceRecord(item) {
-  const attrs = item || {};
   return {
-    id: item?.id,
-    customerName: attrs.customer?.full_name || "—",
-    serviceName: attrs.service_title || "—",
-    amount: Number(attrs.amount || 0),
-    note: attrs.description || "",
-    createdAt: toPersianDate(attrs.createdAt),
+    id: item?.documentId || item?.id,
+    documentId: item?.documentId || item?.id,
+    customerName: item?.customer?.full_name || "—",
+    serviceName: item?.service_title || "—",
+    amount: Number(item?.amount || 0),
+    note: item?.description || "",
+    createdAt: toPersianDate(item?.createdAt),
   };
 }
 
@@ -193,10 +194,10 @@ export async function createInvoiceInStrapi({
 }) {
   let customerId = null;
   const existingCustomers = await strapiRequest(
-    `/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`,
+    `/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=documentId`,
   );
   if (existingCustomers?.data?.length > 0) {
-    customerId = existingCustomers.data[0].id;
+    customerId = existingCustomers.data[0].documentId;
   } else {
     const custRes = await strapiRequest("/customers", {
       method: "POST",
@@ -208,7 +209,7 @@ export async function createInvoiceInStrapi({
         },
       },
     });
-    customerId = custRes?.data?.id;
+    customerId = custRes?.data?.documentId;
   }
 
   const invoiceRes = await strapiRequest("/invoices", {
@@ -269,10 +270,10 @@ export async function updateInvoiceInStrapi(
   let customerId = null;
   if (customerName) {
     const existingCustomers = await strapiRequest(
-      `/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=id`,
+      `/customers?filters[full_name][$eq]=${encodeURIComponent(customerName)}&fields[0]=documentId`,
     );
     if (existingCustomers?.data?.length > 0) {
-      customerId = existingCustomers.data[0].id;
+      customerId = existingCustomers.data[0].documentId;
     } else {
       const custRes = await strapiRequest("/customers", {
         method: "POST",
@@ -284,7 +285,7 @@ export async function updateInvoiceInStrapi(
           },
         },
       });
-      customerId = custRes?.data?.id;
+      customerId = custRes?.data?.documentId;
     }
   }
 
@@ -307,10 +308,10 @@ export async function updateInvoiceInStrapi(
 
   if (items?.length) {
     const existing = await strapiRequest(
-      `/invoice-items?filters[invoice][id][$eq]=${id}&fields[0]=id`,
+      `/invoice-items?filters[invoice][documentId][$eq]=${documentId}&fields[0]=documentId`,
     );
     for (const old of existing?.data || []) {
-      await strapiRequest(`/invoice-items/${old.id}`, { method: "DELETE" });
+      await strapiRequest(`/invoice-items/${old.documentId}`, { method: "DELETE" });
     }
     for (const item of items) {
       if (item.description) {
@@ -318,7 +319,7 @@ export async function updateInvoiceInStrapi(
           method: "POST",
           body: {
             data: {
-              invoice: id,
+              invoice: documentId,
               description: item.description,
               quantity: Number(item.quantity || 1),
               unit_price: Number(item.unitPrice || 0),
@@ -333,14 +334,14 @@ export async function updateInvoiceInStrapi(
   return invoiceRes;
 }
 
-export async function deleteInvoiceFromStrapi(id) {
+export async function deleteInvoiceFromStrapi(documentId) {
   const existing = await strapiRequest(
-    `/invoice-items?filters[invoice][id][$eq]=${id}&fields[0]=id`,
+    `/invoice-items?filters[invoice][documentId][$eq]=${documentId}&fields[0]=documentId`,
   );
   for (const old of existing?.data || []) {
-    await strapiRequest(`/invoice-items/${old.id}`, { method: "DELETE" });
+    await strapiRequest(`/invoice-items/${old.documentId}`, { method: "DELETE" });
   }
-  return strapiRequest(`/invoices/${id}`, { method: "DELETE" });
+  return strapiRequest(`/invoices/${documentId}`, { method: "DELETE" });
 }
 
 // ─── Repairs ──────────────────────────────────────────────
@@ -356,10 +357,10 @@ export async function createRepairInStrapi(data) {
   let customerId = null;
   if (data.customerName) {
     const existing = await strapiRequest(
-      `/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=id`,
+      `/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=documentId`,
     );
     if (existing?.data?.length > 0) {
-      customerId = existing.data[0].id;
+      customerId = existing.data[0].documentId;
     } else {
       const custRes = await strapiRequest("/customers", {
         method: "POST",
@@ -371,7 +372,7 @@ export async function createRepairInStrapi(data) {
           },
         },
       });
-      customerId = custRes?.data?.id;
+      customerId = custRes?.data?.documentId;
     }
   }
 
@@ -395,7 +396,7 @@ export async function createRepairInStrapi(data) {
       },
     },
   });
-  const repairId = repairRes?.data?.id;
+  const repairId = repairRes?.data?.documentId;
 
   if (repairId && data.items?.length) {
     for (const item of data.items) {
@@ -427,10 +428,10 @@ export async function updateRepairInStrapi(documentId, data) {
   let customerId = null;
   if (data.customerName) {
     const existing = await strapiRequest(
-      `/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=id`,
+      `/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=documentId`,
     );
     if (existing?.data?.length > 0) {
-      customerId = existing.data[0].id;
+      customerId = existing.data[0].documentId;
     } else {
       const custRes = await strapiRequest("/customers", {
         method: "POST",
@@ -441,7 +442,7 @@ export async function updateRepairInStrapi(documentId, data) {
           },
         },
       });
-      customerId = custRes?.data?.id;
+      customerId = custRes?.data?.documentId;
     }
   }
 
@@ -467,10 +468,10 @@ export async function updateRepairInStrapi(documentId, data) {
   });
 
   const existing = await strapiRequest(
-    `/repair-items?filters[repair][id][$eq]=${id}&fields[0]=id`,
+    `/repair-items?filters[repair][documentId][$eq]=${documentId}&fields[0]=documentId`,
   );
   for (const old of existing?.data || []) {
-    await strapiRequest(`/repair-items/${old.id}`, { method: "DELETE" });
+    await strapiRequest(`/repair-items/${old.documentId}`, { method: "DELETE" });
   }
   if (data.items?.length) {
     for (const item of data.items) {
@@ -479,7 +480,7 @@ export async function updateRepairInStrapi(documentId, data) {
           method: "POST",
           body: {
             data: {
-              repair: id,
+              repair: documentId,
               name: item.name,
               parts_cost: Number(item.partsCost || 0),
               labor_cost: Number(item.laborCost || 0),
@@ -498,14 +499,14 @@ export async function updateRepairInStrapi(documentId, data) {
   return repairRes;
 }
 
-export async function deleteRepairFromStrapi(id) {
+export async function deleteRepairFromStrapi(documentId) {
   const existing = await strapiRequest(
-    `/repair-items?filters[repair][id][$eq]=${id}&fields[0]=id`,
+    `/repair-items?filters[repair][documentId][$eq]=${documentId}&fields[0]=documentId`,
   );
   for (const old of existing?.data || []) {
-    await strapiRequest(`/repair-items/${old.id}`, { method: "DELETE" });
+    await strapiRequest(`/repair-items/${old.documentId}`, { method: "DELETE" });
   }
-  return strapiRequest(`/repairs/${id}`, { method: "DELETE" });
+  return strapiRequest(`/repairs/${documentId}`, { method: "DELETE" });
 }
 
 // ─── Products (uses existing Strapi product content type) ──
@@ -536,7 +537,7 @@ export async function createProductInStrapi(data) {
 }
 
 export async function updateProductInStrapi(id, data) {
-  return strapiRequest(`/products/${documentId}`, {
+  return strapiRequest(`/products/${id}`, {
     method: "PUT",
     body: {
       data: {
@@ -581,7 +582,7 @@ export async function createEmployeeInStrapi(data) {
 }
 
 export async function updateEmployeeInStrapi(id, data) {
-  return strapiRequest(`/employees/${documentId}`, {
+  return strapiRequest(`/employees/${id}`, {
     method: "PUT",
     body: {
       data: {
@@ -625,8 +626,8 @@ export async function createCommissionInStrapi(data) {
   });
 }
 
-export async function deleteCommissionFromStrapi(id) {
-  return strapiRequest(`/commissions/${id}`, { method: "DELETE" });
+export async function deleteCommissionFromStrapi(documentId) {
+  return strapiRequest(`/commissions/${documentId}`, { method: "DELETE" });
 }
 
 // ─── Payroll ──────────────────────────────────────────────
@@ -658,8 +659,8 @@ export async function createPayrollInStrapi(data) {
   });
 }
 
-export async function deletePayrollFromStrapi(id) {
-  return strapiRequest(`/payroll-records/${id}`, { method: "DELETE" });
+export async function deletePayrollFromStrapi(documentId) {
+  return strapiRequest(`/payroll-records/${documentId}`, { method: "DELETE" });
 }
 
 // ─── Services ─────────────────────────────────────────────
@@ -686,7 +687,7 @@ export async function createServiceInStrapi({
     body: {
       data: {
         invoice_number: `SRV-${Date.now()}`,
-        customer: customerPayload?.data?.id,
+        customer: customerPayload?.data?.documentId,
         service_title: serviceName,
         description: note || "",
         amount: Number(amount),
@@ -701,7 +702,7 @@ export async function createServiceInStrapi({
 export async function getSettingsFromStrapi() {
   try {
     const payload = await strapiRequest("/setting");
-    return payload?.data?.attributes || null;
+    return payload?.data || null;
   } catch {
     return null;
   }

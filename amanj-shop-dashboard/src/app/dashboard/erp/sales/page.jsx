@@ -176,7 +176,7 @@ export default function SalesPage() {
 
   const handleDelete = async () => {
     try {
-      await deleteInvoiceFromStrapi(deleteTarget.id);
+      await deleteInvoiceFromStrapi(deleteTarget.documentId);
       toast.success("فاکتور حذف شد");
       setDeleteTarget(null);
       await loadData();
@@ -202,8 +202,8 @@ export default function SalesPage() {
   };
 
   const columns = [
-    { header: "شماره", render: (row) => row.invoice_number },
-    { header: "مشتری", render: (row) => row.customer?.full_name },
+    { header: "شماره", render: (row) => row.invoiceNumber },
+    { header: "مشتری", render: (row) => row.customerName },
     { header: "تاریخ", render: (row) => formatJalaliDate(row.date) },
     { header: "مبلغ", render: (row) => formatCurrency(row.totalAmount || 0) },
     {

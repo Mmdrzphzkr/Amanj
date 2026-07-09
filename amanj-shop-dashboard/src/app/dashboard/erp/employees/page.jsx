@@ -37,7 +37,7 @@ export default function EmployeesPage() {
   const activeEmployees = employees.filter((e) => e.active !== false);
 
   const openNew = () => { setForm(emptyForm); setEditing(null); setShowForm(true); };
-  const openEdit = (emp) => { setForm({ ...emp }); setEditing(emp.id); setShowForm(true); };
+  const openEdit = (emp) => { setForm({ ...emp }); setEditing(emp.documentId); setShowForm(true); };
 
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error('نام الزامی است'); return; }
@@ -51,7 +51,7 @@ export default function EmployeesPage() {
   };
 
   const handleDelete = async () => {
-    try { await deleteEmployeeFromStrapi(deleteTarget.id); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
+    try { await deleteEmployeeFromStrapi(deleteTarget.documentId); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
     catch (e) { toast.error('خطا: ' + e.message); }
   };
 

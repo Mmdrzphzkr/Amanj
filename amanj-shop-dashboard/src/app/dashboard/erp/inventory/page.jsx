@@ -37,7 +37,7 @@ export default function InventoryPage() {
   const criticalCount = products.filter((p) => Number(p.stock) <= Number(p.minStock)).length;
 
   const openNew = () => { setForm(emptyForm); setEditing(null); setShowForm(true); };
-  const openEdit = (p) => { setForm({ ...p }); setEditing(p.id); setShowForm(true); };
+  const openEdit = (p) => { setForm({ ...p }); setEditing(p.documentId); setShowForm(true); };
 
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error('نام کالا الزامی است'); return; }
@@ -51,7 +51,7 @@ export default function InventoryPage() {
   };
 
   const handleDelete = async () => {
-    try { await deleteProductFromStrapi(deleteTarget.id); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
+    try { await deleteProductFromStrapi(deleteTarget.documentId); toast.success('حذف شد'); setDeleteTarget(null); await loadData(); }
     catch (e) { toast.error('خطا: ' + e.message); }
   };
 
