@@ -42,7 +42,7 @@ function normalizeInvoiceRecord(item) {
     id: item?.documentId || item?.id,
     documentId: item?.documentId || item?.id,
     invoiceNumber: attrs.invoice_number || "",
-    date: attrs.issue_date || attrs.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+    date: attrs.issue_date?.slice(0, 10) || attrs.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
     customerName: attrs.customer?.full_name || "—",
     customerPhone: attrs.customer?.phone || "",
     items: (attrs.items || []).map((it) => ({
@@ -98,7 +98,7 @@ function normalizeRepairRecord(item) {
     id: item?.documentId || item?.id,
     documentId: item?.documentId || item?.id,
     repairNumber: item?.repair_number || "",
-    date: item?.date || item?.createdAt?.slice(0, 10) || "",
+    date: item?.date?.slice(0, 10) || item?.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
     customerName: item?.customer?.full_name || "—",
     customerPhone: item?.customer?.phone || "",
     brand: item?.brand || "",
@@ -106,8 +106,8 @@ function normalizeRepairRecord(item) {
     serialNumber: item?.serial_number || "",
     problem: item?.problem || "",
     technician: item?.technician || "",
-    receivedDate: item?.received_date || "",
-    deliveryDate: item?.delivery_date || "",
+    receivedDate: item?.received_date?.slice(0, 10) || "",
+    deliveryDate: item?.delivery_date?.slice(0, 10) || "",
     items: (item?.items || []).map((it) => ({
       id: it.documentId || it.id,
       name: it.name || "",
@@ -133,7 +133,7 @@ function normalizeCommissionRecord(item) {
     type: item?.type || "invoice",
     reference: item?.reference || "",
     amount: Number(item?.amount || 0),
-    date: item?.date || item?.createdAt?.slice(0, 10) || "",
+    date: item?.date?.slice(0, 10) || item?.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
     description: item?.description || "",
   };
 }
@@ -150,7 +150,7 @@ function normalizePayrollRecord(item) {
     bonus: Number(item?.bonus || 0),
     deduction: Number(item?.deduction || 0),
     totalSalary: Number(item?.total_salary || 0),
-    date: item?.date || item?.createdAt?.slice(0, 10) || "",
+    date: item?.date?.slice(0, 10) || item?.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
     statuses: item?.statuses || "paid",
     note: item?.note || "",
     createdAt: toPersianDate(item?.createdAt),
