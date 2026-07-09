@@ -42,7 +42,7 @@ function normalizeInvoiceRecord(item) {
     id: item?.documentId || item?.id,
     documentId: item?.documentId || item?.id,
     invoiceNumber: attrs.invoice_number || "",
-    date: attrs.issue_date || attrs.createdAt?.slice(0, 10) || "",
+    date: attrs.issue_date || attrs.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
     customerName: attrs.customer?.full_name || "—",
     customerPhone: attrs.customer?.phone || "",
     items: (attrs.items || []).map((it) => ({

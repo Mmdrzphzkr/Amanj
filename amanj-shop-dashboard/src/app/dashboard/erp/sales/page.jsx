@@ -128,7 +128,7 @@ export default function SalesPage() {
     setForm({
       documentId: invoice.documentId,
       invoiceNumber: invoice.invoiceNumber,
-      date: invoice.date,
+      date: invoice.date || new Date().toISOString().slice(0, 10),
       customerName: invoice.customerName,
       customerPhone: invoice.customerPhone || "",
       items: invoice.items?.length

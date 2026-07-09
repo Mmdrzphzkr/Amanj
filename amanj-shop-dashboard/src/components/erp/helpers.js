@@ -50,9 +50,10 @@ export function formatJalaliDate(dateStr) {
   if (!dateStr) return '—';
   try {
     const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '—';
     const j = toJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
     return `${j.year}/${String(j.month).padStart(2, '0')}/${String(j.day).padStart(2, '0')}`;
-  } catch { return dateStr; }
+  } catch { return '—'; }
 }
 
 export function getTodayJalali() {
