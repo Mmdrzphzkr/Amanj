@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useErp } from '@/context/ErpContext';
-import { getRepairsFromStrapi, createRepairInStrapi, updateRepairInStrapi, deleteRepairFromStrapi } from '../erpApi';
+import { getRepairsFromStrapi, createRepairInStrapi, updateRepairInStrapi, deleteRepairFromStrapi, getEmployeesFromStrapi } from '../erpApi';
 import PageHeader from '@/components/erp/PageHeader';
 import StatCard from '@/components/erp/StatCard';
 import Table from '@/components/erp/Table';
@@ -29,6 +29,7 @@ const emptyForm = {
 export default function RepairsPage() {
   const { state } = useErp();
   const [repairs, setRepairs] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [showForm, setShowForm] = useState(false);
@@ -41,12 +42,14 @@ export default function RepairsPage() {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    try { setLoading(true); const data = await getRepairsFromStrapi(); setRepairs(data); }
+    try {
+      setLoading(true);
+      const [data, emps] = await Promise.all([getRepairsFromStrapi(), getEmployeesFromStrapi()]);
+      setRepairs(data); setEmployees(emps);
+    }
     catch (e) { toast.error('خطا در بارگذاری تعمیرات: ' + e.message); }
     finally { setLoading(false); }
   };
-
-  const employees = state.employees || [];
   const filtered = filter === 'all' ? repairs : repairs.filter((r) => r.statuses === filter);
   const totalRevenue = repairs.reduce((s, r) => s + Number(r.totalCost || 0), 0);
   const pendingCount = repairs.filter((r) => r.statuses === 'pending' || r.statuses === 'in_progress').length;
