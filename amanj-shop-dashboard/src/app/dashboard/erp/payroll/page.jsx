@@ -8,6 +8,7 @@ import Modal from '@/components/erp/Modal';
 import Table from '@/components/erp/Table';
 import Button from '@/components/erp/Button';
 import { formatCurrency, getTodayJalali } from '@/components/erp/helpers';
+import ConfirmDialog from '@/components/erp/ConfirmDialog';
 import toast from 'react-hot-toast';
 
 export default function PayrollPage() {
@@ -18,6 +19,7 @@ export default function PayrollPage() {
   const [showGenerator, setShowGenerator] = useState(false);
   const [showDetail, setShowDetail] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [bonusMap, setBonusMap] = useState({});
   const [deductionMap, setDeductionMap] = useState({});
 
@@ -38,8 +40,9 @@ export default function PayrollPage() {
   };
 
   const getEmployeeCommissions = (empId) => commissions.filter((c) => String(c.employeeId) === String(empId));
+  const getCommissionTotal = (empId, type) => getEmployeeCommissions(empId).filter((c) => !type || c.type === type).reduce((s, c) => s + Number(c.amount || 0), 0);
   const calcFinalSalary = (emp) => {
-    const base = Number(emp.baseSalary || 0);
+    const base = emp.salaryType === 'commission_only' ? 0 : Number(emp.baseSalary || 0);
     const totalComm = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
     const bonus = Number(bonusMap[emp.id]?.bonus || 0);
     const deduction = Number(deductionMap[emp.id]?.deduction || 0);
@@ -58,7 +61,7 @@ export default function PayrollPage() {
         await createPayrollInStrapi({
           employeeId: emp.id,
           period,
-          baseSalary: Number(emp.baseSalary || 0),
+          baseSalary: emp.salaryType === 'commission_only' ? 0 : Number(emp.baseSalary || 0),
           commissionTotal: getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0),
           bonus: Number(bonusMap[emp.id]?.bonus || 0),
           deduction: Number(deductionMap[emp.id]?.deduction || 0),
@@ -74,6 +77,11 @@ export default function PayrollPage() {
     finally { setSaving(false); }
   };
 
+  const handleDelete = async () => {
+    try { await deletePayrollFromStrapi(deleteTarget.documentId); toast.success('فیش حقوقی حذف شد'); setDeleteTarget(null); await loadData(); }
+    catch (e) { toast.error('خطا: ' + e.message); }
+  };
+
   const columns = [
     { header: 'کارگر', accessor: 'employeeName' },
     { header: 'دوره', accessor: 'period' },
@@ -83,7 +91,12 @@ export default function PayrollPage() {
     { header: 'کسورات', render: (row) => formatCurrency(row.deduction || 0) },
     { header: 'خالص', render: (row) => <strong style={{ color: 'var(--accent)' }}>{formatCurrency(row.totalSalary)}</strong> },
     { header: 'تاریخ', render: (row) => row.date?.slice(0, 10) || '—' },
-    { header: '', render: (row) => <button onClick={(e) => { e.stopPropagation(); setShowDetail(row); }} className="btn-ghost" style={{ padding: '4px 8px', fontSize: 12 }}>📋</button> },
+    { header: 'عملیات', render: (row) => (
+      <div style={{ display: 'flex', gap: 4 }}>
+        <button onClick={(e) => { e.stopPropagation(); setShowDetail(row); }} className="btn-ghost" style={{ padding: '4px 8px', fontSize: 12 }}>📋</button>
+        <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(row); }} className="btn-ghost" style={{ padding: '4px 8px', fontSize: 12, color: 'var(--danger)' }}>🗑️</button>
+      </div>
+    )},
   ];
 
   return (
@@ -125,13 +138,25 @@ export default function PayrollPage() {
             <tbody>
               {employees.map((emp, idx) => {
                 const commTotal = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
+                const invComm = getCommissionTotal(emp.id, 'invoice');
+                const repComm = getCommissionTotal(emp.id, 'repair');
                 const finalSalary = calcFinalSalary(emp);
                 return (
                   <tr key={emp.id} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{idx + 1}</td>
-                    <td style={{ padding: '8px 12px', fontWeight: 600 }}>{emp.name}</td>
-                    <td style={{ padding: '8px 12px', textAlign: 'center' }}>{formatCurrency(emp.baseSalary || 0)}</td>
-                    <td style={{ padding: '8px 12px', textAlign: 'center', color: 'var(--info)' }}>{formatCurrency(commTotal)}</td>
+                    <td style={{ padding: '8px 12px', fontWeight: 600 }}>
+                      {emp.name}
+                      <span style={{ color: 'var(--text-muted)', fontSize: 11, marginRight: 4 }}>
+                        ({emp.salaryType === 'commission_only' ? 'فقط کمیسیون' : emp.salaryType === 'daily' ? 'روزانه' : emp.salaryType === 'monthly' ? 'ماهانه' : 'پیمانی'})
+                      </span>
+                    </td>
+                    <td style={{ padding: '8px 12px', textAlign: 'center' }}>{emp.salaryType === 'commission_only' ? <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>—</span> : formatCurrency(emp.baseSalary || 0)}</td>
+                    <td style={{ padding: '8px 12px', textAlign: 'center', color: 'var(--info)' }}>
+                      <div>{formatCurrency(commTotal)}</div>
+                      {commTotal > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                        فاکتور: {formatCurrency(invComm)} | تعمیر: {formatCurrency(repComm)}
+                      </div>}
+                    </td>
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>
                       <input type="number" className="input-field" style={{ width: 80, padding: '4px 8px', fontSize: 12, textAlign: 'center' }}
                         value={bonusMap[emp.id]?.bonus || 0}
@@ -165,8 +190,17 @@ export default function PayrollPage() {
             <div className="form-grid">
               <div><strong style={{ color: 'var(--text-secondary)' }}>کارگر:</strong> {showDetail.employeeName}</div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>دوره:</strong> {showDetail.period}</div>
-              <div><strong style={{ color: 'var(--text-secondary)' }}>حقوق پایه:</strong> {formatCurrency(showDetail.baseSalary)}</div>
+              <div><strong style={{ color: 'var(--text-secondary)' }}>حقوق پایه:</strong> {showDetail.baseSalary > 0 ? formatCurrency(showDetail.baseSalary) : <span style={{ color: 'var(--text-muted)' }}>—</span>}</div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>کمیسیون:</strong> {formatCurrency(showDetail.commissionTotal || 0)}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: -8 }}>
+                {(() => {
+                  const empComms = getEmployeeCommissions(showDetail.employeeId);
+                  const invC = empComms.filter(c => c.type === 'invoice').reduce((s, c) => s + Number(c.amount || 0), 0);
+                  const repC = empComms.filter(c => c.type === 'repair').reduce((s, c) => s + Number(c.amount || 0), 0);
+                  if (!invC && !repC) return null;
+                  return `فاکتور: ${formatCurrency(invC)} | تعمیر: ${formatCurrency(repC)}`;
+                })()}
+              </div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>پاداش:</strong> {formatCurrency(showDetail.bonus || 0)}</div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>کسورات:</strong> {formatCurrency(showDetail.deduction || 0)}</div>
             </div>
@@ -177,6 +211,9 @@ export default function PayrollPage() {
           </div>
         )}
       </Modal>
+
+      <ConfirmDialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete}
+        message={`آیا از حذف فیش حقوقی ${deleteTarget?.employeeName || ''} (${deleteTarget?.period || ''}) اطمینان دارید؟`} />
     </div>
   );
 }

@@ -110,6 +110,7 @@ export const salaryTypes = [
   { value: 'daily', label: 'روزانه' },
   { value: 'monthly', label: 'ماهانه' },
   { value: 'contract', label: 'پیمانی' },
+  { value: 'commission_only', label: 'فقط کمیسیون' },
 ];
 
 export const productCategories = [
