@@ -49,13 +49,13 @@ export default function TechnicalServiceReservation() {
 
   useEffect(() => {
     // fetch services from Strapi
-    const STRAPI =
+    const STRAPI_URL =
       process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
     const load = async () => {
       setLoadingServices(true);
       try {
         const res = await fetch(
-          `${STRAPI}/api/services?pagination[pageSize]=100&sort=order:asc`,
+          `${STRAPI_URL}/api/services?pagination[pageSize]=100&sort=order:asc`,
         );
         if (!res.ok) return;
         const json = await res.json();
@@ -97,12 +97,12 @@ export default function TechnicalServiceReservation() {
   // Load logo image from Strapi public-gallery (look for item named 'teknicaservice')
   // const [logoUrl, setLogoUrl] = useState(null);
   useEffect(() => {
-    const STRAPI =
+    const STRAPI_URL =
       process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
     const loadLogo = async () => {
       try {
         const res = await fetch(
-          `${STRAPI}/api/public-galleries?pagination[pageSize]=100`,
+          `${STRAPI_URL}/api/public-galleries?pagination[pageSize]=100`,
         );
         if (!res.ok) return;
         const json = await res.json();
@@ -127,7 +127,7 @@ export default function TechnicalServiceReservation() {
               }
             }
             // if (url) {
-            //   setLogoUrl(url.startsWith("http") ? url : STRAPI + url);
+            //   setLogoUrl(url.startsWith("http") ? url : STRAPI_URL + url);
             //   return;
             // }
           }
