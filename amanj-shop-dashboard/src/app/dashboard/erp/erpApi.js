@@ -3,7 +3,13 @@ const STRAPI_URL =
 const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || "";
 
 async function strapiRequest(path, options = {}) {
-  const response = await fetch(`${STRAPI_URL}/api${path}`, {
+  const url = `${STRAPI_URL}/api${path}`;
+  const bodyStr = options.body ? JSON.stringify(options.body) : undefined;
+
+  console.log(`[API] ${options.method || "GET"} ${url}`);
+  if (bodyStr) console.log("[API] Request body:", bodyStr);
+
+  const response = await fetch(url, {
     method: options.method || "GET",
     credentials: "include",
     headers: {
@@ -11,15 +17,22 @@ async function strapiRequest(path, options = {}) {
       ...(STRAPI_TOKEN ? { Authorization: `Bearer ${STRAPI_TOKEN}` } : {}),
       ...(options.headers || {}),
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: bodyStr,
   });
 
-  const payload = await response.json().catch(() => null);
+  const responseText = await response.text().catch(() => null);
+  console.log(`[API] Response status: ${response.status}`);
+  console.log(`[API] Response body: ${responseText}`);
+
+  let payload = null;
+  try {
+    payload = responseText ? JSON.parse(responseText) : null;
+  } catch { payload = null; }
 
   if (!response.ok) {
-    throw new Error(
-      payload?.error?.message || "درخواست به استرپی با خطا مواجه شد",
-    );
+    const msg = payload?.error?.message || payload?.error?.name || responseText || `HTTP ${response.status}`;
+    console.error(`[API] ERROR: ${msg}`);
+    throw new Error(msg);
   }
 
   return payload;
@@ -87,7 +100,7 @@ function normalizeEmployeeRecord(item) {
     name: item?.full_name || "",
     phone: item?.phone || "",
     position: item?.position || "",
-    salaryType: item?.salary_type || "monthly",
+    salaryType: item?.salaryType || item?.salary_type || "monthly",
     baseSalary: Number(item?.base_salary || 0),
     active: item?.active !== false,
   };
@@ -354,14 +367,19 @@ export async function getRepairsFromStrapi() {
 }
 
 export async function createRepairInStrapi(data) {
+  console.log("[createRepairInStrapi] Input data:", JSON.stringify(data, null, 2));
+
   let customerId = null;
   if (data.customerName) {
+    console.log(`[createRepairInStrapi] Looking up customer: "${data.customerName}"`);
     const existing = await strapiRequest(
       `/customers?filters[full_name][$eq]=${encodeURIComponent(data.customerName)}&fields[0]=documentId`,
     );
     if (existing?.data?.length > 0) {
       customerId = existing.data[0].documentId;
+      console.log(`[createRepairInStrapi] Found existing customer: ${customerId}`);
     } else {
+      console.log("[createRepairInStrapi] Customer not found, creating new one");
       const custRes = await strapiRequest("/customers", {
         method: "POST",
         body: {
@@ -373,29 +391,36 @@ export async function createRepairInStrapi(data) {
         },
       });
       customerId = custRes?.data?.documentId;
+      console.log(`[createRepairInStrapi] Created customer with ID: ${customerId}`);
     }
+  } else {
+    console.log("[createRepairInStrapi] No customerName provided, customerId = null");
   }
+
+  const body = {
+    data: {
+      repair_number: data.repairNumber || `SRV-${Date.now()}`,
+      date: data.date || new Date().toISOString().slice(0, 10),
+      customer: customerId,
+      brand: data.brand || "",
+      model: data.model || "",
+      serial_number: data.serialNumber || "",
+      problem: data.problem || "",
+      technician: data.technician || "",
+      received__date: data.receivedDate || data.date,
+      delivery_date: data.deliveryDate || null,
+      total_cost: Number(data.totalCost || 0),
+      statuses: data.statuses || "pending",
+      note: data.note || "",
+    },
+  };
+  console.log("[createRepairInStrapi] Repair POST body:", JSON.stringify(body, null, 2));
 
   const repairRes = await strapiRequest("/repairs", {
     method: "POST",
-    body: {
-      data: {
-        repair_number: data.repairNumber || `SRV-${Date.now()}`,
-        date: data.date || new Date().toISOString().slice(0, 10),
-        customer: customerId,
-        brand: data.brand || "",
-        model: data.model || "",
-        serial_number: data.serialNumber || "",
-        problem: data.problem || "",
-        technician: data.technician || "",
-        received__date: data.receivedDate || data.date,
-        delivery_date: data.deliveryDate || null,
-        total_cost: Number(data.totalCost || 0),
-        statuses: data.statuses || "pending",
-        note: data.note || "",
-      },
-    },
+    body,
   });
+  console.log("[createRepairInStrapi] Response:", JSON.stringify(repairRes, null, 2));
   const repairId = repairRes?.data?.documentId;
 
   if (repairId && data.items?.length) {
@@ -566,38 +591,39 @@ export async function getEmployeesFromStrapi() {
 }
 
 export async function createEmployeeInStrapi(data) {
-  return strapiRequest("/employees", {
-    method: "POST",
-    body: {
-      data: {
-        full_name: data.name,
-        phone: data.phone || "-",
-        position: data.position || "",
-        salary_type: data.salaryType || "monthly",
-        base_salary: Number(data.baseSalary || 0),
-        active: data.active !== false,
-      },
+  console.log("[createEmployeeInStrapi] Input:", JSON.stringify(data));
+  const body = {
+    data: {
+      full_name: data.name,
+      phone: data.phone || "-",
+      position: data.position || "",
+        salaryType: data.salaryType || "monthly",
+      base_salary: Number(data.baseSalary || 0),
+      active: data.active !== false,
     },
-  });
+  };
+  console.log("[createEmployeeInStrapi] POST body:", JSON.stringify(body));
+  return strapiRequest("/employees", { method: "POST", body });
 }
 
 export async function updateEmployeeInStrapi(id, data) {
-  return strapiRequest(`/employees/${id}`, {
-    method: "PUT",
-    body: {
-      data: {
-        full_name: data.name,
-        phone: data.phone,
-        position: data.position,
-        salary_type: data.salaryType,
-        base_salary: Number(data.baseSalary || 0),
-        active: data.active !== false,
-      },
+  console.log("[updateEmployeeInStrapi] Input:", JSON.stringify(data));
+  const body = {
+    data: {
+      full_name: data.name,
+      phone: data.phone,
+      position: data.position,
+      salary_type: data.salaryType,
+      base_salary: Number(data.baseSalary || 0),
+      active: data.active !== false,
     },
-  });
+  };
+  console.log("[updateEmployeeInStrapi] PUT body:", JSON.stringify(body));
+  return strapiRequest(`/employees/${id}`, { method: "PUT", body });
 }
 
 export async function deleteEmployeeFromStrapi(id) {
+  console.log(`[deleteEmployeeFromStrapi] id=${id}`);
   return strapiRequest(`/employees/${id}`, { method: "DELETE" });
 }
 
