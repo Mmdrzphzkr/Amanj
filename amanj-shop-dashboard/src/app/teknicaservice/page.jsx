@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import {
@@ -18,8 +19,11 @@ import {
 } from "@mui/material";
 import { toast } from "react-hot-toast";
 import MobileNav from "@/components/MobileNav/MobileNav";
+import { fetchPublicGallery } from "@/redux/slices/publicGallerySlice";
 
 export default function TechnicalServiceReservation() {
+  const dispatch = useDispatch();
+  const publicGallery = useSelector((s) => s.publicGallery.items || []);
   const [form, setForm] = useState({
     name: "",
     lastname: "",
@@ -38,6 +42,10 @@ export default function TechnicalServiceReservation() {
   const [loadingServices, setLoadingServices] = useState(true);
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+  useEffect(() => {
+    dispatch(fetchPublicGallery());
+  }, [dispatch]);
 
   useEffect(() => {
     // fetch services from Strapi
