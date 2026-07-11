@@ -58,10 +58,10 @@ export default function RepairsPage() {
 
   const openEdit = (repair) => {
     setForm({
-      documentId: repair.documentId, repairNumber: repair.repairNumber, date: repair.date, customerName: repair.customerName,
+      documentId: repair.documentId, repairNumber: repair.repairNumber, date: repair.date?.slice(0, 10) || new Date().toISOString().slice(0, 10), customerName: repair.customerName,
       customerPhone: repair.customerPhone || '', brand: repair.brand || '', model: repair.model || '',
       serialNumber: repair.serialNumber || '', problem: repair.problem || '', technician: repair.technician || '',
-      receivedDate: repair.receivedDate || repair.date, deliveryDate: repair.deliveryDate || '',
+      receivedDate: repair.receivedDate?.slice(0, 10) || repair.date?.slice(0, 10) || new Date().toISOString().slice(0, 10), deliveryDate: repair.deliveryDate?.slice(0, 10) || '',
       items: repair.items?.length ? repair.items : [{ ...emptyItem, id: Date.now().toString() }],
       totalCost: repair.totalCost, statuses: repair.statuses, note: repair.note || '',
     });
@@ -98,7 +98,7 @@ export default function RepairsPage() {
   const removeItem = (id) => setForm({ ...form, items: form.items.filter((it) => it.id !== id) });
   const updateItem = (id, field, value) => setForm({ ...form, items: form.items.map((it) => it.id === id ? { ...it, [field]: value } : it) });
 
-  const statusLabels = { pending: 'در انتظار', in_progress: 'در حال تعمیر', completed: 'تکمیل شده', delivered: 'تحویل شده', cancelled: 'لغو شده' };
+  const statusLabels = { pending: 'در انتظار', in_progress: 'در حال تعمیر', completed: 'تکمیل شده', delivered: 'تحویل شده', canceled: 'لغو شده' };
 
   const columns = [
     { header: 'شماره', accessor: 'repairNumber' },
@@ -124,7 +124,7 @@ export default function RepairsPage() {
       <PageHeader title="مدیریت تعمیرات" subtitle="ERP • تعمیرات" actions={<Button onClick={openNew}>+ ثبت تعمیر جدید</Button>} />
 
       <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
-        {['all', 'pending', 'in_progress', 'completed', 'delivered', 'cancelled'].map((f) => (
+        {['all', 'pending', 'in_progress', 'completed', 'delivered', 'canceled'].map((f) => (
           <button key={f} onClick={() => setFilter(f)} style={{
             padding: '6px 14px', borderRadius: 'var(--radius-md)', fontSize: 13, fontWeight: 600,
             background: filter === f ? 'var(--accent-dim)' : 'transparent',

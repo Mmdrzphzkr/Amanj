@@ -15,35 +15,33 @@ export function formatNumber(num) {
 }
 
 export function toJalali(gy, gm, gd) {
-  const gdm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-  let gy2 = (gm > 2) ? (gy + 1) : gy;
-  let days = 355666 + (365 * gy) + ~~((gy + 3) / 4) - ~~((gy + 99) / 100) + ~~((gy + 399) / 400) + gd + gdm[gm - 1];
-  days -= (gy - 1600) - 1;
-  days -= (gy2 - 1600) - 1;
-  days += (gy2 - 1600) / 4 | 0;
-  days -= (gy2 - 1600) / 100 | 0;
-  days += (gy2 - 1600) / 400 | 0;
-  days -= 100;
-  let jy = 0, jm = 0, jd = 0;
-  jy = 1177;
-  days -= 1;
+  const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  const j_d_m = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+
+  gy -= 1600;
+  gm -= 1;
+
+  let g_day_no = 365 * gy + ~~((gy + 3) / 4) - ~~((gy + 99) / 100) + ~~((gy + 399) / 400);
+  g_day_no += g_d_m[gm] + gd;
+  if (gm > 1 && ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0))) ++g_day_no;
+
+  let j_day_no = g_day_no - 80;
+  let j_np = ~~(j_day_no / 12053);
+  j_day_no %= 12053;
+  let jy = 979 + 33 * j_np + 4 * ~~(j_day_no / 1461);
+  j_day_no %= 1461;
+
+  if (j_day_no >= 366) {
+    jy += ~~((j_day_no - 1) / 365);
+    j_day_no = (j_day_no - 1) % 365;
+  }
+
   let i;
-  for (i = 0; i < 1200; i++) {
-    const yearDays = (jy % 4 === 3) ? 366 : 365;
-    if (days < yearDays) break;
-    days -= yearDays;
-    jy++;
+  for (i = 0; i < 11 && j_day_no >= j_d_m[i]; ++i) {
+    j_day_no -= j_d_m[i];
   }
-  const jmDays = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
-  if (jy % 4 === 3) jmDays[11] = 30;
-  for (i = 0; i < 12; i++) {
-    if (days < jmDays[i]) break;
-    days -= jmDays[i];
-    jm++;
-  }
-  jm++;
-  jd = days + 1;
-  return { year: jy, month: jm, day: jd };
+
+  return { year: jy, month: i + 1, day: j_day_no + 1 };
 }
 
 export function formatJalaliDate(dateStr) {
@@ -78,7 +76,7 @@ export function getStatusColor(statuses) {
     pending: 'badge-blue',
     paid: 'badge-green',
     completed: 'badge-green',
-    cancelled: 'badge-red',
+    canceled: 'badge-red',
     active: 'badge-green',
     inactive: 'badge-red',
   };
@@ -89,7 +87,7 @@ export const invoiceStatuses = [
   { value: 'draft', label: 'پیش‌نویس' },
   { value: 'pending', label: 'در انتظار پرداخت' },
   { value: 'paid', label: 'پرداخت شده' },
-  { value: 'cancelled', label: 'لغو شده' },
+  { value: 'canceled', label: 'لغو شده' },
 ];
 
 export const repairStatuses = [
@@ -97,7 +95,7 @@ export const repairStatuses = [
   { value: 'in_progress', label: 'در حال تعمیر' },
   { value: 'completed', label: 'تکمیل شده' },
   { value: 'delivered', label: 'تحویل شده' },
-  { value: 'cancelled', label: 'لغو شده' },
+  { value: 'canceled', label: 'لغو شده' },
 ];
 
 export const paymentMethods = [

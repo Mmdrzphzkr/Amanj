@@ -62,7 +62,7 @@ export default function ErpDashboard() {
   const recentRepairs = [...repairs].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 5);
 
   const statusLabels = {
-    draft: 'پیش‌نویس', pending: 'در انتظار', paid: 'پرداخت شده', cancelled: 'لغو شده',
+    draft: 'پیش‌نویس', pending: 'در انتظار', paid: 'پرداخت شده', canceled: 'لغو شده',
     in_progress: 'در حال تعمیر', completed: 'تکمیل شده', delivered: 'تحویل شده',
   };
 

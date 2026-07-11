@@ -128,7 +128,7 @@ export default function SalesPage() {
     setForm({
       documentId: invoice.documentId,
       invoiceNumber: invoice.invoiceNumber,
-      date: invoice.date || new Date().toISOString().slice(0, 10),
+      date: invoice.date?.slice(0, 10) || new Date().toISOString().slice(0, 10),
       customerName: invoice.customerName,
       customerPhone: invoice.customerPhone || "",
       items: invoice.items?.length
@@ -270,7 +270,7 @@ export default function SalesPage() {
       <div
         style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}
       >
-        {["all", "draft", "pending", "paid", "cancelled"].map((f) => (
+        {["all", "draft", "pending", "paid", "canceled"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
