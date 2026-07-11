@@ -297,7 +297,7 @@ const Header = () => {
               </div>
             ))}
             {/* لینک‌های ادمین */}
-            {user?.role?.name === "Administrator" && (
+            {user?.role?.type === "admin" && (
               <>
                 <Link
                   href="/dashboard"

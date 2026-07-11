@@ -20,7 +20,7 @@ const MobileNav = () => {
         >
           <HomeIcon size={20} className="text-[#3f3f3f]" />
         </Link>
-        {user?.role?.type === "admin" && (
+        {(user?.role?.name === "Admin" || user?.role?.type === "admin") && (
           <>
             <Link
               href="/dashboard"
