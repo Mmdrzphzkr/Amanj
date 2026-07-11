@@ -38,6 +38,8 @@ export default function TechnicalServiceReservation() {
     phone: "",
     description: "",
   });
+  const STRAPI_URL =
+    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
   const [serviceOptions, setServiceOptions] = useState([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const handleChange = (e) =>
@@ -49,8 +51,6 @@ export default function TechnicalServiceReservation() {
 
   useEffect(() => {
     // fetch services from Strapi
-    const STRAPI_URL =
-      process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
     const load = async () => {
       setLoadingServices(true);
       try {
@@ -97,8 +97,6 @@ export default function TechnicalServiceReservation() {
   // Load logo image from Strapi public-gallery (look for item named 'teknicaservice')
   // const [logoUrl, setLogoUrl] = useState(null);
   useEffect(() => {
-    const STRAPI_URL =
-      process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
     const loadLogo = async () => {
       try {
         const res = await fetch(
