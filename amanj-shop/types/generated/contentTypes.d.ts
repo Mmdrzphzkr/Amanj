@@ -738,6 +738,7 @@ export interface ApiEmployeeEmployee extends Struct.CollectionTypeSchema {
   attributes: {
     active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     base_salary: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
+    commission_rate: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
     commissions: Schema.Attribute.Relation<
       'oneToMany',
       'api::commission.commission'
@@ -760,7 +761,9 @@ export interface ApiEmployeeEmployee extends Struct.CollectionTypeSchema {
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     position: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    salaryType: Schema.Attribute.Enumeration<['daily', 'monthly', 'contract']> &
+    salaryType: Schema.Attribute.Enumeration<
+      ['daily', 'monthly', 'contract', 'commission_only']
+    > &
       Schema.Attribute.DefaultTo<'monthly'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
