@@ -151,7 +151,7 @@ const Header = () => {
               </Link>
             ))}
             {/* لینک‌های ادمین — موبایل */}
-            {user?.role?.name === "Administrator" && (
+            {user?.role?.type === "admin" && (
               <>
                 <div className="text-sm text-gray-400 font-bold border-b pb-2 mt-4">
                   مدیریت
