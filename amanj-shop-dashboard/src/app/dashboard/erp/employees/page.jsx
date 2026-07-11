@@ -11,7 +11,7 @@ import ConfirmDialog from '@/components/erp/ConfirmDialog';
 import { formatCurrency, salaryTypes } from '@/components/erp/helpers';
 import toast from 'react-hot-toast';
 
-const emptyForm = { name: '', phone: '', position: '', salaryType: 'monthly', baseSalary: 0, active: true };
+const emptyForm = { name: '', phone: '', position: '', salaryType: 'monthly', baseSalary: 0, commissionRate: 0, active: true };
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
@@ -115,6 +115,7 @@ export default function EmployeesPage() {
           <Input label="سمت" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} />
           <Select label="نوع حقوق" options={salaryTypes} value={form.salaryType} onChange={(e) => setForm({ ...form, salaryType: e.target.value })} />
           <Input label="حقوق پایه" type="number" value={form.baseSalary} onChange={(e) => setForm({ ...form, baseSalary: Number(e.target.value) })} />
+          <Input label="نرخ کمیسیون تعمیرات (%)" type="number" step="0.1" value={form.commissionRate} onChange={(e) => setForm({ ...form, commissionRate: Number(e.target.value) })} placeholder="مثال: 15 برای ۱۵٪" />
           <div className="form-group">
             <label className="label">فعال</label>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', paddingTop: 8 }}>

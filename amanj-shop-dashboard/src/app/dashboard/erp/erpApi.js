@@ -89,6 +89,7 @@ function normalizeEmployeeRecord(item) {
     position: item?.position || "",
     salaryType: item?.salaryType || item?.salary_type || "monthly",
     baseSalary: Number(item?.base_salary || 0),
+    commissionRate: Number(item?.commission_rate || 0),
     active: item?.active !== false,
   };
 }
@@ -575,6 +576,7 @@ export async function createEmployeeInStrapi(data) {
         position: data.position || "",
         salaryType: data.salaryType || "monthly",
         base_salary: Number(data.baseSalary || 0),
+        commission_rate: Number(data.commissionRate || 0),
         active: data.active !== false,
       },
     },
@@ -591,6 +593,7 @@ export async function updateEmployeeInStrapi(id, data) {
         position: data.position,
         salaryType: data.salaryType,
         base_salary: Number(data.baseSalary || 0),
+        commission_rate: Number(data.commissionRate || 0),
         active: data.active !== false,
       },
     },

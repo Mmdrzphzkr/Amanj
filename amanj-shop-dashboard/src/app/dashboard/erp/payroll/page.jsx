@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getPayrollsFromStrapi, createPayrollInStrapi, deletePayrollFromStrapi, getEmployeesFromStrapi, getCommissionsFromStrapi } from '../erpApi';
+import { getPayrollsFromStrapi, createPayrollInStrapi, deletePayrollFromStrapi, getEmployeesFromStrapi, getCommissionsFromStrapi, getRepairsFromStrapi } from '../erpApi';
 import PageHeader from '@/components/erp/PageHeader';
 import StatCard from '@/components/erp/StatCard';
 import Modal from '@/components/erp/Modal';
@@ -15,6 +15,7 @@ export default function PayrollPage() {
   const [payrolls, setPayrolls] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [commissions, setCommissions] = useState([]);
+  const [repairs, setRepairs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showGenerator, setShowGenerator] = useState(false);
   const [showDetail, setShowDetail] = useState(null);
@@ -26,9 +27,23 @@ export default function PayrollPage() {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    try { setLoading(true); const [p, e, c] = await Promise.all([getPayrollsFromStrapi(), getEmployeesFromStrapi(), getCommissionsFromStrapi()]); setPayrolls(p); setEmployees(e.filter((emp) => emp.active !== false)); setCommissions(c); }
-    catch (err) { toast.error('خطا در بارگذاری: ' + err.message); }
-    finally { setLoading(false); }
+    try {
+      setLoading(true);
+      const [p, e, c, r] = await Promise.all([
+        getPayrollsFromStrapi(),
+        getEmployeesFromStrapi(),
+        getCommissionsFromStrapi(),
+        getRepairsFromStrapi(),
+      ]);
+      setPayrolls(p);
+      setEmployees(e.filter((emp) => emp.active !== false));
+      setCommissions(c);
+      setRepairs(r);
+    } catch (err) {
+      toast.error("خطا در بارگذاری: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const totalPaid = payrolls.reduce((s, p) => s + Number(p.totalSalary || 0), 0);
@@ -41,9 +56,25 @@ export default function PayrollPage() {
 
   const getEmployeeCommissions = (empId) => commissions.filter((c) => String(c.employeeId) === String(empId));
   const getCommissionTotal = (empId, type) => getEmployeeCommissions(empId).filter((c) => !type || c.type === type).reduce((s, c) => s + Number(c.amount || 0), 0);
+
+  // Calculate repair commissions for an employee based on repairs where they were the technician
+  const getRepairCommissions = (emp) => {
+    if (!emp.commissionRate || emp.commissionRate === 0) return 0;
+    const empName = emp.name;
+    return repairs
+      .filter((repair) => repair.technician === empName && (repair.statuses === 'completed' || repair.statuses === 'delivered'))
+      .reduce((sum, repair) => {
+        // Calculate commission from labor cost of repair items
+        const totalLabor = repair.items.reduce((s, item) => s + Number(item.laborCost || 0) * Number(item.quantity || 1), 0);
+        return sum + (totalLabor * emp.commissionRate) / 100;
+      }, 0);
+  };
+
   const calcFinalSalary = (emp) => {
     const base = emp.salaryType === 'commission_only' ? 0 : Number(emp.baseSalary || 0);
-    const totalComm = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
+    const manualCommTotal = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
+    const repairCommTotal = getRepairCommissions(emp);
+    const totalComm = manualCommTotal + repairCommTotal;
     const bonus = Number(bonusMap[emp.id]?.bonus || 0);
     const deduction = Number(deductionMap[emp.id]?.deduction || 0);
     return base + totalComm + bonus - deduction;
@@ -58,11 +89,13 @@ export default function PayrollPage() {
         if (finalSalary <= 0) continue;
         const exists = payrolls.find((p) => String(p.employeeId) === String(emp.id) && p.period === period);
         if (exists) continue;
+        const manualCommTotal = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
+        const repairCommTotal = getRepairCommissions(emp);
         await createPayrollInStrapi({
           employeeId: emp.id,
           period,
           baseSalary: emp.salaryType === 'commission_only' ? 0 : Number(emp.baseSalary || 0),
-          commissionTotal: getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0),
+          commissionTotal: manualCommTotal + repairCommTotal,
           bonus: Number(bonusMap[emp.id]?.bonus || 0),
           deduction: Number(deductionMap[emp.id]?.deduction || 0),
           totalSalary: finalSalary,
@@ -137,9 +170,11 @@ export default function PayrollPage() {
             </thead>
             <tbody>
               {employees.map((emp, idx) => {
-                const commTotal = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
+                const manualCommTotal = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
                 const invComm = getCommissionTotal(emp.id, 'invoice');
-                const repComm = getCommissionTotal(emp.id, 'repair');
+                const repCommManual = getCommissionTotal(emp.id, 'repair');
+                const repairCommAuto = getRepairCommissions(emp);
+                const totalComm = manualCommTotal + repairCommAuto;
                 const finalSalary = calcFinalSalary(emp);
                 return (
                   <tr key={emp.id} style={{ borderBottom: '1px solid var(--border)' }}>
@@ -152,9 +187,9 @@ export default function PayrollPage() {
                     </td>
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>{emp.salaryType === 'commission_only' ? <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>—</span> : formatCurrency(emp.baseSalary || 0)}</td>
                     <td style={{ padding: '8px 12px', textAlign: 'center', color: 'var(--info)' }}>
-                      <div>{formatCurrency(commTotal)}</div>
-                      {commTotal > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-                        فاکتور: {formatCurrency(invComm)} | تعمیر: {formatCurrency(repComm)}
+                      <div>{formatCurrency(totalComm)}</div>
+                      {totalComm > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                        فاکتور: {formatCurrency(invComm)} | تعمیر (دستی): {formatCurrency(repCommManual)} | تعمیر (خودکار): {formatCurrency(repairCommAuto)}
                       </div>}
                     </td>
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>
@@ -196,9 +231,12 @@ export default function PayrollPage() {
                 {(() => {
                   const empComms = getEmployeeCommissions(showDetail.employeeId);
                   const invC = empComms.filter(c => c.type === 'invoice').reduce((s, c) => s + Number(c.amount || 0), 0);
-                  const repC = empComms.filter(c => c.type === 'repair').reduce((s, c) => s + Number(c.amount || 0), 0);
-                  if (!invC && !repC) return null;
-                  return `فاکتور: ${formatCurrency(invC)} | تعمیر: ${formatCurrency(repC)}`;
+                  const repCManual = empComms.filter(c => c.type === 'repair').reduce((s, c) => s + Number(c.amount || 0), 0);
+                  const emp = employees.find(e => String(e.id) === String(showDetail.employeeId));
+                  const repCAuto = emp ? getRepairCommissions(emp) : 0;
+                  const totalComm = invC + repCManual + repCAuto;
+                  if (!invC && !repCManual && !repCAuto) return null;
+                  return `فاکتور: ${formatCurrency(invC)} | تعمیر (دستی): ${formatCurrency(repCManual)} | تعمیر (خودکار): ${formatCurrency(repCAuto)} | جمع: ${formatCurrency(totalComm)}`;
                 })()}
               </div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>پاداش:</strong> {formatCurrency(showDetail.bonus || 0)}</div>
