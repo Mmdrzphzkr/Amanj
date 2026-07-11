@@ -152,14 +152,14 @@ export default function RepairsPage() {
       >
         <div className="form-grid">
           <Input label="شماره تعمیر" value={form.repairNumber} onChange={(e) => setForm({ ...form, repairNumber: e.target.value })} />
-          <JalaliDatePicker value={form.date} onChange={(v) => setForm({ ...form, date: v })} />
+          <JalaliDatePicker label="تاریخ" value={form.date} onChange={(v) => setForm({ ...form, date: v })} />
           <Input label="نام مشتری" value={form.customerName} onChange={(e) => setForm({ ...form, customerName: e.target.value })} />
           <Input label="تلفن مشتری" value={form.customerPhone} onChange={(e) => setForm({ ...form, customerPhone: e.target.value })} />
           <Input label="برند دستگاه" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
           <Input label="مدل" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
           <Input label="شماره سریال" value={form.serialNumber} onChange={(e) => setForm({ ...form, serialNumber: e.target.value })} />
-          <JalaliDatePicker value={form.receivedDate} onChange={(v) => setForm({ ...form, receivedDate: v })} />
-          <JalaliDatePicker value={form.deliveryDate} onChange={(v) => setForm({ ...form, deliveryDate: v })} />
+          <JalaliDatePicker label="تاریخ دریافت" value={form.receivedDate} onChange={(v) => setForm({ ...form, receivedDate: v })} />
+          <JalaliDatePicker label="تاریخ تحویل" value={form.deliveryDate} onChange={(v) => setForm({ ...form, deliveryDate: v })} />
           <Select label="تکنسین" options={employees.filter((e) => e.active !== false).map((e) => ({ value: e.name, label: e.name }))} value={form.technician} onChange={(e) => setForm({ ...form, technician: e.target.value })} />
           <Select label="وضعیت" options={repairStatuses} value={form.statuses} onChange={(e) => setForm({ ...form, statuses: e.target.value })} />
         </div>

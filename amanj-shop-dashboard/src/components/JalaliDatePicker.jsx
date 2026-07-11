@@ -1,21 +1,13 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   toJalali, jalaliToGregorian, daysInJalaliMonth, jalaliMonths
 } from "@/components/erp/helpers";
 
-const selectStyle = {
-  width: "100%",
-  padding: "11px 14px",
-  fontSize: 14,
-  fontFamily: "Vazirmatn, sans-serif",
+const overrideStyle = {
   background: "#fff",
   color: "#1a1a2e",
-  border: "1px solid #d1d5db",
-  borderRadius: "var(--radius-md)",
-  outline: "none",
   cursor: "pointer",
-  transition: "border-color 0.15s, box-shadow 0.15s",
   WebkitAppearance: "none",
   MozAppearance: "none",
   appearance: "none",
@@ -87,24 +79,24 @@ export default function JalaliDatePicker({ value, onChange, label, ...props }) {
     dayOptions.push(d);
   }
 
-  return (
+  const selects = (
     <div style={{ display: "flex", gap: 8, width: "100%" }}>
       <div style={{ flex: 1 }}>
-        <select value={jYear} onChange={handleYearChange} style={selectStyle} {...props}>
+        <select value={jYear} onChange={handleYearChange} className="input-field" style={overrideStyle} {...props}>
           {yearOptions.map((y) => (
             <option key={y} value={y}>{y}</option>
           ))}
         </select>
       </div>
       <div style={{ flex: 1.5 }}>
-        <select value={jMonth} onChange={handleMonthChange} style={selectStyle} {...props}>
+        <select value={jMonth} onChange={handleMonthChange} className="input-field" style={overrideStyle} {...props}>
           {jalaliMonths.map((name, idx) => (
             <option key={idx + 1} value={idx + 1}>{name}</option>
           ))}
         </select>
       </div>
       <div style={{ flex: 1 }}>
-        <select value={jDay} onChange={handleDayChange} style={selectStyle} {...props}>
+        <select value={jDay} onChange={handleDayChange} className="input-field" style={overrideStyle} {...props}>
           {dayOptions.map((d) => (
             <option key={d} value={d}>{d}</option>
           ))}
@@ -112,4 +104,15 @@ export default function JalaliDatePicker({ value, onChange, label, ...props }) {
       </div>
     </div>
   );
+
+  if (label) {
+    return (
+      <div className="form-group">
+        <label className="label">{label}</label>
+        {selects}
+      </div>
+    );
+  }
+
+  return selects;
 }

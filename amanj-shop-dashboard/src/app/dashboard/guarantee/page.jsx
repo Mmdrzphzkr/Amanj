@@ -69,9 +69,8 @@ export default function GuaranteePage() {
       if (imageFile) fd.append("deviceImage", imageFile);
 
       const url = editing ? `/api/guarantees/${editing.documentId || editing.id}` : "/api/guarantees";
-      const method = editing ? "PUT" : "POST";
 
-      const res = await fetch(url, { method, body: fd });
+      const res = await fetch(url, { method: "POST", body: fd });
       if (!res.ok) {
         const err = await res.json();
         alert(err.message || "خطا در ذخیره");
@@ -89,8 +88,11 @@ export default function GuaranteePage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
+      const fd = new FormData();
+      fd.append("_method", "DELETE");
       const res = await fetch(`/api/guarantees/${deleteTarget.documentId || deleteTarget.id}`, {
-        method: "DELETE",
+        method: "POST",
+        body: fd,
       });
       if (!res.ok) {
         alert("خطا در حذف");
@@ -158,7 +160,7 @@ export default function GuaranteePage() {
         open={showModal}
         onClose={() => setShowModal(false)}
         title={editing ? "ویرایش گارانتی" : "گارانتی جدید"}
-        size="lg"
+        size="xl"
         footer={<>
           <Button variant="primary" onClick={handleSave} disabled={saving}>
             {saving ? "⏳ در حال ذخیره..." : editing ? "به‌روزرسانی" : "ثبت گارانتی"}
@@ -169,15 +171,9 @@ export default function GuaranteePage() {
         </>}
       >
         {/* اطلاعات دستگاه */}
-        <div style={{
-          background: "var(--bg-hover)", borderRadius: "var(--radius-md)",
-          padding: "12px 16px", marginBottom: 16,
-          display: "flex", alignItems: "center", gap: 8,
-        }}>
-          <span style={{ fontSize: 16 }}>📦</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" }}>
-            اطلاعات دستگاه
-          </span>
+        <div className="modal-section-header">
+          <span>📦</span>
+          <span>اطلاعات دستگاه</span>
         </div>
         <div className="form-grid" style={{ marginBottom: 20 }}>
           <Input
@@ -202,15 +198,9 @@ export default function GuaranteePage() {
         </div>
 
         {/* اطلاعات گارانتی */}
-        <div style={{
-          background: "var(--bg-hover)", borderRadius: "var(--radius-md)",
-          padding: "12px 16px", marginBottom: 16,
-          display: "flex", alignItems: "center", gap: 8,
-        }}>
-          <span style={{ fontSize: 16 }}>🛡️</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" }}>
-            اطلاعات گارانتی
-          </span>
+        <div className="modal-section-header">
+          <span>🛡️</span>
+          <span>اطلاعات گارانتی</span>
         </div>
         <div className="form-grid" style={{ marginBottom: 20 }}>
           <Select
@@ -230,32 +220,22 @@ export default function GuaranteePage() {
             required
             min="0"
           />
-          <div className="form-group">
-            <label className="label">تاریخ شروع</label>
-            <JalaliDatePicker
-              value={form.startDate}
-              onChange={(v) => setForm({ ...form, startDate: v })}
-            />
-          </div>
-          <div className="form-group">
-            <label className="label">تاریخ پایان</label>
-            <JalaliDatePicker
-              value={form.endDate}
-              onChange={(v) => setForm({ ...form, endDate: v })}
-            />
-          </div>
+          <JalaliDatePicker
+            label="تاریخ شروع"
+            value={form.startDate}
+            onChange={(v) => setForm({ ...form, startDate: v })}
+          />
+          <JalaliDatePicker
+            label="تاریخ پایان"
+            value={form.endDate}
+            onChange={(v) => setForm({ ...form, endDate: v })}
+          />
         </div>
 
         {/* تصویر دستگاه */}
-        <div style={{
-          background: "var(--bg-hover)", borderRadius: "var(--radius-md)",
-          padding: "12px 16px", marginBottom: 16,
-          display: "flex", alignItems: "center", gap: 8,
-        }}>
-          <span style={{ fontSize: 16 }}>📸</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" }}>
-            تصویر دستگاه (اختیاری)
-          </span>
+        <div className="modal-section-header">
+          <span>📸</span>
+          <span>تصویر دستگاه (اختیاری)</span>
         </div>
         <div className="form-group">
           <input

@@ -120,7 +120,7 @@ export default function CommissionsPage() {
           <Select label="نوع" options={[{ value: 'invoice', label: 'فاکتور فروش' }, { value: 'repair', label: 'تعمیرات' }]} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} />
           <Input label="مرجع" value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} placeholder="شماره فاکتور/تعمیر" />
           <Input label="مبلغ" type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })} />
-          <JalaliDatePicker value={form.date} onChange={(v) => setForm({ ...form, date: v })} />
+          <JalaliDatePicker label="تاریخ" value={form.date} onChange={(v) => setForm({ ...form, date: v })} />
           <Input label="توضیحات" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
       </Modal>

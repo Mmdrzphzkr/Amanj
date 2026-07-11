@@ -379,6 +379,7 @@ export default function SalesPage() {
             }
           />
           <JalaliDatePicker
+            label="تاریخ"
             value={form.date}
             onChange={(v) => setForm({ ...form, date: v })}
           />
