@@ -150,6 +150,28 @@ const Header = () => {
                 {h.name}
               </Link>
             ))}
+            {/* لینک‌های ادمین — موبایل */}
+            {user?.role?.name === "Administrator" && (
+              <>
+                <div className="text-sm text-gray-400 font-bold border-b pb-2 mt-4">
+                  مدیریت
+                </div>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-lg font-medium text-gray-700 hover:text-black"
+                >
+                  داشبورد
+                </Link>
+                <Link
+                  href="/dashboard/guarantee"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-lg font-medium text-gray-700 hover:text-black"
+                >
+                  گارانتی
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </div>
@@ -274,6 +296,23 @@ const Header = () => {
                 </Link>
               </div>
             ))}
+            {/* لینک‌های ادمین */}
+            {user?.role?.name === "Administrator" && (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-[#696969] text-[18px] font-[600] hover:text-black transition-colors"
+                >
+                  داشبورد
+                </Link>
+                <Link
+                  href="/dashboard/guarantee"
+                  className="text-[#696969] text-[18px] font-[600] hover:text-black transition-colors"
+                >
+                  گارانتی
+                </Link>
+              </>
+            )}
           </nav>
         </div>
 
