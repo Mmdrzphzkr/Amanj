@@ -185,19 +185,25 @@ export default function SalesPage() {
     }
   };
 
+  const calcLineTotal = (it) =>
+    Number(it.unitPrice || 0) * Number(it.quantity || 1) - Number(it.discount || 0) + Number(it.tax || 0);
+
   const addItem = () =>
     setForm({
       ...form,
-      items: [...form.items, { ...emptyItem, id: Date.now().toString() }],
+      items: [...form.items, { ...emptyItem, id: Date.now().toString(), total: 0 }],
     });
   const removeItem = (id) =>
     setForm({ ...form, items: form.items.filter((it) => it.id !== id) });
   const updateItem = (id, field, value) => {
     setForm({
       ...form,
-      items: form.items.map((it) =>
-        it.id === id ? { ...it, [field]: value } : it,
-      ),
+      items: form.items.map((it) => {
+        if (it.id !== id) return it;
+        const updated = { ...it, [field]: value };
+        updated.total = calcLineTotal(updated);
+        return updated;
+      }),
     });
   };
 
@@ -486,7 +492,7 @@ export default function SalesPage() {
                     textAlign: "center",
                   }}
                 >
-                  {item.total_price?.toLocaleString?.() || 0}
+                  {Number(item.total || 0).toLocaleString()}
                 </span>
               </div>
               <button
