@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import JalaliDatePicker from "@/components/JalaliDatePicker";
 import AuthHelper from "@/helpers/authHelper";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
@@ -258,31 +259,22 @@ function AddGuaranteeContent() {
                     fullWidth
                   />
 
-                  <TextField
-                    type="date"
-                    label="تاریخ شروع"
-                    name="startDate"
-                    value={form.startDate}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                  />
-
-                  {/* فیلد جدید تاریخ پایان */}
-                  <TextField
-                    type="date"
-                    label="تاریخ پایان"
-                    name="endDate"
-                    value={form.endDate}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                    helperText="تاریخی که گارانتی به پایان می‌رسد"
-                  />
+                  <Box>
+                    <Typography sx={{ mb: 0.5, fontSize: "0.85rem", color: "text.secondary" }}>تاریخ شروع</Typography>
+                    <JalaliDatePicker
+                      value={form.startDate}
+                      onChange={(v) => setForm({ ...form, startDate: v })}
+                      disabled={loading}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography sx={{ mb: 0.5, fontSize: "0.85rem", color: "text.secondary" }}>تاریخ پایان</Typography>
+                    <JalaliDatePicker
+                      value={form.endDate}
+                      onChange={(v) => setForm({ ...form, endDate: v })}
+                      disabled={loading}
+                    />
+                  </Box>
 
                   <TextField
                     label="شماره موبایل مشتری"

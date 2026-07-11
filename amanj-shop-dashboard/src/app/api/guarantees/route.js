@@ -5,10 +5,30 @@ const STRAPI_URL = (
     process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
   ).replace(/\/+$/, "");
 
+async function getToken() {
+  const cookieStore = cookies();
+  return cookieStore.get("strapi_jwt")?.value;
+}
+
+export async function GET() {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${STRAPI_URL}/api/guarantees?populate=*&sort[0]=createdAt:desc`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      return NextResponse.json({ message: "Failed to fetch guarantees" }, { status: 500 });
+    }
+    const json = await res.json();
+    return NextResponse.json(json);
+  } catch (error) {
+    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
+  }
+}
+
 export async function POST(req) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("strapi_jwt")?.value;
+    const token = await getToken();
     const formData = await req.formData();
 
     const serialNumber = formData.get("serialNumber")?.toString().trim();
@@ -16,117 +36,75 @@ export async function POST(req) {
     const customerPhoneNumber = formData.get("customerPhoneNumber")?.toString().trim();
     const warrantyDuration = Number(formData.get("warrantyDuration"));
     const warrantyType = formData.get("warrantyType")?.toString().trim();
+    const startDate = formData.get("startDate")?.toString().trim();
+    const endDate = formData.get("endDate")?.toString().trim();
     const deviceImage = formData.get("deviceImage");
 
     if (!serialNumber || !deviceName || !customerPhoneNumber || !warrantyDuration || !warrantyType) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
     if (!["Normal", "VIP"].includes(warrantyType)) {
-      return NextResponse.json(
-        { message: "Invalid warranty type" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Invalid warranty type" }, { status: 400 });
     }
 
-    // 1) check duplicate serial
     const existsRes = await fetch(
       `${STRAPI_URL}/api/guarantees?filters[serialNumber][$eq]=${encodeURIComponent(serialNumber)}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        }, cache: "no-store"
-      }
+      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
     );
-
     const existsJson = await existsRes.json();
     if (existsJson?.data?.length > 0) {
-      return NextResponse.json(
-        { message: "Serial number already exists" },
-        { status: 409 }
-      );
+      return NextResponse.json({ message: "Serial number already exists" }, { status: 409 });
     }
 
-    const startDate = new Date();
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + warrantyDuration);
+    const effectiveStart = startDate || new Date().toISOString().slice(0, 10);
+    const effectiveEnd = endDate || (() => {
+      const d = new Date();
+      d.setMonth(d.getMonth() + warrantyDuration);
+      return d.toISOString().slice(0, 10);
+    })();
 
     let uploadedImageId = null;
 
-    // 2) upload image if exists
     if (deviceImage && typeof deviceImage === "object") {
       const uploadForm = new FormData();
       uploadForm.append("files", deviceImage);
-
       const uploadRes = await fetch(`${STRAPI_URL}/api/upload`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: uploadForm,
       });
-
       if (!uploadRes.ok) {
-        return NextResponse.json(
-          { message: "Image upload failed" },
-          { status: 500 }
-        );
+        return NextResponse.json({ message: "Image upload failed" }, { status: 500 });
       }
-
       const uploadJson = await uploadRes.json();
       uploadedImageId = uploadJson?.[0]?.id || null;
     }
 
     const payload = {
       data: {
-        serialNumber,
-        deviceName,
-        customerPhoneNumber,
-        warrantyDuration,
-        warrantyType,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-
+        serialNumber, deviceName, customerPhoneNumber,
+        warrantyDuration, warrantyType,
+        startDate: effectiveStart,
+        endDate: effectiveEnd,
         ...(uploadedImageId ? { deviceImage: uploadedImageId } : {}),
       },
     };
 
     const createRes = await fetch(`${STRAPI_URL}/api/guarantees`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(payload),
     });
 
     if (!createRes.ok) {
       const err = await createRes.json();
-      return NextResponse.json(
-        { message: "Failed to create guarantee", error: err },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: "Failed to create guarantee", error: err }, { status: 500 });
     }
 
     const created = await createRes.json();
-
-    return NextResponse.json(
-      {
-        message: "Guarantee created successfully",
-        data: created,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: "Guarantee created successfully", data: created }, { status: 201 });
   } catch (error) {
-    console.error("Guarantees POST error:", error);
-    return NextResponse.json(
-      { message: "Server error", error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
   }
 }

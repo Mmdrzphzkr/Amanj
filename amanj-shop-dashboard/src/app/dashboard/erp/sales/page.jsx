@@ -13,6 +13,7 @@ import StatCard from "@/components/erp/StatCard";
 import Table from "@/components/erp/Table";
 import Modal from "@/components/erp/Modal";
 import { Input, Select, Textarea } from "@/components/erp/Input";
+import JalaliDatePicker from "@/components/JalaliDatePicker";
 import Button from "@/components/erp/Button";
 import Badge from "@/components/erp/Badge";
 import ConfirmDialog from "@/components/erp/ConfirmDialog";
@@ -377,11 +378,9 @@ export default function SalesPage() {
               setForm({ ...form, invoiceNumber: e.target.value })
             }
           />
-          <Input
-            label="تاریخ"
-            type="date"
+          <JalaliDatePicker
             value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            onChange={(v) => setForm({ ...form, date: v })}
           />
           <Input
             label="نام مشتری"

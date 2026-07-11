@@ -1,6 +1,7 @@
 // checkout/components/PaymentStep.jsx
 import React from "react";
 import { Grid, Paper, Typography, Box, TextField, Button } from "@mui/material";
+import JalaliDatePicker from "@/components/JalaliDatePicker";
 
 export default function PaymentStep({
   paymentMethod,
@@ -110,16 +111,13 @@ export default function PaymentStep({
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <TextField
-                type="date"
-                label="تاریخ واریز"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
+              <Typography sx={{ mb: 0.5, fontSize: "0.85rem", color: "text.secondary" }}>تاریخ واریز</Typography>
+              <JalaliDatePicker
                 value={receiptData.date}
-                onChange={(e) =>
+                onChange={(v) =>
                   setReceiptData((p) => ({
                     ...p,
-                    date: e.target.value,
+                    date: v,
                   }))
                 }
               />
