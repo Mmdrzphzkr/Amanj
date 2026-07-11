@@ -15,8 +15,8 @@ function getAuthHeaders() {
 }
 
 export async function POST(req, { params }) {
-  const authHeaders = await getAuthHeaders();
-  const { id } = params;
+  const authHeaders = getAuthHeaders();
+  const { id } = await params;
   const formData = await req.formData();
   const _method = formData.get("_method");
 
@@ -61,8 +61,8 @@ export async function POST(req, { params }) {
 
 export async function PUT(req, { params }) {
   try {
-    const headers = await getAuthHeaders();
-    const { id } = params;
+    const headers = getAuthHeaders();
+    const { id } = await params;
     const formData = await req.formData();
 
     const payload = {
@@ -101,8 +101,8 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   try {
-    const headers = await getAuthHeaders();
-    const { id } = params;
+    const headers = getAuthHeaders();
+    const { id } = await params;
 
     const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
       method: "DELETE",

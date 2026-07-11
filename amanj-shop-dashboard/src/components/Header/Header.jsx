@@ -303,13 +303,13 @@ const Header = () => {
                   href="/dashboard"
                   className="text-[#696969] text-[18px] font-[600] hover:text-black transition-colors"
                 >
-                  داشبورد
+                  داشبورد مدیریت
                 </Link>
                 <Link
                   href="/dashboard/guarantee"
                   className="text-[#696969] text-[18px] font-[600] hover:text-black transition-colors"
                 >
-                  گارانتی
+                  مدیریت گارانتی
                 </Link>
               </>
             )}

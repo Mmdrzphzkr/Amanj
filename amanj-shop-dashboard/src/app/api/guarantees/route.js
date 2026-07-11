@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
 const STRAPI_URL = (
     process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
@@ -25,7 +24,7 @@ function getUploadHeaders() {
 
 export async function GET() {
   try {
-    const headers = await getAuthHeaders();
+    const headers = getAuthHeaders();
     const res = await fetch(`${STRAPI_URL}/api/guarantees?populate=*&sort[0]=createdAt:desc`, { headers });
     if (!res.ok) {
       return NextResponse.json({ message: "Failed to fetch guarantees" }, { status: 500 });
@@ -39,8 +38,8 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const authHeaders = await getAuthHeaders();
-    const uploadHeaders = await getUploadHeaders();
+    const authHeaders = getAuthHeaders();
+    const uploadHeaders = getUploadHeaders();
     const formData = await req.formData();
 
     const serialNumber = formData.get("serialNumber")?.toString().trim();
