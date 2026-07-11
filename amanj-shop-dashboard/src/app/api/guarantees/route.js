@@ -5,17 +5,36 @@ const STRAPI_URL = (
     process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
   ).replace(/\/+$/, "");
 
-async function getToken() {
-  const cookieStore = cookies();
-  return cookieStore.get("strapi_jwt")?.value;
+const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
+
+async function getAuthHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  if (STRAPI_TOKEN) {
+    headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
+  } else {
+    const cookieStore = cookies();
+    const jwt = cookieStore.get("strapi_jwt")?.value;
+    if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
+  }
+  return headers;
+}
+
+async function getUploadHeaders() {
+  const headers = {};
+  if (STRAPI_TOKEN) {
+    headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
+  } else {
+    const cookieStore = cookies();
+    const jwt = cookieStore.get("strapi_jwt")?.value;
+    if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
+  }
+  return headers;
 }
 
 export async function GET() {
   try {
-    const token = await getToken();
-    const res = await fetch(`${STRAPI_URL}/api/guarantees?populate=*&sort[0]=createdAt:desc`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${STRAPI_URL}/api/guarantees?populate=*&sort[0]=createdAt:desc`, { headers });
     if (!res.ok) {
       return NextResponse.json({ message: "Failed to fetch guarantees" }, { status: 500 });
     }
@@ -28,7 +47,8 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const token = await getToken();
+    const authHeaders = await getAuthHeaders();
+    const uploadHeaders = await getUploadHeaders();
     const formData = await req.formData();
 
     const serialNumber = formData.get("serialNumber")?.toString().trim();
@@ -50,7 +70,7 @@ export async function POST(req) {
 
     const existsRes = await fetch(
       `${STRAPI_URL}/api/guarantees?filters[serialNumber][$eq]=${encodeURIComponent(serialNumber)}`,
-      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
+      { headers: authHeaders, cache: "no-store" }
     );
     const existsJson = await existsRes.json();
     if (existsJson?.data?.length > 0) {
@@ -71,7 +91,7 @@ export async function POST(req) {
       uploadForm.append("files", deviceImage);
       const uploadRes = await fetch(`${STRAPI_URL}/api/upload`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: uploadHeaders,
         body: uploadForm,
       });
       if (!uploadRes.ok) {
@@ -93,7 +113,7 @@ export async function POST(req) {
 
     const createRes = await fetch(`${STRAPI_URL}/api/guarantees`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: authHeaders,
       body: JSON.stringify(payload),
     });
 

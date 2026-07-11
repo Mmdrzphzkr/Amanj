@@ -158,6 +158,7 @@ export default function GuaranteePage() {
         open={showModal}
         onClose={() => setShowModal(false)}
         title={editing ? "ویرایش گارانتی" : "گارانتی جدید"}
+        size="lg"
         footer={<>
           <Button variant="primary" onClick={handleSave} disabled={saving}>
             {saving ? "⏳ در حال ذخیره..." : editing ? "به‌روزرسانی" : "ثبت گارانتی"}
@@ -167,7 +168,18 @@ export default function GuaranteePage() {
           </Button>
         </>}
       >
-        <div className="form-grid">
+        {/* اطلاعات دستگاه */}
+        <div style={{
+          background: "var(--bg-hover)", borderRadius: "var(--radius-md)",
+          padding: "12px 16px", marginBottom: 16,
+          display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <span style={{ fontSize: 16 }}>📦</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" }}>
+            اطلاعات دستگاه
+          </span>
+        </div>
+        <div className="form-grid" style={{ marginBottom: 20 }}>
           <Input
             label="نام دستگاه"
             value={form.deviceName}
@@ -180,6 +192,27 @@ export default function GuaranteePage() {
             onChange={(e) => setForm({ ...form, serialNumber: e.target.value })}
             required
           />
+          <Input
+            label="شماره موبایل مشتری"
+            value={form.customerPhoneNumber}
+            onChange={(e) => setForm({ ...form, customerPhoneNumber: e.target.value })}
+            required
+            placeholder="مثال: 09123456789"
+          />
+        </div>
+
+        {/* اطلاعات گارانتی */}
+        <div style={{
+          background: "var(--bg-hover)", borderRadius: "var(--radius-md)",
+          padding: "12px 16px", marginBottom: 16,
+          display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <span style={{ fontSize: 16 }}>🛡️</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" }}>
+            اطلاعات گارانتی
+          </span>
+        </div>
+        <div className="form-grid" style={{ marginBottom: 20 }}>
           <Select
             label="نوع گارانتی"
             options={[
@@ -197,12 +230,6 @@ export default function GuaranteePage() {
             required
             min="0"
           />
-          <Input
-            label="شماره موبایل مشتری"
-            value={form.customerPhoneNumber}
-            onChange={(e) => setForm({ ...form, customerPhoneNumber: e.target.value })}
-            required
-          />
           <div className="form-group">
             <label className="label">تاریخ شروع</label>
             <JalaliDatePicker
@@ -218,8 +245,19 @@ export default function GuaranteePage() {
             />
           </div>
         </div>
-        <div className="form-group" style={{ marginTop: 12 }}>
-          <label className="label">تصویر دستگاه (اختیاری)</label>
+
+        {/* تصویر دستگاه */}
+        <div style={{
+          background: "var(--bg-hover)", borderRadius: "var(--radius-md)",
+          padding: "12px 16px", marginBottom: 16,
+          display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <span style={{ fontSize: 16 }}>📸</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" }}>
+            تصویر دستگاه (اختیاری)
+          </span>
+        </div>
+        <div className="form-group">
           <input
             type="file"
             accept="image/*"

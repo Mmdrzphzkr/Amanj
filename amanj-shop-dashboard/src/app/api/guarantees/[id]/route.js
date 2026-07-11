@@ -5,14 +5,23 @@ const STRAPI_URL = (
     process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
   ).replace(/\/+$/, "");
 
-async function getToken() {
-  const cookieStore = cookies();
-  return cookieStore.get("strapi_jwt")?.value;
+const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
+
+async function getAuthHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  if (STRAPI_TOKEN) {
+    headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
+  } else {
+    const cookieStore = cookies();
+    const jwt = cookieStore.get("strapi_jwt")?.value;
+    if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
+  }
+  return headers;
 }
 
 export async function PUT(req, { params }) {
   try {
-    const token = await getToken();
+    const headers = await getAuthHeaders();
     const { id } = params;
     const formData = await req.formData();
 
@@ -34,7 +43,7 @@ export async function PUT(req, { params }) {
 
     const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers,
       body: JSON.stringify(payload),
     });
 
@@ -52,12 +61,12 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   try {
-    const token = await getToken();
+    const headers = await getAuthHeaders();
     const { id } = params;
 
     const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      headers,
     });
 
     if (!res.ok) {

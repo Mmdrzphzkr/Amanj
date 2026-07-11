@@ -1,11 +1,25 @@
 "use client";
-import { useState, useEffect } from "react";
-import {
-  TextField, MenuItem, Stack, FormControl, InputLabel, Select
-} from "@mui/material";
+import { useState, useEffect, useRef } from "react";
 import {
   toJalali, jalaliToGregorian, daysInJalaliMonth, jalaliMonths
 } from "@/components/erp/helpers";
+
+const selectStyle = {
+  width: "100%",
+  padding: "11px 14px",
+  fontSize: 14,
+  fontFamily: "Vazirmatn, sans-serif",
+  background: "#fff",
+  color: "#1a1a2e",
+  border: "1px solid #d1d5db",
+  borderRadius: "var(--radius-md)",
+  outline: "none",
+  cursor: "pointer",
+  transition: "border-color 0.15s, box-shadow 0.15s",
+  WebkitAppearance: "none",
+  MozAppearance: "none",
+  appearance: "none",
+};
 
 export default function JalaliDatePicker({ value, onChange, label, ...props }) {
   const [jYear, setJYear] = useState(1403);
@@ -60,45 +74,42 @@ export default function JalaliDatePicker({ value, onChange, label, ...props }) {
     emitChange(jYear, jMonth, d);
   };
 
-  const yearOptions = [];
   const currentYear = new Date().getFullYear();
   const todayJ = toJalali(currentYear, new Date().getMonth() + 1, new Date().getDate());
+  const yearOptions = [];
   for (let y = todayJ.year - 5; y <= todayJ.year + 5; y++) {
     yearOptions.push(y);
   }
 
-  const dayOptions = [];
   const maxDay = daysInJalaliMonth(jYear, jMonth);
+  const dayOptions = [];
   for (let d = 1; d <= maxDay; d++) {
     dayOptions.push(d);
   }
 
   return (
-    <Stack direction="row" spacing={1} sx={{ width: "100%" }}>
-      <FormControl size="small" sx={{ flex: 1 }}>
-        <InputLabel>{label ? `روز (${label})` : "روز"}</InputLabel>
-        <Select value={jDay} label={label ? `روز (${label})` : "روز"} onChange={handleDayChange} {...props}>
-          {dayOptions.map((d) => (
-            <MenuItem key={d} value={d}>{d}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl size="small" sx={{ flex: 1.5 }}>
-        <InputLabel>{label ? `ماه (${label})` : "ماه"}</InputLabel>
-        <Select value={jMonth} label={label ? `ماه (${label})` : "ماه"} onChange={handleMonthChange} {...props}>
-          {jalaliMonths.map((name, idx) => (
-            <MenuItem key={idx + 1} value={idx + 1}>{name}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl size="small" sx={{ flex: 1 }}>
-        <InputLabel>{label ? `سال (${label})` : "سال"}</InputLabel>
-        <Select value={jYear} label={label ? `سال (${label})` : "سال"} onChange={handleYearChange} {...props}>
+    <div style={{ display: "flex", gap: 8, width: "100%" }}>
+      <div style={{ flex: 1 }}>
+        <select value={jYear} onChange={handleYearChange} style={selectStyle} {...props}>
           {yearOptions.map((y) => (
-            <MenuItem key={y} value={y}>{y}</MenuItem>
+            <option key={y} value={y}>{y}</option>
           ))}
-        </Select>
-      </FormControl>
-    </Stack>
+        </select>
+      </div>
+      <div style={{ flex: 1.5 }}>
+        <select value={jMonth} onChange={handleMonthChange} style={selectStyle} {...props}>
+          {jalaliMonths.map((name, idx) => (
+            <option key={idx + 1} value={idx + 1}>{name}</option>
+          ))}
+        </select>
+      </div>
+      <div style={{ flex: 1 }}>
+        <select value={jDay} onChange={handleDayChange} style={selectStyle} {...props}>
+          {dayOptions.map((d) => (
+            <option key={d} value={d}>{d}</option>
+          ))}
+        </select>
+      </div>
+    </div>
   );
 }
