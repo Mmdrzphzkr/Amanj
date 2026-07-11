@@ -80,7 +80,7 @@ export default function EmployeesPage() {
           return (
             <div key={emp.id} className="panel-card" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--accent), #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 18, color: '#0d0f14', flexShrink: 0 }}>{emp.name?.[0] || '?'}</div>
+                <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--accent), #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 18, color: 'var(--bg-base)', flexShrink: 0 }}>{emp.name?.[0] || '?'}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>{emp.name}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{emp.position || '—'}</div>

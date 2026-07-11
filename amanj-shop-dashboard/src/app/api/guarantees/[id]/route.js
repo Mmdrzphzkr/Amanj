@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 
 const STRAPI_URL = (
-    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
-  ).replace(/\/+$/, "");
+  process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:8000"
+).replace(/\/+$/, "");
 
 const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 
 function getAuthHeaders() {
   const headers = { "Content-Type": "application/json" };
+  console.log("STRAPI_TOKEN:", STRAPI_TOKEN);
   if (STRAPI_TOKEN) {
     headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
   }
@@ -22,9 +23,14 @@ export async function POST(req, { params }) {
 
   if (_method === "DELETE") {
     const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
-      method: "DELETE", headers: authHeaders,
+      method: "DELETE",
+      headers: authHeaders,
     });
-    if (!res.ok) return NextResponse.json({ message: "Failed to delete guarantee" }, { status: 500 });
+    if (!res.ok)
+      return NextResponse.json(
+        { message: "Failed to delete guarantee" },
+        { status: 500 },
+      );
     return NextResponse.json({ message: "Guarantee deleted successfully" });
   }
 
@@ -32,7 +38,10 @@ export async function POST(req, { params }) {
     data: {
       serialNumber: formData.get("serialNumber")?.toString().trim(),
       deviceName: formData.get("deviceName")?.toString().trim(),
-      customerPhoneNumber: formData.get("customerPhoneNumber")?.toString().trim(),
+      customerPhoneNumber: formData
+        .get("customerPhoneNumber")
+        ?.toString()
+        .trim(),
       warrantyDuration: Number(formData.get("warrantyDuration")),
       warrantyType: formData.get("warrantyType")?.toString().trim(),
       startDate: formData.get("startDate")?.toString().trim(),
@@ -52,11 +61,17 @@ export async function POST(req, { params }) {
 
   if (!res.ok) {
     const err = await res.json();
-    return NextResponse.json({ message: "Failed to update guarantee", error: err }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to update guarantee", error: err },
+      { status: 500 },
+    );
   }
 
   const updated = await res.json();
-  return NextResponse.json({ message: "Guarantee updated successfully", data: updated });
+  return NextResponse.json({
+    message: "Guarantee updated successfully",
+    data: updated,
+  });
 }
 
 export async function PUT(req, { params }) {
@@ -69,7 +84,10 @@ export async function PUT(req, { params }) {
       data: {
         serialNumber: formData.get("serialNumber")?.toString().trim(),
         deviceName: formData.get("deviceName")?.toString().trim(),
-        customerPhoneNumber: formData.get("customerPhoneNumber")?.toString().trim(),
+        customerPhoneNumber: formData
+          .get("customerPhoneNumber")
+          ?.toString()
+          .trim(),
         warrantyDuration: Number(formData.get("warrantyDuration")),
         warrantyType: formData.get("warrantyType")?.toString().trim(),
         startDate: formData.get("startDate")?.toString().trim(),
@@ -89,13 +107,22 @@ export async function PUT(req, { params }) {
 
     if (!res.ok) {
       const err = await res.json();
-      return NextResponse.json({ message: "Failed to update guarantee", error: err }, { status: 500 });
+      return NextResponse.json(
+        { message: "Failed to update guarantee", error: err },
+        { status: 500 },
+      );
     }
 
     const updated = await res.json();
-    return NextResponse.json({ message: "Guarantee updated successfully", data: updated });
+    return NextResponse.json({
+      message: "Guarantee updated successfully",
+      data: updated,
+    });
   } catch (error) {
-    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Server error", error: error.message },
+      { status: 500 },
+    );
   }
 }
 
@@ -110,11 +137,17 @@ export async function DELETE(req, { params }) {
     });
 
     if (!res.ok) {
-      return NextResponse.json({ message: "Failed to delete guarantee" }, { status: 500 });
+      return NextResponse.json(
+        { message: "Failed to delete guarantee" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ message: "Guarantee deleted successfully" });
   } catch (error) {
-    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Server error", error: error.message },
+      { status: 500 },
+    );
   }
 }

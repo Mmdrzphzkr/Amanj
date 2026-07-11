@@ -79,8 +79,8 @@ export default function ErpDashboard() {
           </div>
         </div>
         <div className="dashboard-hero__status">
-          <div className="dashboard-statuses-pill">● سیستم آنلاین</div>
-          <div className="dashboard-statuses-card">
+          <div className="dashboard-status-pill">● سیستم آنلاین</div>
+          <div className="dashboard-status-card">
             <span>تاریخ امروز</span>
             <strong>{new Date().toLocaleDateString('fa-IR')}</strong>
           </div>
@@ -181,7 +181,7 @@ export default function ErpDashboard() {
               const empComm = commissions.filter((c) => String(c.employeeId) === String(emp.id)).reduce((s, c) => s + Number(c.amount || 0), 0);
               return (
                 <div key={emp.id} className="stat-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--accent), #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, color: '#0d0f14', flexShrink: 0 }}>{emp.name?.[0] || '?'}</div>
+                  <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--accent), #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, color: 'var(--bg-base)', flexShrink: 0 }}>{emp.name?.[0] || '?'}</div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13 }}>{emp.name}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{emp.position || '—'}</div>
