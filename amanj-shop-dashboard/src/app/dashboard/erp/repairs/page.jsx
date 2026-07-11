@@ -149,7 +149,7 @@ export default function RepairsPage() {
       <Modal open={showForm} onClose={() => setShowForm(false)} title={editing ? 'ویرایش تعمیر' : 'ثبت تعمیر جدید'} size="xl"
         footer={<><Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? 'در حال ذخیره...' : (editing ? 'به‌روزرسانی' : 'ثبت تعمیر')}</Button><Button variant="ghost" onClick={() => setShowForm(false)}>انصراف</Button></>}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="form-grid">
           <Input label="شماره تعمیر" value={form.repairNumber} onChange={(e) => setForm({ ...form, repairNumber: e.target.value })} />
           <Input label="تاریخ" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
           <Input label="نام مشتری" value={form.customerName} onChange={(e) => setForm({ ...form, customerName: e.target.value })} />
@@ -163,18 +163,30 @@ export default function RepairsPage() {
           <Select label="وضعیت" options={repairStatuses} value={form.statuses} onChange={(e) => setForm({ ...form, statuses: e.target.value })} />
         </div>
         <Textarea label="شرح مشکل" value={form.problem} onChange={(e) => setForm({ ...form, problem: e.target.value })} style={{ marginTop: 12 }} />
-        <div style={{ marginTop: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>قطعات و خدمات</h4>
+        <div className="items-section">
+          <div className="items-header">
+            <h4>قطعات و خدمات</h4>
             <Button variant="secondary" size="sm" onClick={addItem}>+ افزودن آیتم</Button>
           </div>
           {form.items.map((item) => (
-            <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '2fr 70px 70px 60px 30px', gap: 8, alignItems: 'center', marginBottom: 8, padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
-              <input className="input-field" placeholder="نام قطعه/خدمت" value={item.name} onChange={(e) => updateItem(item.id, 'name', e.target.value)} style={{ padding: '6px 10px', fontSize: 13 }} />
-              <input className="input-field" type="number" placeholder="قیمت قطعه" value={item.partsCost} onChange={(e) => updateItem(item.id, 'partsCost', Number(e.target.value))} style={{ padding: '6px 10px', fontSize: 13, textAlign: 'center' }} />
-              <input className="input-field" type="number" placeholder="دستمزد" value={item.laborCost} onChange={(e) => updateItem(item.id, 'laborCost', Number(e.target.value))} style={{ padding: '6px 10px', fontSize: 13, textAlign: 'center' }} />
-              <input className="input-field" type="number" placeholder="تعداد" value={item.quantity} onChange={(e) => updateItem(item.id, 'quantity', Number(e.target.value))} style={{ padding: '6px 10px', fontSize: 13, textAlign: 'center' }} />
-              <button onClick={() => removeItem(item.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 16 }}>✕</button>
+            <div key={item.id} className="item-row item-row--repair">
+              <div className="item-field">
+                <span className="item-field__label">نام قطعه/خدمت</span>
+                <input className="input-field" placeholder="نام قطعه یا خدمت" value={item.name} onChange={(e) => updateItem(item.id, 'name', e.target.value)} />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">قیمت قطعه</span>
+                <input className="input-field" type="number" min={0} placeholder="۰" value={item.partsCost} onChange={(e) => updateItem(item.id, 'partsCost', Number(e.target.value))} />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">دستمزد</span>
+                <input className="input-field" type="number" min={0} placeholder="۰" value={item.laborCost} onChange={(e) => updateItem(item.id, 'laborCost', Number(e.target.value))} />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">تعداد</span>
+                <input className="input-field" type="number" min={1} placeholder="۱" value={item.quantity} onChange={(e) => updateItem(item.id, 'quantity', Number(e.target.value))} />
+              </div>
+              <button onClick={() => removeItem(item.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 16, padding: '4px 8px' }}>✕</button>
             </div>
           ))}
         </div>

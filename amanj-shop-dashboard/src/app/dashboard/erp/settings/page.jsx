@@ -56,7 +56,7 @@ export default function SettingsPage() {
     <div>
       <PageHeader title="تنظیمات سیستم" subtitle="ERP • تنظیمات" />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="form-grid">
         <div className="panel-card">
           <div className="panel-card__header">🏢 اطلاعات شرکت</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

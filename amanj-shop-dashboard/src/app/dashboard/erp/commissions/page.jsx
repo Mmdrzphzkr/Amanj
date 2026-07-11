@@ -114,7 +114,7 @@ export default function CommissionsPage() {
       <Modal open={showForm} onClose={() => setShowForm(false)} title="کمیسیون جدید"
         footer={<><Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? 'در حال ذخیره...' : 'ثبت کمیسیون'}</Button><Button variant="ghost" onClick={() => setShowForm(false)}>انصراف</Button></>}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="form-grid">
           <Select label="کارمند" options={employeeOptions} value={form.employeeId} onChange={(e) => setForm({ ...form, employeeId: e.target.value })} />
           <Select label="نوع" options={[{ value: 'invoice', label: 'فاکتور فروش' }, { value: 'repair', label: 'تعمیرات' }]} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} />
           <Input label="مرجع" value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} placeholder="شماره فاکتور/تعمیر" />

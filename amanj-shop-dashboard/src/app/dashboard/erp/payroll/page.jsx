@@ -162,7 +162,7 @@ export default function PayrollPage() {
       <Modal open={!!showDetail} onClose={() => setShowDetail(null)} title="جزئیات فیش حقوقی" size="md">
         {showDetail && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="form-grid">
               <div><strong style={{ color: 'var(--text-secondary)' }}>کارگر:</strong> {showDetail.employeeName}</div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>دوره:</strong> {showDetail.period}</div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>حقوق پایه:</strong> {formatCurrency(showDetail.baseSalary)}</div>

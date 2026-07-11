@@ -106,7 +106,7 @@ export default function InventoryPage() {
       <Modal open={showForm} onClose={() => setShowForm(false)} title={editing ? 'ویرایش کالا' : 'کالای جدید'}
         footer={<><Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? 'در حال ذخیره...' : (editing ? 'به‌روزرسانی' : 'ثبت کالا')}</Button><Button variant="ghost" onClick={() => setShowForm(false)}>انصراف</Button></>}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="form-grid">
           <Input label="نام کالا" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <Select label="دسته‌بندی" options={productCategories} value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
           <Input label="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />

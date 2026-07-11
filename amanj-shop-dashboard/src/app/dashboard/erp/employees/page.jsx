@@ -109,7 +109,7 @@ export default function EmployeesPage() {
       <Modal open={showForm} onClose={() => setShowForm(false)} title={editing ? 'ویرایش کارگر' : 'کارگر جدید'}
         footer={<><Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? 'در حال ذخیره...' : (editing ? 'به‌روزرسانی' : 'ثبت کارگر')}</Button><Button variant="ghost" onClick={() => setShowForm(false)}>انصراف</Button></>}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="form-grid">
           <Input label="نام و نام خانوادگی" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <Input label="تلفن" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           <Input label="سمت" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} />

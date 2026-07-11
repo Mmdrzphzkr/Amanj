@@ -362,7 +362,7 @@ export default function SalesPage() {
         }
       >
         <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+          className="form-grid"
         >
           <Input
             label="شماره فاکتور"
@@ -404,116 +404,91 @@ export default function SalesPage() {
             onChange={(e) => setForm({ ...form, statuses: e.target.value })}
           />
         </div>
-        <div style={{ marginTop: 20 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 10,
-            }}
-          >
-            <h4
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: "var(--text-primary)",
-              }}
-            >
-              آیتم‌های فاکتور
-            </h4>
+        <div className="items-section">
+          <div className="items-header">
+            <h4>آیتم‌های فاکتور</h4>
             <Button variant="secondary" size="sm" onClick={addItem}>
               + افزودن آیتم
             </Button>
           </div>
           {form.items.map((item, idx) => (
-            <div
-              key={item.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "2fr 60px 80px 70px 70px 80px 30px",
-                gap: 8,
-                alignItems: "center",
-                marginBottom: 8,
-                padding: "6px 0",
-                borderBottom: "1px solid var(--border)",
-              }}
-            >
-              <input
-                className="input-field"
-                placeholder="شرح کالا/خدمت"
-                value={item.description}
-                onChange={(e) =>
-                  updateItem(item.id, "description", e.target.value)
-                }
-                style={{ padding: "6px 10px", fontSize: 13 }}
-              />
-              <input
-                className="input-field"
-                type="number"
-                placeholder="تعداد"
-                value={item.quantity}
-                onChange={(e) =>
-                  updateItem(item.id, "quantity", Number(e.target.value))
-                }
-                style={{
-                  padding: "6px 10px",
-                  fontSize: 13,
-                  textAlign: "center",
-                }}
-              />
-              <input
-                className="input-field"
-                type="number"
-                placeholder="فی"
-                value={item.unitPrice}
-                onChange={(e) =>
-                  updateItem(item.id, "unitPrice", Number(e.target.value))
-                }
-                style={{
-                  padding: "6px 10px",
-                  fontSize: 13,
-                  textAlign: "center",
-                }}
-              />
-              <input
-                className="input-field"
-                type="number"
-                placeholder="تخفیف"
-                value={item.discount}
-                onChange={(e) =>
-                  updateItem(item.id, "discount", Number(e.target.value))
-                }
-                style={{
-                  padding: "6px 10px",
-                  fontSize: 13,
-                  textAlign: "center",
-                }}
-              />
-              <input
-                className="input-field"
-                type="number"
-                placeholder="مالیات"
-                value={item.tax}
-                onChange={(e) =>
-                  updateItem(item.id, "tax", Number(e.target.value))
-                }
-                style={{
-                  padding: "6px 10px",
-                  fontSize: 13,
-                  textAlign: "center",
-                }}
-              />
-              <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: 13,
-                  color: "var(--accent)",
-                  textAlign: "center",
-                }}
-              >
-                {item.total_price?.toLocaleString?.() || 0}
-              </span>
+            <div key={item.id} className="item-row item-row--invoice">
+              <div className="item-field">
+                <span className="item-field__label">شرح کالا/خدمت</span>
+                <input
+                  className="input-field"
+                  placeholder="نام کالا یا خدمت"
+                  value={item.description}
+                  onChange={(e) =>
+                    updateItem(item.id, "description", e.target.value)
+                  }
+                />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">تعداد</span>
+                <input
+                  className="input-field"
+                  type="number"
+                  min={1}
+                  placeholder="۱"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    updateItem(item.id, "quantity", Number(e.target.value))
+                  }
+                />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">فی (ریال)</span>
+                <input
+                  className="input-field"
+                  type="number"
+                  min={0}
+                  placeholder="۰"
+                  value={item.unitPrice}
+                  onChange={(e) =>
+                    updateItem(item.id, "unitPrice", Number(e.target.value))
+                  }
+                />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">تخفیف</span>
+                <input
+                  className="input-field"
+                  type="number"
+                  min={0}
+                  placeholder="۰"
+                  value={item.discount}
+                  onChange={(e) =>
+                    updateItem(item.id, "discount", Number(e.target.value))
+                  }
+                />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">مالیات</span>
+                <input
+                  className="input-field"
+                  type="number"
+                  min={0}
+                  placeholder="۰"
+                  value={item.tax}
+                  onChange={(e) =>
+                    updateItem(item.id, "tax", Number(e.target.value))
+                  }
+                />
+              </div>
+              <div className="item-field">
+                <span className="item-field__label">جمع</span>
+                <span
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 13,
+                    color: "var(--accent)",
+                    textAlign: "center",
+                  }}
+                >
+                  {item.total_price?.toLocaleString?.() || 0}
+                </span>
+              </div>
               <button
                 onClick={() => removeItem(item.id)}
                 style={{
@@ -522,6 +497,7 @@ export default function SalesPage() {
                   color: "var(--danger)",
                   cursor: "pointer",
                   fontSize: 16,
+                  padding: "4px 8px",
                 }}
               >
                 ✕
