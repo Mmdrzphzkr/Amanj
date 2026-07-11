@@ -7,26 +7,18 @@ const STRAPI_URL = (
 
 const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 
-async function getAuthHeaders() {
+function getAuthHeaders() {
   const headers = { "Content-Type": "application/json" };
   if (STRAPI_TOKEN) {
     headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
-  } else {
-    const cookieStore = cookies();
-    const jwt = cookieStore.get("strapi_jwt")?.value;
-    if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
   }
   return headers;
 }
 
-async function getUploadHeaders() {
+function getUploadHeaders() {
   const headers = {};
   if (STRAPI_TOKEN) {
     headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
-  } else {
-    const cookieStore = cookies();
-    const jwt = cookieStore.get("strapi_jwt")?.value;
-    if (jwt) headers["Authorization"] = `Bearer ${jwt}`;
   }
   return headers;
 }

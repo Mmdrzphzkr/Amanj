@@ -32,7 +32,6 @@ const emptyItem = {
   quantity: 1,
   unitPrice: 0,
   discount: 0,
-  tax: 0,
   total: 0,
 };
 
@@ -187,7 +186,7 @@ export default function SalesPage() {
   };
 
   const calcLineTotal = (it) =>
-    Number(it.unitPrice || 0) * Number(it.quantity || 1) - Number(it.discount || 0) + Number(it.tax || 0);
+    Number(it.unitPrice || 0) * Number(it.quantity || 1) - Number(it.discount || 0);
 
   const addItem = () =>
     setForm({
@@ -444,7 +443,7 @@ export default function SalesPage() {
                 />
               </div>
               <div className="item-field">
-                <span className="item-field__label">فی (ریال)</span>
+                <span className="item-field__label">فی (تومان)</span>
                 <input
                   className="input-field"
                   type="number"
@@ -466,19 +465,6 @@ export default function SalesPage() {
                   value={item.discount}
                   onChange={(e) =>
                     updateItem(item.id, "discount", Number(e.target.value))
-                  }
-                />
-              </div>
-              <div className="item-field">
-                <span className="item-field__label">مالیات</span>
-                <input
-                  className="input-field"
-                  type="number"
-                  min={0}
-                  placeholder="۰"
-                  value={item.tax}
-                  onChange={(e) =>
-                    updateItem(item.id, "tax", Number(e.target.value))
                   }
                 />
               </div>
