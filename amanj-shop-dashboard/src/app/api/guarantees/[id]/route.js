@@ -6,64 +6,53 @@ const STRAPI_URL = (
 
 const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 
+console.log('[GUARANTEE ROUTE] STRAPI_TOKEN:', STRAPI_TOKEN ? 'SET (' + STRAPI_TOKEN.slice(0, 10) + '...)' : 'NOT SET');
+
 function getAuthHeaders() {
   const headers = { "Content-Type": "application/json" };
-  console.log("STRAPI_TOKEN:", STRAPI_TOKEN);
   if (STRAPI_TOKEN) {
     headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
   }
   return headers;
 }
 
-export async function POST(req, { params }) {
-  const authHeaders = getAuthHeaders();
-  const { id } = await params;
-  const formData = await req.formData();
-  const _method = formData.get("_method");
-
-  if (_method === "DELETE") {
-    const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
-      method: "DELETE",
-      headers: authHeaders,
-    });
-    if (!res.ok)
-      return NextResponse.json(
-        { message: "Failed to delete guarantee" },
-        { status: 500 },
-      );
-    return NextResponse.json({ message: "Guarantee deleted successfully" });
-  }
-
-  const payload = {
-    data: {
-      serialNumber: formData.get("serialNumber")?.toString().trim(),
-      deviceName: formData.get("deviceName")?.toString().trim(),
-      customerPhoneNumber: formData
-        .get("customerPhoneNumber")
-        ?.toString()
-        .trim(),
-      warrantyDuration: Number(formData.get("warrantyDuration")),
-      warrantyType: formData.get("warrantyType")?.toString().trim(),
-      startDate: formData.get("startDate")?.toString().trim(),
-      endDate: formData.get("endDate")?.toString().trim(),
-    },
+function extractDataFromFormData(formData) {
+  return {
+    serialNumber: formData.get("serialNumber")?.toString().trim(),
+    deviceName: formData.get("deviceName")?.toString().trim(),
+    customerPhoneNumber: formData.get("customerPhoneNumber")?.toString().trim(),
+    warrantyDuration: Number(formData.get("warrantyDuration")),
+    warrantyType: formData.get("warrantyType")?.toString().trim(),
+    startDate: formData.get("startDate")?.toString().trim(),
+    endDate: formData.get("endDate")?.toString().trim(),
   };
+}
 
-  Object.keys(payload.data).forEach((k) => {
-    if (!payload.data[k] && payload.data[k] !== 0) delete payload.data[k];
+async function parseRequest(req) {
+  const contentType = req.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return await req.json();
+  }
+  return await req.formData();
+}
+
+async function handleUpdate(id, data, authHeaders) {
+  const cleanData = { ...data };
+  Object.keys(cleanData).forEach((k) => {
+    if (!cleanData[k] && cleanData[k] !== 0) delete cleanData[k];
   });
 
   const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
     method: "PUT",
     headers: authHeaders,
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ data: cleanData }),
   });
 
   if (!res.ok) {
     const err = await res.json();
     return NextResponse.json(
       { message: "Failed to update guarantee", error: err },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -74,80 +63,77 @@ export async function POST(req, { params }) {
   });
 }
 
+async function handleDelete(id, authHeaders) {
+  const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
+    method: "DELETE",
+    headers: authHeaders,
+  });
+  if (!res.ok) {
+    return NextResponse.json(
+      { message: "Failed to delete guarantee" },
+      { status: 500 }
+    );
+  }
+  return NextResponse.json({ message: "Guarantee deleted successfully" });
+}
+
+export async function POST(req, { params }) {
+  const authHeaders = getAuthHeaders();
+  const { id } = await params;
+  console.log('[POST] /api/guarantees/[id] - id:', id);
+
+  const body = await parseRequest(req);
+  let data, isDelete = false;
+
+  if (body instanceof FormData) {
+    data = extractDataFromFormData(body);
+    isDelete = body.get("_method") === "DELETE";
+  } else {
+    data = body;
+    isDelete = body._method === "DELETE";
+  }
+
+  if (isDelete) {
+    return handleDelete(id, authHeaders);
+  }
+
+  return handleUpdate(id, data, authHeaders);
+}
+
 export async function PUT(req, { params }) {
   try {
-    const headers = getAuthHeaders();
+    const authHeaders = getAuthHeaders();
     const { id } = await params;
-    const formData = await req.formData();
+    console.log('[PUT] /api/guarantees/[id] - id:', id);
 
-    const payload = {
-      data: {
-        serialNumber: formData.get("serialNumber")?.toString().trim(),
-        deviceName: formData.get("deviceName")?.toString().trim(),
-        customerPhoneNumber: formData
-          .get("customerPhoneNumber")
-          ?.toString()
-          .trim(),
-        warrantyDuration: Number(formData.get("warrantyDuration")),
-        warrantyType: formData.get("warrantyType")?.toString().trim(),
-        startDate: formData.get("startDate")?.toString().trim(),
-        endDate: formData.get("endDate")?.toString().trim(),
-      },
-    };
+    const body = await parseRequest(req);
+    let data;
 
-    Object.keys(payload.data).forEach((k) => {
-      if (!payload.data[k] && payload.data[k] !== 0) delete payload.data[k];
-    });
-
-    const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      return NextResponse.json(
-        { message: "Failed to update guarantee", error: err },
-        { status: 500 },
-      );
+    if (body instanceof FormData) {
+      data = extractDataFromFormData(body);
+    } else {
+      data = body;
     }
 
-    const updated = await res.json();
-    return NextResponse.json({
-      message: "Guarantee updated successfully",
-      data: updated,
-    });
+    return handleUpdate(id, data, authHeaders);
   } catch (error) {
     return NextResponse.json(
       { message: "Server error", error: error.message },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function DELETE(req, { params }) {
   try {
-    const headers = getAuthHeaders();
+    const authHeaders = getAuthHeaders();
     const { id } = await params;
-
-    const res = await fetch(`${STRAPI_URL}/api/guarantees/${id}`, {
-      method: "DELETE",
-      headers,
-    });
-
-    if (!res.ok) {
-      return NextResponse.json(
-        { message: "Failed to delete guarantee" },
-        { status: 500 },
-      );
-    }
-
-    return NextResponse.json({ message: "Guarantee deleted successfully" });
+    console.log('[DELETE] /api/guarantees/[id] - id:', id);
+    return handleDelete(id, authHeaders);
   } catch (error) {
     return NextResponse.json(
       { message: "Server error", error: error.message },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
