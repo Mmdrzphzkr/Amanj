@@ -1,6 +1,10 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import PageHeader from "@/components/erp/PageHeader";
+import Table from "@/components/erp/Table";
+import Modal from "@/components/erp/Modal";
 import { Input, Select } from "@/components/erp/Input";
+import Button from "@/components/erp/Button";
 import ConfirmDialog from "@/components/erp/ConfirmDialog";
 import JalaliDatePicker from "@/components/JalaliDatePicker";
 import { formatJalaliDate } from "@/components/erp/helpers";
@@ -57,8 +61,7 @@ export default function GuaranteePage() {
     setShowModal(true);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSave = async () => {
     setSaving(true);
     try {
       const fd = new FormData();
@@ -100,151 +103,147 @@ export default function GuaranteePage() {
     }
   };
 
-  if (loading) {
-    return <div className="page-container"><p>در حال بارگذاری...</p></div>;
-  }
-
-  const warrantyTypeLabel = (t) => t === "VIP" ? "VIP" : "Normal";
+  const columns = [
+    { header: "شماره سریال", accessor: "serialNumber" },
+    { header: "نام دستگاه", accessor: "deviceName" },
+    { header: "موبایل مشتری", accessor: "customerPhoneNumber" },
+    {
+      header: "نوع",
+      render: (row) => row.warrantyType === "VIP" ? "VIP" : "Normal",
+    },
+    { header: "مدت (ماه)", accessor: "warrantyDuration" },
+    {
+      header: "تاریخ شروع",
+      render: (row) => formatJalaliDate(row.startDate),
+    },
+    {
+      header: "تاریخ پایان",
+      render: (row) => formatJalaliDate(row.endDate),
+    },
+    {
+      header: "عملیات",
+      render: (row) => (
+        <div style={{ display: "flex", gap: 4 }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); openEdit(row); }}
+            className="btn-ghost"
+            style={{ padding: "4px 8px", fontSize: 12 }}
+          >✏️</button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setDeleteTarget(row); }}
+            className="btn-ghost"
+            style={{ padding: "4px 8px", fontSize: 12, color: "var(--danger)" }}
+          >🗑️</button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h1>مدیریت گارانتی‌ها</h1>
-        <button className="btn btn-primary" onClick={openAdd}>+ گارانتی جدید</button>
-      </div>
+    <div>
+      <PageHeader
+        title="مدیریت گارانتی‌ها"
+        subtitle="داشبورد • گارانتی"
+        actions={<Button onClick={openAdd}>+ گارانتی جدید</Button>}
+      />
 
-      <div className="table-wrapper">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>شماره سریال</th>
-              <th>نام دستگاه</th>
-              <th>موبایل مشتری</th>
-              <th>نوع</th>
-              <th>مدت (ماه)</th>
-              <th>تاریخ شروع</th>
-              <th>تاریخ پایان</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody>
-            {guarantees.length === 0 ? (
-              <tr><td colSpan={8} style={{ textAlign: "center" }}>هیچ گارانتی یافت نشد</td></tr>
-            ) : (
-              guarantees.map((g) => (
-                <tr key={g.id}>
-                  <td>{g.serialNumber}</td>
-                  <td>{g.deviceName}</td>
-                  <td>{g.customerPhoneNumber}</td>
-                  <td>{warrantyTypeLabel(g.warrantyType)}</td>
-                  <td>{g.warrantyDuration}</td>
-                  <td>{formatJalaliDate(g.startDate)}</td>
-                  <td>{formatJalaliDate(g.endDate)}</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button className="btn btn-sm btn-secondary" onClick={() => openEdit(g)}>ویرایش</button>
-                      <button className="btn btn-sm btn-danger" onClick={() => setDeleteTarget(g)}>حذف</button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={columns}
+        data={guarantees}
+        loading={loading}
+        emptyMessage="هیچ گارانتی یافت نشد"
+      />
 
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{editing ? "ویرایش گارانتی" : "گارانتی جدید"}</h2>
-              <button className="btn-close" onClick={() => setShowModal(false)}>✕</button>
-            </div>
-            <form onSubmit={handleSubmit} className="modal-body">
-              <div className="form-grid">
-                <Input
-                  label="نام دستگاه"
-                  value={form.deviceName}
-                  onChange={(e) => setForm({ ...form, deviceName: e.target.value })}
-                  required
-                />
-                <Input
-                  label="شماره سریال"
-                  value={form.serialNumber}
-                  onChange={(e) => setForm({ ...form, serialNumber: e.target.value })}
-                  required
-                />
-                <Select
-                  label="نوع گارانتی"
-                  options={[
-                    { value: "Normal", label: "Normal" },
-                    { value: "VIP", label: "VIP" },
-                  ]}
-                  value={form.warrantyType}
-                  onChange={(e) => setForm({ ...form, warrantyType: e.target.value })}
-                />
-                <Input
-                  label="مدت گارانتی (ماه)"
-                  type="number"
-                  value={form.warrantyDuration}
-                  onChange={(e) => setForm({ ...form, warrantyDuration: e.target.value })}
-                  required
-                  min="0"
-                />
-                <Input
-                  label="شماره موبایل مشتری"
-                  value={form.customerPhoneNumber}
-                  onChange={(e) => setForm({ ...form, customerPhoneNumber: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div style={{ marginTop: 16 }}>
-                <label className="label">تاریخ شروع</label>
-                <JalaliDatePicker
-                  value={form.startDate}
-                  onChange={(v) => setForm({ ...form, startDate: v })}
-                />
-              </div>
-              <div style={{ marginTop: 16 }}>
-                <label className="label">تاریخ پایان</label>
-                <JalaliDatePicker
-                  value={form.endDate}
-                  onChange={(v) => setForm({ ...form, endDate: v })}
-                />
-              </div>
-
-              <div style={{ marginTop: 16 }}>
-                <label className="label">تصویر دستگاه (اختیاری)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files[0])}
-                  className="input-field"
-                />
-                {imageFile && <span style={{ fontSize: 12, color: "#666" }}>{imageFile.name}</span>}
-              </div>
-
-              <div className="modal-actions" style={{ marginTop: 24 }}>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? "در حال ذخیره..." : editing ? "به‌روزرسانی" : "ثبت"}
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                  انصراف
-                </button>
-              </div>
-            </form>
+      <Modal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title={editing ? "ویرایش گارانتی" : "گارانتی جدید"}
+        footer={<>
+          <Button variant="primary" onClick={handleSave} disabled={saving}>
+            {saving ? "⏳ در حال ذخیره..." : editing ? "به‌روزرسانی" : "ثبت گارانتی"}
+          </Button>
+          <Button variant="ghost" onClick={() => setShowModal(false)}>
+            انصراف
+          </Button>
+        </>}
+      >
+        <div className="form-grid">
+          <Input
+            label="نام دستگاه"
+            value={form.deviceName}
+            onChange={(e) => setForm({ ...form, deviceName: e.target.value })}
+            required
+          />
+          <Input
+            label="شماره سریال"
+            value={form.serialNumber}
+            onChange={(e) => setForm({ ...form, serialNumber: e.target.value })}
+            required
+          />
+          <Select
+            label="نوع گارانتی"
+            options={[
+              { value: "Normal", label: "Normal" },
+              { value: "VIP", label: "VIP" },
+            ]}
+            value={form.warrantyType}
+            onChange={(e) => setForm({ ...form, warrantyType: e.target.value })}
+          />
+          <Input
+            label="مدت گارانتی (ماه)"
+            type="number"
+            value={form.warrantyDuration}
+            onChange={(e) => setForm({ ...form, warrantyDuration: e.target.value })}
+            required
+            min="0"
+          />
+          <Input
+            label="شماره موبایل مشتری"
+            value={form.customerPhoneNumber}
+            onChange={(e) => setForm({ ...form, customerPhoneNumber: e.target.value })}
+            required
+          />
+          <div className="form-group">
+            <label className="label">تاریخ شروع</label>
+            <JalaliDatePicker
+              value={form.startDate}
+              onChange={(v) => setForm({ ...form, startDate: v })}
+            />
+          </div>
+          <div className="form-group">
+            <label className="label">تاریخ پایان</label>
+            <JalaliDatePicker
+              value={form.endDate}
+              onChange={(v) => setForm({ ...form, endDate: v })}
+            />
           </div>
         </div>
-      )}
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label className="label">تصویر دستگاه (اختیاری)</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files[0])}
+            className="input-field"
+          />
+          {imageFile && (
+            <span style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, display: "block" }}>
+              {imageFile.name}
+            </span>
+          )}
+        </div>
+      </Modal>
 
-      {deleteTarget && (
-        <ConfirmDialog
-          message={`آیا از حذف گارانتی "${deleteTarget.serialNumber}" اطمینان دارید؟`}
-          onConfirm={handleDelete}
-          onCancel={() => setDeleteTarget(null)}
-        />
-      )}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        message={
+          deleteTarget
+            ? `آیا از حذف گارانتی "${deleteTarget.serialNumber}" اطمینان دارید؟`
+            : ""
+        }
+      />
     </div>
   );
 }
