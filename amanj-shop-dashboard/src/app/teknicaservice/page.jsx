@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import {
@@ -47,7 +47,7 @@ export default function TechnicalServiceReservation() {
       setLoadingServices(true);
       try {
         const res = await fetch(
-          `${STRAPI}/api/services?pagination[pageSize]=100&sort=order:asc`
+          `${STRAPI}/api/services?pagination[pageSize]=100&sort=order:asc`,
         );
         if (!res.ok) return;
         const json = await res.json();
@@ -66,19 +66,44 @@ export default function TechnicalServiceReservation() {
     load();
   }, []);
 
+  const getImageByFileName = useCallback(
+    (fileName) => {
+      // پیدا کردن آیتمی که نام فایل آن با fileName مطابقت داشته باشد
+      const item = publicGallery.find((item) => {
+        const imageName = item?.image?.name || "";
+        // حذف پسوند و مقایسه
+        const nameWithoutExt = imageName.replace(/\.[^.]+$/, "");
+        return nameWithoutExt === fileName;
+      });
+
+      if (item?.image?.url) {
+        return `${STRAPI_URL}${item.image.url}`;
+      }
+
+      // اگر عکسی پیدا نشد، یک placeholder برگردان
+      return "";
+    },
+    [publicGallery, STRAPI_URL],
+  );
+
   // Load logo image from Strapi public-gallery (look for item named 'teknicaservice')
-  const [logoUrl, setLogoUrl] = useState(null);
+  // const [logoUrl, setLogoUrl] = useState(null);
   useEffect(() => {
-    const STRAPI = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+    const STRAPI =
+      process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
     const loadLogo = async () => {
       try {
-        const res = await fetch(`${STRAPI}/api/public-galleries?pagination[pageSize]=100`);
+        const res = await fetch(
+          `${STRAPI}/api/public-galleries?pagination[pageSize]=100`,
+        );
         if (!res.ok) return;
         const json = await res.json();
         const items = json.data || [];
         for (const d of items) {
           const attrs = d || {};
-          const name = (attrs.name || attrs.title || "").toString().toLowerCase();
+          const name = (attrs.name || attrs.title || "")
+            .toString()
+            .toLowerCase();
           if (name === "teknicaservice") {
             const imgData = attrs.image?.data;
             let url = null;
@@ -86,14 +111,17 @@ export default function TechnicalServiceReservation() {
               const imgAttrs = imgData.attributes || {};
               url = imgAttrs.url || null;
               if (!url && imgAttrs.formats) {
-                const f = imgAttrs.formats.small || imgAttrs.formats.thumbnail || Object.values(imgAttrs.formats)[0];
+                const f =
+                  imgAttrs.formats.small ||
+                  imgAttrs.formats.thumbnail ||
+                  Object.values(imgAttrs.formats)[0];
                 url = f?.url || null;
               }
             }
-            if (url) {
-              setLogoUrl(url.startsWith("http") ? url : STRAPI + url);
-              return;
-            }
+            // if (url) {
+            //   setLogoUrl(url.startsWith("http") ? url : STRAPI + url);
+            //   return;
+            // }
           }
         }
       } catch (err) {
@@ -148,7 +176,7 @@ export default function TechnicalServiceReservation() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: trimmed }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -159,9 +187,9 @@ export default function TechnicalServiceReservation() {
       }
 
       // ۲. ارسال اس‌ام‌اس به مدیران با پترن
-      const smsResponse = await fetch('/api/send-sms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const smsResponse = await fetch("/api/send-sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: trimmed.name,
           lastname: trimmed.lastname,
@@ -174,14 +202,14 @@ export default function TechnicalServiceReservation() {
       const smsResult = await smsResponse.json();
 
       if (!smsResult.success) {
-        console.warn('SMS warning:', smsResult.message);
+        console.warn("SMS warning:", smsResult.message);
       }
 
       // ۳. (اختیاری) ارسال پیام تایید به مشتری
       try {
-        await fetch('/api/send-sms-customer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/send-sms-customer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: trimmed.name,
             lastname: trimmed.lastname,
@@ -189,19 +217,23 @@ export default function TechnicalServiceReservation() {
           }),
         });
       } catch (customerSmsError) {
-        console.warn('Customer SMS failed but form submitted:', customerSmsError);
+        console.warn(
+          "Customer SMS failed but form submitted:",
+          customerSmsError,
+        );
       }
 
-      toast.success("درخواست شما با موفقیت ارسال شد. پیامک تایید برای شما ارسال گردید.");
+      toast.success(
+        "درخواست شما با موفقیت ارسال شد. پیامک تایید برای شما ارسال گردید.",
+      );
       setForm({
         name: "",
         lastname: "",
         phone: "",
         description: "",
-        services: []
+        services: [],
       });
       setErrors({ name: "", lastname: "", phone: "", description: "" });
-
     } catch (err) {
       console.error(err);
       if (!err.message)
@@ -252,7 +284,7 @@ export default function TechnicalServiceReservation() {
             >
               <Box
                 component="img"
-                src={logoUrl || "/uploads/teknicaservice.jpg"}
+                src={getImageByFileName("teknicaservice") || "/placeholder.jpg"}
                 alt="teknicaservice"
                 fetchPriority="high"
                 sx={{
@@ -307,8 +339,7 @@ export default function TechnicalServiceReservation() {
               sx={{
                 width: 80,
                 height: 5,
-                background:
-                  "linear-gradient(90deg, #fd4d00, #568f00)",
+                background: "linear-gradient(90deg, #fd4d00, #568f00)",
                 borderRadius: 4,
                 mt: 1.5,
               }}
@@ -378,8 +409,7 @@ export default function TechnicalServiceReservation() {
                     size="small"
                     sx={{
                       borderRadius: "8px",
-                      background:
-                        "linear-gradient(135deg, #fd4d00, #568f00)",
+                      background: "linear-gradient(135deg, #fd4d00, #568f00)",
                       color: "white",
                       fontWeight: 600,
                     }}
@@ -476,15 +506,12 @@ export default function TechnicalServiceReservation() {
                   fontWeight: 700,
                   fontSize: "15px",
                   textTransform: "none",
-                  background:
-                    "linear-gradient(135deg, #fd4d00, #568f00)",
-                  boxShadow:
-                    "0 10px 25px rgba(253,77,0,.25)",
+                  background: "linear-gradient(135deg, #fd4d00, #568f00)",
+                  boxShadow: "0 10px 25px rgba(253,77,0,.25)",
                   transition: "all .3s ease",
                   "&:hover": {
                     transform: "translateY(-3px)",
-                    boxShadow:
-                      "0 15px 35px rgba(86,143,0,.3)",
+                    boxShadow: "0 15px 35px rgba(86,143,0,.3)",
                   },
                 }}
               >

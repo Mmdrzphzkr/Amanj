@@ -119,7 +119,7 @@ const HomePage = () => {
               <div className="garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px] md:col-span-7">
                 <div className="relative w-full h-[253px]">
                   <Image
-                    src={getImageByFileName("Tatilat") || "/placeholder.jpg"}
+                    src={getImageByFileName("TamirTakhasosi") || "/placeholder.jpg"}
                     alt="تعمیر تخصصی با قطعات اورجینال"
                     fill
                     sizes="(max-width:768px) 100vw, 50vw"
@@ -142,7 +142,7 @@ const HomePage = () => {
               <div className="garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px] md:col-span-4">
                 <div className="relative w-full h-[253px]">
                   <Image
-                    src={getImageByFileName("Asalat") || "/placeholder.jpg"}
+                    src={getImageByFileName("Esalat") || "/placeholder.jpg"}
                     alt="اصالت کالا"
                     fill
                     sizes="(max-width:768px) 100vw, 33vw"
@@ -182,7 +182,7 @@ const HomePage = () => {
               <div className="garantee-box flex flex-col justify-between items-center p-4 bg-white rounded-[40px] flex-1 h-[361px] md:col-span-4">
                 <div className="relative w-full h-[253px]">
                   <Image
-                    src={getImageByFileName("Garanti") || "/placeholder.jpg"}
+                    src={getImageByFileName("Garantee") || "/placeholder.jpg"}
                     alt="گارانتی"
                     fill
                     sizes="(max-width:768px) 100vw, 33vw"
