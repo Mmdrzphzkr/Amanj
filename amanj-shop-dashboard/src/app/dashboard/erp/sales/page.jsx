@@ -104,14 +104,15 @@ export default function SalesPage() {
       subtotal += lineTotal;
       return { ...item, total, tax, discount };
     });
-    const discountSum = items.reduce((s, i) => s + Number(i.discount || 0), 0);
-    const taxSum = items.reduce((s, i) => s + Number(i.tax || 0), 0);
+    const discountSum = updated.reduce((s, i) => s + i.discount, 0);
+    const taxSum = updated.reduce((s, i) => s + i.tax, 0);
+    const totalAmount = updated.reduce((s, i) => s + i.total, 0);
     return {
       items: updated,
       subtotal,
       discount: discountSum,
       taxAmount: taxSum,
-      totalAmount: subtotal - discountSum + taxSum,
+      totalAmount,
     };
   };
 
