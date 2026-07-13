@@ -52,14 +52,14 @@ export default function ArticleCategoryForm({ allCategories, initialData }) {
         parent: formData.parent || null,
       };
       const url = isEditMode
-        ? `/api/article-categories/${initialData.id}`
+        ? `/api/article-categories/${initialData.documentId}`
         : "/api/article-categories";
       const method = isEditMode ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ data: payload }),
       });
 
       if (res.ok) {
