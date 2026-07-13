@@ -18,7 +18,7 @@ export default function ArticleForm({ categories = [], initialData }) {
 
   const [formData, setFormData] = useState({
     title: "", slug: "", content: "", excerpt: "",
-    category: "", author: "", publishedAt: "",
+    category: "", author: "", published_date: "",
     SEO: { metaTitle: "", metaDescription: "" },
   });
   const [imageFile, setImageFile] = useState(null);
@@ -35,7 +35,7 @@ export default function ArticleForm({ categories = [], initialData }) {
         excerpt: attrs.excerpt ?? "",
         category: attrs.category?.data?.id ?? attrs.category?.id ?? "",
         author: attrs.author ?? "",
-        publishedAt: attrs.publishedAt ? attrs.publishedAt.slice(0, 16) : "",
+        published_date: attrs.published_date ? attrs.published_date.slice(0, 16) : "",
         SEO: {
           metaTitle: attrs.SEO?.metaTitle ?? attrs.metaTitle ?? "",
           metaDescription: attrs.SEO?.metaDescription ?? attrs.metaDescription ?? "",
@@ -99,7 +99,7 @@ export default function ArticleForm({ categories = [], initialData }) {
         excerpt: formData.excerpt,
         category: formData.category || null,
         author: formData.author,
-        publishedAt: formData.publishedAt || null,
+        published_date: formData.published_date || null,
         SEO: {
           metaTitle: formData.SEO.metaTitle,
           metaDescription: formData.SEO.metaDescription,
@@ -186,7 +186,7 @@ export default function ArticleForm({ categories = [], initialData }) {
                 </div>
                 <div>
                   <label className="label">تاریخ انتشار</label>
-                  <input name="publishedAt" type="datetime-local" value={formData.publishedAt} onChange={handleChange} onFocus={onFocus} onBlur={onBlur} style={{ ...inputStyle, direction: "ltr" }} />
+                  <input name="published_date" type="datetime-local" value={formData.published_date} onChange={handleChange} onFocus={onFocus} onBlur={onBlur} style={{ ...inputStyle, direction: "ltr" }} />
                 </div>
                 <div style={{ gridColumn: "1/-1" }}>
                   <label className="label">خلاصه مقاله</label>

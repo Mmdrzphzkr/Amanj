@@ -42,7 +42,7 @@ export async function generateMetadata({ params }) {
       title: fullTitle,
       description: metaDescription,
       type: "article",
-      publishedTime: attrs.publishedAt || null,
+      publishedTime: attrs.published_date || null,
       authors: attrs.author ? [attrs.author] : [],
       images: shareImage ? [`${STRAPI_URL}${shareImage}`] : [],
     },
@@ -153,8 +153,8 @@ export default async function ArticleDetailPage({ params }) {
   const excerpt = attrs.excerpt || "";
   const content = attrs.content || "";
   const imageUrl = attrs.image?.url ? `${STRAPI_URL}${attrs.image.url}` : null;
-  const publishedAt = attrs.publishedAt
-    ? new Date(attrs.publishedAt).toLocaleDateString("fa-IR")
+  const published_date = attrs.published_date
+    ? new Date(attrs.published_date).toLocaleDateString("fa-IR")
     : "";
   const categoryName = attrs.category?.name || attrs.category?.data?.attributes?.name || null;
   const categorySlug = attrs.category?.slug || attrs.category?.data?.attributes?.slug || null;
@@ -166,7 +166,7 @@ export default async function ArticleDetailPage({ params }) {
     headline: title,
     description: excerpt || attrs.SEO?.metaDescription || "",
     image: imageUrl || (attrs.SEO?.shareImage?.url ? `${STRAPI_URL}${attrs.SEO.shareImage.url}` : undefined),
-    datePublished: attrs.publishedAt || undefined,
+    datePublished: attrs.published_date || undefined,
     author: author ? {
       "@type": "Person",
       name: author,
@@ -233,9 +233,9 @@ export default async function ArticleDetailPage({ params }) {
                   {categoryName}
                 </Link>
               )}
-              {publishedAt && (
+              {published_date && (
                 <Typography variant="caption" sx={{ color: "#C5A35C", fontWeight: 600 }}>
-                  {publishedAt}
+                  {published_date}
                 </Typography>
               )}
               {author && (

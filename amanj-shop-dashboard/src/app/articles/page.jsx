@@ -11,7 +11,7 @@ const STRAPI_URL = (
 async function getArticles() {
   try {
     const res = await fetch(
-      `${STRAPI_URL}/api/articles?populate=*&sort=publishedAt:desc&pagination[pageSize]=50`,
+      `${STRAPI_URL}/api/articles?populate=*&sort=published_date:desc&pagination[pageSize]=50`,
       { cache: "no-store" }
     );
     const data = await res.json();
@@ -95,8 +95,8 @@ export default async function ArticlesPage() {
                 const imageUrl = attrs.image?.url
                   ? `${STRAPI_URL}${attrs.image.url}`
                   : null;
-                const publishedAt = attrs.publishedAt
-                  ? new Date(attrs.publishedAt).toLocaleDateString("fa-IR")
+                const published_date = attrs.published_date
+                  ? new Date(attrs.published_date).toLocaleDateString("fa-IR")
                   : "";
                 const categoryName = attrs.category?.name || attrs.category?.data?.attributes?.name || null;
 
@@ -129,9 +129,9 @@ export default async function ArticlesPage() {
                                 {categoryName}
                               </Typography>
                             )}
-                            {publishedAt && (
+                            {published_date && (
                               <Typography variant="caption" sx={{ color: "#C5A35C", fontWeight: 600, fontSize: "11px" }}>
-                                {publishedAt}
+                                {published_date}
                               </Typography>
                             )}
                           </Box>

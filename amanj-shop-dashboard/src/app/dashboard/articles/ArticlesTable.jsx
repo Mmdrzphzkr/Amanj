@@ -70,7 +70,7 @@ export default function ArticlesTable({ articles }) {
               const title = attrs?.title ?? "مقاله بدون عنوان";
               const categoryName = attrs?.category?.name || attrs?.category?.data?.attributes?.name || null;
               const author = attrs?.author || null;
-              const publishedAt = attrs?.publishedAt || attrs?.createdAt || null;
+              const published_date = attrs?.published_date || attrs?.createdAt || null;
 
               return (
                 <tr key={id}>
@@ -88,7 +88,7 @@ export default function ArticlesTable({ articles }) {
                     {author || "—"}
                   </td>
                   <td style={{ color: "var(--text-secondary)", fontSize: "13px" }}>
-                    {publishedAt ? new Date(publishedAt).toLocaleDateString("fa-IR") : "—"}
+                    {published_date ? new Date(published_date).toLocaleDateString("fa-IR") : "—"}
                   </td>
                   <td style={{ textAlign: "center", display: "flex", gap: "8px", justifyContent: "center" }}>
                     <Link href={`/dashboard/articles/${id}`} style={{

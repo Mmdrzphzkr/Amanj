@@ -19,7 +19,7 @@ async function getCategoryAndArticles(slug) {
     if (!category) return { category: null, articles: [] };
 
     const artRes = await fetch(
-      `${STRAPI_URL}/api/articles?filters[category][slug][$eq]=${slug}&populate=*&sort=publishedAt:desc`,
+      `${STRAPI_URL}/api/articles?filters[category][slug][$eq]=${slug}&populate=*&sort=published_date:desc`,
       { cache: "no-store" }
     );
     const artData = await artRes.json();
@@ -93,8 +93,8 @@ export default async function ArticleCategoryPage({ params }) {
                 const imageUrl = artAttrs.image?.url
                   ? `${STRAPI_URL}${artAttrs.image.url}`
                   : null;
-                const publishedAt = artAttrs.publishedAt
-                  ? new Date(artAttrs.publishedAt).toLocaleDateString("fa-IR")
+                const published_date = artAttrs.published_date
+                  ? new Date(artAttrs.published_date).toLocaleDateString("fa-IR")
                   : "";
 
                 return (
@@ -116,9 +116,9 @@ export default async function ArticleCategoryPage({ params }) {
                           />
                         )}
                         <CardContent sx={{ p: 3 }}>
-                          {publishedAt && (
+                          {published_date && (
                             <Typography variant="caption" sx={{ color: "#C5A35C", fontWeight: 600, mb: 1, display: "block" }}>
-                              {publishedAt}
+                              {published_date}
                             </Typography>
                           )}
                           <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: "#3F3F3F", lineHeight: 1.4 }}>
