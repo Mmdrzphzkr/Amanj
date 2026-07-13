@@ -76,11 +76,19 @@ export default function ArticleForm({ categories = [], initialData }) {
     try { setImagePreview(URL.createObjectURL(file)); } catch {}
   };
 
+  const authHeaders = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
+    ? { Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}` }
+    : {};
+
   const uploadImage = async () => {
     if (!imageFile) return null;
     const fd = new FormData();
     fd.append("files", imageFile);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      headers: authHeaders,
+      body: fd,
+    });
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) return data[0].id;
     return null;
@@ -118,7 +126,7 @@ export default function ArticleForm({ categories = [], initialData }) {
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({ data: payloadData }),
       });
 

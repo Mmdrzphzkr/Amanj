@@ -37,6 +37,10 @@ export default function ArticleCategoryForm({ allCategories, initialData }) {
     });
   };
 
+  const authHeaders = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
+    ? { Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_TOKEN}` }
+    : {};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -54,7 +58,7 @@ export default function ArticleCategoryForm({ allCategories, initialData }) {
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify(payload),
       });
 
