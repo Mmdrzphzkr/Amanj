@@ -1,3 +1,4 @@
+"use client";
 import { useDispatch, useSelector } from "react-redux";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";

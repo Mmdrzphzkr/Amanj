@@ -14,6 +14,18 @@ const Icons = {
       <rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" />
     </svg>
   ),
+  Articles: () => (
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path d="M4 6h16M4 10h16M4 14h12M4 18h8" />
+      <rect x="14" y="14" width="6" height="4" rx="1" />
+    </svg>
+  ),
+  ArticleCategories: () => (
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path d="M4 6h16M4 12h16M4 18h7" />
+      <circle cx="18" cy="18" r="3" />
+    </svg>
+  ),
   Products: () => (
     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path d="M20 7H4a1 1 0 00-1 1v10a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z" />
@@ -77,6 +89,8 @@ const navLinks = [
   { href: "/dashboard/guarantee", label: "گارانتی", icon: Icons.Guarantee },
   { href: "/dashboard/erp", label: "ERP", icon: Icons.Erp },
   { href: "/dashboard/products", label: "محصولات", icon: Icons.Products },
+  { href: "/dashboard/articles", label: "مقالات", icon: Icons.Articles },
+  { href: "/dashboard/article-categories", label: "دسته‌بندی مقالات", icon: Icons.ArticleCategories },
   { href: "/dashboard/orders", label: "سفارشات", icon: Icons.Orders },
   { href: "/dashboard/categories", label: "دسته‌بندی‌ها", icon: Icons.Categories },
   { href: "/dashboard/brands", label: "برندها", icon: Icons.Brands },
