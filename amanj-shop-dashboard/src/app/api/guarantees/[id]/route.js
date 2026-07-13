@@ -30,6 +30,7 @@ function extractDataFromFormData(formData) {
 
 async function parseRequest(req) {
   const contentType = req.headers.get('content-type') || '';
+  console.log('[parseRequest] content-type:', contentType);
   if (contentType.includes('application/json')) {
     return await req.json();
   }
@@ -80,7 +81,7 @@ async function handleDelete(id, authHeaders) {
 export async function POST(req, { params }) {
   const authHeaders = getAuthHeaders();
   const { id } = await params;
-  console.log('[POST] /api/guarantees/[id] - id:', id);
+  console.log('[POST] /api/guarantees/[id] - id:', id, 'method:', req.method, 'url:', req.url);
 
   const body = await parseRequest(req);
   let data, isDelete = false;
@@ -92,6 +93,8 @@ export async function POST(req, { params }) {
     data = body;
     isDelete = body._method === "DELETE";
   }
+
+  console.log('[POST] isDelete:', isDelete, 'data keys:', Object.keys(data || {}));
 
   if (isDelete) {
     return handleDelete(id, authHeaders);
