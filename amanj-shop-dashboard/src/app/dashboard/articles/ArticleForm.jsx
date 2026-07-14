@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toJalali, jalaliToGregorian, jalaliMonths, daysInJalaliMonth } from "@/components/erp/helpers";
 
 const slugify = (text) => {
   if (!text) return "";
@@ -12,20 +13,54 @@ const slugify = (text) => {
     .toLowerCase();
 };
 
+const getTimeFromISO = (iso) => {
+  if (!iso) return "";
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  } catch { return ""; }
+};
+
 export default function ArticleForm({ categories = [], initialData }) {
   const router = useRouter();
   const isEditMode = Boolean(initialData);
 
   const [formData, setFormData] = useState({
     title: "", slug: "", content: "", excerpt: "",
-    category: "", author: "", published_date: "",
+    category: "", author: "", time: "",
     SEO: { metaTitle: "", metaDescription: "" },
   });
+  const [jYear, setJYear] = useState(1400);
+  const [jMonth, setJMonth] = useState(1);
+  const [jDay, setJDay] = useState(1);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    const setFromISO = (iso) => {
+      if (!iso) {
+        const today = new Date();
+        const j = toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        setJYear(j.year);
+        setJMonth(j.month);
+        setJDay(j.day);
+        setFormData((p) => ({ ...p, time: "" }));
+        return;
+      }
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return;
+      const j = toJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+      setJYear(j.year);
+      setJMonth(j.month);
+      setJDay(Math.min(j.day, daysInJalaliMonth(j.year, j.month)));
+      setFormData((p) => ({
+        ...p,
+        time: `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`,
+      }));
+    };
+
     if (isEditMode && initialData) {
       const attrs = initialData.attributes ?? initialData;
       setFormData({
@@ -35,12 +70,13 @@ export default function ArticleForm({ categories = [], initialData }) {
         excerpt: attrs.excerpt ?? "",
         category: attrs.category?.data?.id ?? attrs.category?.id ?? "",
         author: attrs.author ?? "",
-        published_date: attrs.published_date ? attrs.published_date.slice(0, 16) : "",
+        time: getTimeFromISO(attrs.published_date),
         SEO: {
           metaTitle: attrs.SEO?.metaTitle ?? attrs.metaTitle ?? "",
           metaDescription: attrs.SEO?.metaDescription ?? attrs.metaDescription ?? "",
         },
       });
+      setFromISO(attrs.published_date);
 
       const img = attrs.image?.data ?? attrs.image ?? null;
       if (img) {
@@ -50,6 +86,13 @@ export default function ArticleForm({ categories = [], initialData }) {
           setImagePreview(url.startsWith("/") ? `${base}${url}` : url);
         }
       }
+    } else {
+      const today = new Date();
+      const j = toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+      setJYear(j.year);
+      setJMonth(j.month);
+      setJDay(j.day);
+      setFormData((p) => ({ ...p, time: `${String(today.getHours()).padStart(2, "0")}:${String(today.getMinutes()).padStart(2, "0")}` }));
     }
   }, [initialData, isEditMode]);
 
@@ -68,6 +111,22 @@ export default function ArticleForm({ categories = [], initialData }) {
       ...prev,
       SEO: { ...prev.SEO, [name]: value },
     }));
+  };
+
+  const handleJalaliYear = (e) => {
+    const y = parseInt(e.target.value);
+    setJYear(y);
+    setJDay((prev) => Math.min(prev, daysInJalaliMonth(y, jMonth)));
+  };
+
+  const handleJalaliMonth = (e) => {
+    const m = parseInt(e.target.value);
+    setJMonth(m);
+    setJDay((prev) => Math.min(prev, daysInJalaliMonth(jYear, m)));
+  };
+
+  const handleJalaliDay = (e) => {
+    setJDay(parseInt(e.target.value));
   };
 
   const handleImageFile = (file) => {
@@ -100,12 +159,10 @@ export default function ArticleForm({ categories = [], initialData }) {
     try {
       const uploadedImageId = await uploadImage();
 
-      const formatDate = (dateStr) => {
-        if (!dateStr) return null;
-        const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return dateStr;
-        return d.toISOString();
-      };
+      const greg = jalaliToGregorian(jYear, jMonth, jDay);
+      const isoDate = formData.time
+        ? `${greg.year}-${String(greg.month).padStart(2, "0")}-${String(greg.day).padStart(2, "0")}T${formData.time}:00.000Z`
+        : `${greg.year}-${String(greg.month).padStart(2, "0")}-${String(greg.day).padStart(2, "0")}T00:00:00.000Z`;
 
       const payloadData = {
         title: formData.title,
@@ -114,7 +171,7 @@ export default function ArticleForm({ categories = [], initialData }) {
         excerpt: formData.excerpt,
         category: formData.category || null,
         author: formData.author,
-        published_date: formatDate(formData.published_date),
+        published_date: isoDate,
         SEO: formData.SEO.metaTitle || formData.SEO.metaDescription
           ? { metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }
           : null,
@@ -206,8 +263,32 @@ export default function ArticleForm({ categories = [], initialData }) {
                   <input name="author" value={formData.author} onChange={handleChange} onFocus={onFocus} onBlur={onBlur} style={inputStyle} placeholder="نام نویسنده" />
                 </div>
                 <div>
-                  <label className="label">تاریخ انتشار</label>
-                  <input name="published_date" type="datetime-local" value={formData.published_date} onChange={handleChange} onFocus={onFocus} onBlur={onBlur} style={{ ...inputStyle, direction: "ltr" }} />
+                  <label className="label">تاریخ انتشار (شمسی)</label>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <select value={jYear} onChange={handleJalaliYear} style={{ ...inputStyle, flex: 1, cursor: "pointer", direction: "ltr" }}>
+                      {(() => {
+                        const today = new Date();
+                        const tj = toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+                        const opts = [];
+                        for (let y = tj.year - 5; y <= tj.year + 5; y++) opts.push(y);
+                        return opts.map((y) => <option key={y} value={y}>{y}</option>);
+                      })()}
+                    </select>
+                    <select value={jMonth} onChange={handleJalaliMonth} style={{ ...inputStyle, flex: 1.5, cursor: "pointer" }}>
+                      {jalaliMonths.map((name, idx) => (
+                        <option key={idx + 1} value={idx + 1}>{name}</option>
+                      ))}
+                    </select>
+                    <select value={jDay} onChange={handleJalaliDay} style={{ ...inputStyle, flex: 1, cursor: "pointer", direction: "ltr" }}>
+                      {Array.from({ length: daysInJalaliMonth(jYear, jMonth) }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="label">ساعت انتشار</label>
+                  <input name="time" type="time" value={formData.time} onChange={handleChange} onFocus={onFocus} onBlur={onBlur} style={{ ...inputStyle, direction: "ltr" }} />
                 </div>
                 <div style={{ gridColumn: "1/-1" }}>
                   <label className="label">خلاصه مقاله</label>
