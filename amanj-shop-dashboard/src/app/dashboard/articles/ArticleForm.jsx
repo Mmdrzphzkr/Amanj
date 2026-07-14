@@ -77,7 +77,7 @@ export default function ArticleForm({ categories = [], initialData }) {
         slug: attrs.slug ?? "",
         content: extractText(attrs.content),
         excerpt: attrs.excerpt ?? "",
-        category: attrs.category?.data?.id ?? attrs.category?.id ?? "",
+        category: attrs.category?.data?.documentId ?? attrs.category?.documentId ?? "",
         author: attrs.author ?? "",
         time: getTimeFromISO(attrs.published_date),
         SEO: {
@@ -178,11 +178,11 @@ export default function ArticleForm({ categories = [], initialData }) {
         slug: formData.slug,
         content: [{ type: "paragraph", children: [{ type: "text", text: formData.content }] }],
         excerpt: formData.excerpt,
-        category: formData.category ? { connect: [{ id: parseInt(formData.category) }] } : null,
+        category: formData.category || null,
         author: formData.author,
         published_date: isoDate,
         SEO: formData.SEO.metaTitle || formData.SEO.metaDescription
-          ? [{ id: null, metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }]
+          ? [{ metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }]
           : null,
       };
       if (uploadedImageId) payloadData.image = uploadedImageId;
@@ -261,9 +261,9 @@ export default function ArticleForm({ categories = [], initialData }) {
                     <option value="">انتخاب دسته‌بندی</option>
                     {(Array.isArray(categories) ? categories : categories?.data ?? []).map((c) => {
                       const item = c.attributes ?? c;
-                      const id = item?.documentId ?? "";
+                      const id = item?.documentId ?? c.documentId ?? c.id ?? item?.id ?? "";
                       const label = item?.name ?? item?.title ?? String(id);
-                      return <option key={id} value={String(id)}>{label}</option>;
+                      return <option key={id} value={id}>{label}</option>;
                     })}
                   </select>
                 </div>
