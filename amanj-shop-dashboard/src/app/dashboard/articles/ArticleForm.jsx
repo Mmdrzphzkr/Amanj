@@ -63,10 +63,19 @@ export default function ArticleForm({ categories = [], initialData }) {
 
     if (isEditMode && initialData) {
       const attrs = initialData.attributes ?? initialData;
+      const extractText = (blocks) => {
+        if (!blocks) return "";
+        if (typeof blocks === "string") return blocks;
+        if (Array.isArray(blocks)) {
+          return blocks.map((b) => b.children?.map((c) => c.text).join("") || "").join("\n");
+        }
+        return String(blocks);
+      };
+
       setFormData({
         title: attrs.title ?? "",
         slug: attrs.slug ?? "",
-        content: JSON.stringify(attrs.content ?? []) ?? "",
+        content: extractText(attrs.content),
         excerpt: attrs.excerpt ?? "",
         category: attrs.category?.data?.id ?? attrs.category?.id ?? "",
         author: attrs.author ?? "",
@@ -167,13 +176,13 @@ export default function ArticleForm({ categories = [], initialData }) {
       const payloadData = {
         title: formData.title,
         slug: formData.slug,
-        content: formData.content,
+        content: [{ type: "paragraph", children: [{ type: "text", text: formData.content }] }],
         excerpt: formData.excerpt,
-        category: formData.category || null,
+        category: formData.category ? { connect: [{ id: parseInt(formData.category) }] } : null,
         author: formData.author,
         published_date: isoDate,
         SEO: formData.SEO.metaTitle || formData.SEO.metaDescription
-          ? { id: null, metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }
+          ? [{ id: null, metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }]
           : null,
       };
       if (uploadedImageId) payloadData.image = uploadedImageId;
