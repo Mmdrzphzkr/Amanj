@@ -11,13 +11,12 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "titile": {
+    "title": {
       "type": "string",
       "required": true
     },
     "slug": {
       "type": "uid",
-      "targetField": "titile",
       "required": true,
       "regex": "^[a-zA-Z0-9-_.~\\u0600-\\u06FF]*$"
     },
