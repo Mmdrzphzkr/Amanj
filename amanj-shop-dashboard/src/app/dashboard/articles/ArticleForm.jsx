@@ -100,6 +100,13 @@ export default function ArticleForm({ categories = [], initialData }) {
     try {
       const uploadedImageId = await uploadImage();
 
+      const formatDate = (dateStr) => {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toISOString();
+      };
+
       const payloadData = {
         title: formData.title,
         slug: formData.slug,
@@ -107,11 +114,10 @@ export default function ArticleForm({ categories = [], initialData }) {
         excerpt: formData.excerpt,
         category: formData.category || null,
         author: formData.author,
-        published_date: formData.published_date || null,
-        SEO: {
-          metaTitle: formData.SEO.metaTitle,
-          metaDescription: formData.SEO.metaDescription,
-        },
+        published_date: formatDate(formData.published_date),
+        SEO: formData.SEO.metaTitle || formData.SEO.metaDescription
+          ? { metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }
+          : null,
       };
       if (uploadedImageId) payloadData.image = uploadedImageId;
 
@@ -130,11 +136,18 @@ export default function ArticleForm({ categories = [], initialData }) {
         body: JSON.stringify({ data: payloadData }),
       });
 
-      if (!res.ok) throw new Error("Failed to save article");
+      if (!res.ok) {
+        let errorMsg = "خطا در ذخیره مقاله";
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData?.error?.message || JSON.stringify(errorData?.error?.details || errorData);
+        } catch {}
+        throw new Error(errorMsg);
+      }
       router.push("/dashboard/articles");
     } catch (err) {
       console.error(err);
-      alert("خطا در ذخیره مقاله");
+      alert(err.message || "خطا در ذخیره مقاله");
     } finally {
       setSaving(false);
     }
