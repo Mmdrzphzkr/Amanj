@@ -173,7 +173,7 @@ export default function ArticleForm({ categories = [], initialData }) {
         author: formData.author,
         published_date: isoDate,
         SEO: formData.SEO.metaTitle || formData.SEO.metaDescription
-          ? { metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }
+          ? { id: null, metaTitle: formData.SEO.metaTitle, metaDescription: formData.SEO.metaDescription }
           : null,
       };
       if (uploadedImageId) payloadData.image = uploadedImageId;
