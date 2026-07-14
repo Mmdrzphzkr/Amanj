@@ -252,7 +252,7 @@ export default function ArticleForm({ categories = [], initialData }) {
                     <option value="">انتخاب دسته‌بندی</option>
                     {(Array.isArray(categories) ? categories : categories?.data ?? []).map((c) => {
                       const item = c.attributes ?? c;
-                      const id = c.id ?? item?.id ?? item?.documentId ?? "";
+                      const id = item?.documentId ?? "";
                       const label = item?.name ?? item?.title ?? String(id);
                       return <option key={id} value={String(id)}>{label}</option>;
                     })}
