@@ -57,19 +57,31 @@ export default function PayrollPage() {
   const getEmployeeCommissions = (empId) => commissions.filter((c) => String(c.employeeId) === String(empId));
   const getCommissionTotal = (empId, type) => getEmployeeCommissions(empId).filter((c) => !type || c.type === type).reduce((s, c) => s + Number(c.amount || 0), 0);
 
-  // Calculate repair commissions for an employee based on repairs where they were the technician
+  // محاسبه کمیسیون تعمیرات (خودکار)
   const getRepairCommissions = (emp) => {
-    if (!emp.commissionRate || emp.commissionRate === 0) return 0;
+    if (!emp) return 0;
     const empName = emp.name;
-    return repairs
-      .filter((repair) => repair.technician === empName && (repair.statuses === 'completed' || repair.statuses === 'delivered'))
-      .reduce((sum, repair) => {
-        // Calculate commission from labor cost of repair items
-        const totalLabor = repair.items.reduce((s, item) => s + Number(item.laborCost || 0) * Number(item.quantity || 1), 0);
-        return sum + (totalLabor * emp.commissionRate) / 100;
-      }, 0);
+    // تعمیرات کامل یا تحویل‌شده که تکنسین آن کارمند است
+    const relevantRepairs = repairs.filter(
+      (repair) => repair.technician === empName && (repair.statuses === 'completed' || repair.statuses === 'delivered')
+    );
+
+    // اگر مقدار ثابت برای تعمیرات تعیین شده باشد، از آن استفاده می‌کنیم
+    const fixedAmount = Number(emp.repairFixedAmount || 0);
+    if (fixedAmount > 0) {
+      return relevantRepairs.length * fixedAmount;
+    }
+
+    // در غیر این صورت محاسبه درصدی از هزینه نیروی کار
+    const rate = Number(emp.commissionRate || 0);
+    if (rate === 0) return 0;
+    return relevantRepairs.reduce((sum, repair) => {
+      const totalLabor = repair.items.reduce((s, item) => s + Number(item.laborCost || 0) * Number(item.quantity || 1), 0);
+      return sum + (totalLabor * rate) / 100;
+    }, 0);
   };
 
+  // محاسبه حقوق نهایی با احتساب نوع جدید
   const calcFinalSalary = (emp) => {
     const base = emp.salaryType === 'commission_only' ? 0 : Number(emp.baseSalary || 0);
     const manualCommTotal = getEmployeeCommissions(emp.id).reduce((s, c) => s + Number(c.amount || 0), 0);
@@ -176,6 +188,19 @@ export default function PayrollPage() {
                 const repairCommAuto = getRepairCommissions(emp);
                 const totalComm = manualCommTotal + repairCommAuto;
                 const finalSalary = calcFinalSalary(emp);
+
+                // تولید توضیح برای کمیسیون تعمیرات خودکار
+                let repairAutoDetails = '';
+                const fixedAmt = Number(emp.repairFixedAmount || 0);
+                const relevantRepairs = repairs.filter(
+                  (r) => r.technician === emp.name && (r.statuses === 'completed' || r.statuses === 'delivered')
+                );
+                if (fixedAmt > 0) {
+                  repairAutoDetails = ` (تعداد ${relevantRepairs.length} × ${formatCurrency(fixedAmt)})`;
+                } else if (Number(emp.commissionRate || 0) > 0) {
+                  repairAutoDetails = ` (درصد ${emp.commissionRate}%)`;
+                }
+
                 return (
                   <tr key={emp.id} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{idx + 1}</td>
@@ -188,9 +213,11 @@ export default function PayrollPage() {
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>{emp.salaryType === 'commission_only' ? <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>—</span> : formatCurrency(emp.baseSalary || 0)}</td>
                     <td style={{ padding: '8px 12px', textAlign: 'center', color: 'var(--info)' }}>
                       <div>{formatCurrency(totalComm)}</div>
-                      {totalComm > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-                        فاکتور: {formatCurrency(invComm)} | تعمیر (دستی): {formatCurrency(repCommManual)} | تعمیر (خودکار): {formatCurrency(repairCommAuto)}
-                      </div>}
+                      {totalComm > 0 && (
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                          فاکتور: {formatCurrency(invComm)} | تعمیر (دستی): {formatCurrency(repCommManual)} | تعمیر (خودکار): {formatCurrency(repairCommAuto)}{repairAutoDetails}
+                        </div>
+                      )}
                     </td>
                     <td style={{ padding: '8px 12px', textAlign: 'center' }}>
                       <input type="number" className="input-field" style={{ width: 80, padding: '4px 8px', fontSize: 12, textAlign: 'center' }}
@@ -236,7 +263,17 @@ export default function PayrollPage() {
                   const repCAuto = emp ? getRepairCommissions(emp) : 0;
                   const totalComm = invC + repCManual + repCAuto;
                   if (!invC && !repCManual && !repCAuto) return null;
-                  return `فاکتور: ${formatCurrency(invC)} | تعمیر (دستی): ${formatCurrency(repCManual)} | تعمیر (خودکار): ${formatCurrency(repCAuto)} | جمع: ${formatCurrency(totalComm)}`;
+                  let autoDetail = '';
+                  if (emp) {
+                    const fixedAmt = Number(emp.repairFixedAmount || 0);
+                    if (fixedAmt > 0) {
+                      const count = repairs.filter(r => r.technician === emp.name && (r.statuses === 'completed' || r.statuses === 'delivered')).length;
+                      autoDetail = ` (${count} × ${formatCurrency(fixedAmt)})`;
+                    } else if (Number(emp.commissionRate || 0) > 0) {
+                      autoDetail = ` (${emp.commissionRate}%)`;
+                    }
+                  }
+                  return `فاکتور: ${formatCurrency(invC)} | تعمیر (دستی): ${formatCurrency(repCManual)} | تعمیر (خودکار): ${formatCurrency(repCAuto)}${autoDetail} | جمع: ${formatCurrency(totalComm)}`;
                 })()}
               </div>
               <div><strong style={{ color: 'var(--text-secondary)' }}>پاداش:</strong> {formatCurrency(showDetail.bonus || 0)}</div>

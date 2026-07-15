@@ -11,7 +11,8 @@ import ConfirmDialog from '@/components/erp/ConfirmDialog';
 import { formatCurrency, salaryTypes } from '@/components/erp/helpers';
 import toast from 'react-hot-toast';
 
-const emptyForm = { name: '', phone: '', position: '', salaryType: 'monthly', baseSalary: 0, commissionRate: 0, active: true };
+// ✅ افزودن فیلد repairFixedAmount با مقدار پیش‌فرض ۰
+const emptyForm = { name: '', phone: '', position: '', salaryType: 'monthly', baseSalary: 0, commissionRate: 0, repairFixedAmount: 0, active: true };
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
@@ -91,6 +92,9 @@ export default function EmployeesPage() {
                 <span>📞 {emp.phone || '—'}</span>
                 <span>💼 {salaryTypes.find((s) => s.value === emp.salaryType)?.label || emp.salaryType}</span>
                 {Number(emp.baseSalary) > 0 && <span>💰 {formatCurrency(emp.baseSalary)}</span>}
+                {Number(emp.commissionRate) > 0 && <span>📊 {emp.commissionRate}% کمیسیون</span>}
+                {/* ✅ نمایش مبلغ ثابت تعمیرات در صورت تنظیم */}
+                {Number(emp.repairFixedAmount) > 0 && <span>🔧 {formatCurrency(emp.repairFixedAmount)} ثابت/تعمیر</span>}
               </div>
               {empCommissions.length > 0 && (
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', borderTop: '1px solid var(--border)', paddingTop: 8 }}>
@@ -116,6 +120,8 @@ export default function EmployeesPage() {
           <Select label="نوع حقوق" options={salaryTypes} value={form.salaryType} onChange={(e) => setForm({ ...form, salaryType: e.target.value })} />
           <Input label="حقوق پایه" type="number" value={form.baseSalary} onChange={(e) => setForm({ ...form, baseSalary: Number(e.target.value) })} />
           <Input label="نرخ کمیسیون تعمیرات (%)" type="number" step="0.1" value={form.commissionRate} onChange={(e) => setForm({ ...form, commissionRate: Number(e.target.value) })} placeholder="مثال: 15 برای ۱۵٪" />
+          {/* ✅ افزودن فیلد مبلغ ثابت به ازای هر تعمیر */}
+          <Input label="مبلغ ثابت به ازای هر تعمیر (تومان)" type="number" step="1000" value={form.repairFixedAmount} onChange={(e) => setForm({ ...form, repairFixedAmount: Number(e.target.value) })} placeholder="در صورت تنظیم، این مبلغ به‌جای درصد محاسبه می‌شود" />
           <div className="form-group">
             <label className="label">فعال</label>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', paddingTop: 8 }}>
