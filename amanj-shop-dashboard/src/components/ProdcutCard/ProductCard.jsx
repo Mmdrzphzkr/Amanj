@@ -4,7 +4,7 @@ const ProductCard = ({ product, strapiUrl }) => {
   const src = `${strapiUrl}${
     product.thumbnail.url?.startsWith("/") ? "" : "/"
   }${product.thumbnail.url || ""}`;
-console.log("src:", src)
+
   return (
     <Card
       sx={{
