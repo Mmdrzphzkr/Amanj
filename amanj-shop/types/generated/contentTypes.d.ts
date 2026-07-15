@@ -732,6 +732,7 @@ export interface ApiEmployeeEmployee extends Struct.CollectionTypeSchema {
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     position: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    repairFixedAmount: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
     salaryType: Schema.Attribute.Enumeration<
       ['daily', 'monthly', 'contract', 'commission_only']
     > &

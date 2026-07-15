@@ -61,6 +61,10 @@
       "type": "decimal",
       "required": false,
       "default": 0
+    },
+    "repairFixedAmount": {
+      "type": "decimal",
+      "default": 0
     }
   }
 }
