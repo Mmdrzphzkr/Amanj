@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
+import { isSafeRedirect } from "@/lib/security";
 import Footer from "@/components/Footer/Footer";
 import Header from "@/components/Header/Header";
 import MobileNav from "@/components/MobileNav/MobileNav";
@@ -21,6 +22,7 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const auth = useAuth();
   const router = useRouter();
@@ -29,6 +31,13 @@ export default function LoginPage() {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    // Validate redirect URL
+    if (!isSafeRedirect(callbackUrl)) {
+      setError("Invalid redirect URL");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -46,10 +55,11 @@ export default function LoginPage() {
       if (strapiData.jwt) {
         await auth.login(strapiData.jwt, strapiData.user, callbackUrl);
       } else {
-        alert(`Error: ${strapiData.error.message}`);
+        setError(strapiData.error?.message || "Login failed");
       }
     } catch (error) {
       console.error("An unexpected error occurred during login.", error);
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -14,7 +14,17 @@ export async function POST() {
     maxAge: 0,
   });
 
+  // Also clear CSRF token cookie
+  const csrfCookie = serialize("csrf_token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
+
   const res = NextResponse.json({ ok: true });
-  res.headers.set("Set-Cookie", cookie);
+  res.headers.append("Set-Cookie", cookie);
+  res.headers.append("Set-Cookie", csrfCookie);
   return res;
 }

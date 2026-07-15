@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
+import { isSafeRedirect } from "@/lib/security";
 import {
   Button,
   TextField,
@@ -32,8 +33,21 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate redirect URL
+    if (!isSafeRedirect(callbackUrl)) {
+      toast.error("Invalid redirect URL");
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast.error("رمز عبور مطابقت ندارد");
+      return;
+    }
+
+    // Validate password strength
+    if (password.length < 8) {
+      toast.error("رمز عبور باید حداقل 8 کاراکتر باشد");
       return;
     }
 

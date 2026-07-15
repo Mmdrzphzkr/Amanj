@@ -1,17 +1,54 @@
 // app/api/send-sms/route.ts
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
+import { rateLimit, getClientIp, getRateLimitHeaders } from '@/lib/rateLimit';
+import { validateSmsInput } from '@/lib/validation';
 
-export async function POST(request) {  // ✅ تصحیح نام پارامتر
+export async function POST(request) {
+  // Rate limiting: 10 attempts per minute
+  const clientIp = getClientIp(request);
+  const rateLimitKey = `sms:${clientIp}`;
+  const { allowed, remaining, resetTime } = rateLimit(rateLimitKey, 10, 60000);
+
+  if (!allowed) {
+    return NextResponse.json(
+      { success: false, message: 'Too many SMS requests. Please try again later.' },
+      {
+        status: 429,
+        headers: getRateLimitHeaders(remaining, resetTime),
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     const { name, lastname, phone, services, description } = body;
 
-    // شماره‌هایی که باید اس‌ام‌اس بهشون ارسال بشه
-    const adminPhones = [
-      '09005739084',
-      '09928203497',
-    ];
+    // Validate input
+    const validation = validateSmsInput(name, lastname, phone);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { success: false, message: validation.errors.join(', ') },
+        {
+          status: 400,
+          headers: getRateLimitHeaders(remaining, resetTime),
+        }
+      );
+    }
+
+    // شماره‌هایی که باید اس‌ام‌اس بهشون ارسال بشه - from environment variables
+    const adminPhonesEnv = process.env.ADMIN_PHONES;
+    if (!adminPhonesEnv) {
+      console.error('ADMIN_PHONES environment variable is not set');
+      return NextResponse.json(
+        { success: false, message: 'SMS service configuration error' },
+        {
+          status: 500,
+          headers: getRateLimitHeaders(remaining, resetTime),
+        }
+      );
+    }
+    const adminPhones = adminPhonesEnv.split(',').map(phone => phone.trim());
 
     // اطلاعات پنل فرازاس‌ام‌اس از env
     const from = process.env.FARAZSMS_FROM;
