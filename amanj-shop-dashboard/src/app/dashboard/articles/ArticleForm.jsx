@@ -92,10 +92,7 @@ export default function ArticleForm({ categories = [], initialData }) {
         return String(blocks);
       };
 
-      // ✅ SEO is a repeatable component → it's an array, read index [0]
-      const seoData = Array.isArray(attrs.SEO)
-        ? attrs.SEO[0] // repeatable component → take first item
-        : (attrs.SEO ?? {}); // fallback if somehow it's an object
+      const seoItem = Array.isArray(attrs.SEO) ? attrs.SEO[0] : attrs.SEO;
 
       setFormData({
         title: attrs.title ?? "",
